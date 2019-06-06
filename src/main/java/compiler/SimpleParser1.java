@@ -10,7 +10,7 @@ import org.antlr.runtime.Token;
  * Hello Parser
  *
  */
-public class HelloParser {
+public class SimpleParser1 {
     private List<Token> tokens = null;
 
     public static void main(String[] args) {
@@ -20,6 +20,18 @@ public class HelloParser {
     //根节点
     private void parseProg(){
 
+    }
+
+    private void matchAdditive(){
+
+    }
+
+    private void matchMultiplicative(){
+
+    }
+
+    private void matchPrimary(){
+        
     }
 
         
