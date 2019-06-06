@@ -1,3 +1,5 @@
+package compiler;
+
 // Generated from MyParser.g4 by ANTLR 4.7.2
 import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.CharStream;
