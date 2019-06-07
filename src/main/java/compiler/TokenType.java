@@ -2,8 +2,9 @@ package compiler;
 
 public enum TokenType{
     Plus,
-    Star,
     Minus,
+    Star,
+    Slash,
 
     GE,
     GT,

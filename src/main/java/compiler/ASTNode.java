@@ -3,8 +3,8 @@ package compiler;
 import java.util.List;
 
 public interface ASTNode{
-    public ASTNode getParent();
+    public ASTNode getParent();   // do we really need this?
     public List<ASTNode> getChildren();
-    public String getNodeTpye();
+    public ASTNodeType getType();
     public String getText();
 }

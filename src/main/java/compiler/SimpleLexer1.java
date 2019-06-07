@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+
 public class SimpleLexer1 {
 
     public static void main(String args[]) {
@@ -66,7 +67,7 @@ public class SimpleLexer1 {
         return newState;
     }
 
-    public List<Token> tokenize(String code) {
+    public SimpleTokenReader tokenize(String code) {
         tokens = new ArrayList<Token>();
         CharArrayReader reader = new CharArrayReader(code.toCharArray());
         tokenText = new StringBuffer();
@@ -110,7 +111,10 @@ public class SimpleLexer1 {
                         state = initToken(ch);
                     }
                     break;
+                default:
+                    
                 }
+            
 
             }
             // 把最后一个token送进去
@@ -118,11 +122,10 @@ public class SimpleLexer1 {
                 initToken(ch);
             }
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
 
-        return tokens;
+        return new SimpleTokenReader(tokens);
     }
 
     private final class SimpleToken implements Token{
@@ -182,5 +185,44 @@ public class SimpleLexer1 {
 
         IntConstant
     }
+
+    private class SimpleTokenReader implements TokenReader{
+        List<Token> tokens = null;
+        int pos = 0;
+
+        public SimpleTokenReader(List<Token> tokens){
+            this.tokens = tokens;
+        }
+
+        @Override
+        public Token read() {
+            if (pos < tokens.size()){
+                return tokens.get(pos++);
+            }
+            return null;
+        }
+
+        @Override
+        /**
+         * 返回Token流中下一个Token，但不从流中取出。
+         * 如果流已经为空，返回null;
+         */
+        public Token peek() {
+            if (pos < tokens.size()){
+                return tokens.get(pos);
+            }
+            return null;
+        }
+
+        // @Override
+        // public void unread() {
+        //     if (pos > 0){
+        //         pos --;
+        //     }
+        // }
+
+    }
+
+    
 
 }
