@@ -1,4 +1,4 @@
-package compiler;
+package pwc;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -39,7 +39,26 @@ public class SimpleParser1 {
         node.nodeType = ASTNodeType.Programm;
 
         SimpleASTNode child = additive();
+        if (child == null){
+           child = intDeclare();     
+        }
+
         node.addChild(child);
+        return node;
+    }
+
+    private SimpleASTNode intDeclare() throws Exception {
+        SimpleASTNode node = null;
+        if (tokens.peek().getType() == TokenType.Int){
+            Token token = tokens.read();
+            if (tokens.peek().getType() == TokenType.Identifier){
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.IntDeclaration,token.getText());
+            }
+            else{
+                throw new Exception("variable name expected");
+            }
+        }
         return node;
     }
 

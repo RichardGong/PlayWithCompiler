@@ -1,4 +1,4 @@
-package compiler;
+package pwc;
 
 import java.util.ArrayList;
 import java.util.Collections;

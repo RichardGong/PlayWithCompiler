@@ -1,4 +1,4 @@
-package compiler;
+package pwc;
 
 public enum TokenType{
     Plus,
@@ -11,8 +11,6 @@ public enum TokenType{
     EQ,
     LE,
     LT,
-
-    AssignmentOperator,
 
     SemiColon,
 
@@ -27,6 +25,4 @@ public enum TokenType{
 
     IntConstant,
     StringConstant
-
-
 }

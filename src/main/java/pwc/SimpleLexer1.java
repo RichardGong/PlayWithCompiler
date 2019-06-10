@@ -1,4 +1,4 @@
-package compiler;
+package pwc;
 
 import java.io.CharArrayReader;
 import java.io.IOException;

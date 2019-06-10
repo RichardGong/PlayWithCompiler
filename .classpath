@@ -31,6 +31,7 @@
 			<attribute name="m2e-apt" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="/usr/local/Cellar/antlr/4.7.2/antlr-4.7.2-complete.jar"/>
 	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
 		<attributes>
 			<attribute name="optional" value="true"/>
@@ -41,5 +42,4 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
-	<classpathentry kind="lib" path="/usr/local/Cellar/antlr/4.7.2/antlr-4.7.2-complete.jar" />
 </classpath>

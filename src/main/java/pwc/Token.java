@@ -1,4 +1,4 @@
-package compiler;
+package pwc;
 
 public interface Token{
     public TokenType getType();
