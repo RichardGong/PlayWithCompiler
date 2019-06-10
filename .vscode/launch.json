@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - SimpleParser2",
+            "request": "launch",
+            "mainClass": "compiler.SimpleParser2",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - SimpleParser1",
             "request": "launch",
             "mainClass": "compiler.SimpleParser1",

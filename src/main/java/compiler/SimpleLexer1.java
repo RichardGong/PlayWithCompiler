@@ -5,13 +5,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-
-
 public class SimpleLexer1 {
 
     public static void main(String args[]) {
         SimpleLexer1 lexer = new SimpleLexer1();
-        lexer.tokenize("3+4*5");
+        lexer.tokenize("inta age = 45");
     }
 
     private StringBuffer tokenText = null;
@@ -26,11 +24,15 @@ public class SimpleLexer1 {
         return ch >= '0' && ch <= '9';
     }
 
+    private boolean isBlank(int ch) {
+        return ch == ' ' || ch == '\t' || ch == '\n';
+    }
+
     private DfaState initToken(char ch) {
-        if (tokenText.length() > 0) {          
-            token.text=tokenText.toString();
+        if (tokenText.length() > 0) {
+            token.text = tokenText.toString();
             tokens.add(token);
-            System.out.println(token.getText());
+            System.out.println(token.getType() + "\t" + token.getText());
 
             tokenText = new StringBuffer();
             token = new SimpleToken();
@@ -38,7 +40,11 @@ public class SimpleLexer1 {
 
         DfaState newState = DfaState.Initial;
         if (isAlpha(ch)) {
-            newState = DfaState.Id;
+            if (ch == 'i') {
+                newState = DfaState.Id_int1;
+            } else {
+                newState = DfaState.Id;
+            }
             token.type = TokenType.Identifier;
             tokenText.append(ch);
         } else if (isDigit(ch)) {
@@ -60,6 +66,18 @@ public class SimpleLexer1 {
         } else if (ch == '*') {
             newState = DfaState.Star;
             token.type = TokenType.Star;
+            tokenText.append(ch);
+        } else if (ch == '/') {
+            newState = DfaState.Slash;
+            token.type = TokenType.Slash;
+            tokenText.append(ch);
+        } else if (ch == ';') {
+            newState = DfaState.SemiColon;
+            token.type = TokenType.SemiColon;
+            tokenText.append(ch);
+        } else if (ch == '=') {
+            newState = DfaState.Assignment;
+            token.type = TokenType.Assignment;
             tokenText.append(ch);
         } else {
             newState = DfaState.Initial; // skip all unknown patterns
@@ -99,10 +117,13 @@ public class SimpleLexer1 {
                     }
                     break;
                 case GE:
+                case Assignment:
                 case Plus:
                 case Minus:
                 case Star:
-                    state = initToken(ch);                 
+                case Slash:
+                case SemiColon:
+                    state = initToken(ch);
                     break;
                 case IntConstant:
                     if (isDigit(ch)) {
@@ -111,10 +132,27 @@ public class SimpleLexer1 {
                         state = initToken(ch);
                     }
                     break;
+                case Id_int1:
+                    if (ch == 'n') {
+                        state = DfaState.Id_int2;
+                        tokenText.append(ch);
+                    }
+                    break;
+                case Id_int2:
+                    if (ch == 't') {
+                        state = DfaState.Id_int3;
+                        tokenText.append(ch);
+                    }
+                    break;
+                case Id_int3:
+                    if (isBlank(ch)) {
+                        token.type = TokenType.Int;
+                        state = initToken(ch);
+                    }
+                    break;
                 default:
-                    
+
                 }
-            
 
             }
             // 把最后一个token送进去
@@ -128,15 +166,15 @@ public class SimpleLexer1 {
         return new SimpleTokenReader(tokens);
     }
 
-    private final class SimpleToken implements Token{
-        private TokenType type=null;
+    private final class SimpleToken implements Token {
+        private TokenType type = null;
         private String text = null;
 
         // public SimpleToken(){ }
 
         // public SimpleToken(TokenType type,String text){
-        //     this.type = type;
-        //     this.text = text;
+        // this.type = type;
+        // this.text = text;
         // }
 
         @Override
@@ -150,53 +188,40 @@ public class SimpleLexer1 {
         }
 
         // public void setType(TokenType type){
-        //     this.type = type;
+        // this.type = type;
         // }
 
         // public void setText(String text){
-        //     this.text = text;
+        // this.text = text;
         // }
-
 
     }
 
-    private enum DfaState{
+    private enum DfaState {
         Initial,
 
-        If,
-        Id_if1,
-        Id_if2,
-        Else,
-        Id_else1,
-        Id_else2,
-        Id_else3,
-        Id_else4,
-        Int,
-        Id_int1,
-        Id_int2,
-        Id_int3,
-        Id,
-        GT,
-        GE,
+        If, Id_if1, Id_if2, Else, Id_else1, Id_else2, Id_else3, Id_else4, Int, Id_int1, Id_int2, Id_int3, Id, GT, GE,
 
-        Plus,
-        Minus,
-        Star,
+        Assignment,
+
+        Plus, Minus, Star, Slash,
+
+        SemiColon,
 
         IntConstant
     }
 
-    private class SimpleTokenReader implements TokenReader{
+    private class SimpleTokenReader implements TokenReader {
         List<Token> tokens = null;
         int pos = 0;
 
-        public SimpleTokenReader(List<Token> tokens){
+        public SimpleTokenReader(List<Token> tokens) {
             this.tokens = tokens;
         }
 
         @Override
         public Token read() {
-            if (pos < tokens.size()){
+            if (pos < tokens.size()) {
                 return tokens.get(pos++);
             }
             return null;
@@ -204,11 +229,10 @@ public class SimpleLexer1 {
 
         @Override
         /**
-         * 返回Token流中下一个Token，但不从流中取出。
-         * 如果流已经为空，返回null;
+         * 返回Token流中下一个Token，但不从流中取出。 如果流已经为空，返回null;
          */
         public Token peek() {
-            if (pos < tokens.size()){
+            if (pos < tokens.size()) {
                 return tokens.get(pos);
             }
             return null;
@@ -216,13 +240,11 @@ public class SimpleLexer1 {
 
         // @Override
         // public void unread() {
-        //     if (pos > 0){
-        //         pos --;
-        //     }
+        // if (pos > 0){
+        // pos --;
+        // }
         // }
 
     }
-
-    
 
 }

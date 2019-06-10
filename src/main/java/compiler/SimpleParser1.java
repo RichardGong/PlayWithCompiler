@@ -5,7 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Hello Parser
+ * 实现一个计算器，但不支持左递归的加减乘除
  *
  */
 public class SimpleParser1 {
@@ -59,8 +59,8 @@ public class SimpleParser1 {
                 } else {
                     throw new Exception("invalid additive expression, expecting the right part.");
                 }
-            } 
-        } 
+            }
+        }
 
         return node;
 
@@ -69,21 +69,21 @@ public class SimpleParser1 {
     private SimpleASTNode multiplicative() throws Exception {
         SimpleASTNode child1 = primary();
         SimpleASTNode node = child1;
-        
-            Token token = tokens.peek();
-            if (token != null) {
-                if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash) {
-                    token = tokens.read();
-                    SimpleASTNode child2 = primary();
-                    if (child2 != null) {
-                        node = new SimpleASTNode(ASTNodeType.MulticativeExp, token.getText());
-                        node.addChild(child1);
-                        node.addChild(child2);
-                    } else {
-                        throw new Exception("invalid multiplicative expression, expecting the right part.");
-                    }
-                } 
-            }    
+
+        Token token = tokens.peek();
+        if (token != null) {
+            if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash) {
+                token = tokens.read();
+                SimpleASTNode child2 = primary();
+                if (child2 != null) {
+                    node = new SimpleASTNode(ASTNodeType.MulticativeExp, token.getText());
+                    node.addChild(child1);
+                    node.addChild(child2);
+                } else {
+                    throw new Exception("invalid multiplicative expression, expecting the right part.");
+                }
+            }
+        }
         return node;
     }
 

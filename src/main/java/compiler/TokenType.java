@@ -14,6 +14,10 @@ public enum TokenType{
 
     AssignmentOperator,
 
+    SemiColon,
+
+    Assignment,
+
     If,
     Else,
     

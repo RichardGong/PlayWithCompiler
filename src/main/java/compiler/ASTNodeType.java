@@ -5,6 +5,5 @@ public enum ASTNodeType{
 
     PrimaryExp,
     MulticativeExp,
-    AdditiveExp,
-    AdditiveExp2
+    AdditiveExp
 }

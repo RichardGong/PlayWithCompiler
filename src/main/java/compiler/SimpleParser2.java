@@ -14,9 +14,9 @@ public class SimpleParser2 {
     public static void main(String[] args) {
         SimpleParser2 parser = new SimpleParser2();
         try {
-            ASTNode tree = parser.parse("3+5+2");
-            parser.dumpAST(tree,"");
-            
+            ASTNode tree = parser.parse("3+5+4*5*6");
+            parser.dumpAST(tree, "");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -44,76 +44,44 @@ public class SimpleParser2 {
     }
 
     private SimpleASTNode additive() throws Exception {
-        SimpleASTNode node = null;
         SimpleASTNode child1 = multiplicative();
-        Token token = tokens.peek();
-        if (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus) {
-            SimpleASTNode child2 = additive2();
-            if (child2 != null){
+        SimpleASTNode node = child1;
+
+        while (true) {
+            Token token = tokens.peek();
+            if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
+                token = tokens.read();
+                SimpleASTNode child2 = multiplicative();
                 node = new SimpleASTNode(ASTNodeType.AdditiveExp, token.getText());
                 node.addChild(child1);
                 node.addChild(child2);
-            }
-            else{
-                node = child1;  //允许additive2的范围值为空
-            }
-        }
-        return node;  
-    }
-
-    private SimpleASTNode additive2() throws Exception {
-        SimpleASTNode node = null;
-        SimpleASTNode child1 = multiplicative();
-        if (child1 != null) {
-            Token token = tokens.peek();
-            if (token != null) {
-                if (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus) {
-                    token = tokens.read();
-                    SimpleASTNode child2 = additive();
-                    if (child2 != null) {
-                        node = new SimpleASTNode(ASTNodeType.AdditiveExp, token.getText());
-                        node.addChild(child1);
-                        node.addChild(child2);
-                    } else {
-                        throw new Exception("invalid additive expression, expecting the right part.");
-                    }
-                } else {
-                    //throw new Exception("invalid additive expression, expecting + or -.");
-                    node = child1;
-                }
-            }
-            else{
-                node = child1;
+                child1 = node;   
+            } else {
+                break;
             }
         }
+        
         return node;
-
     }
 
     private SimpleASTNode multiplicative() throws Exception {
-        SimpleASTNode node = null;
         SimpleASTNode child1 = primary();
-        if (child1 != null) {
+        SimpleASTNode node = child1;
+
+        while (true) {
             Token token = tokens.peek();
-            if (token != null) {
-                if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash) {
-                    token = tokens.read();
-                    SimpleASTNode child2 = primary();
-                    if (child2 != null) {
-                        node = new SimpleASTNode(ASTNodeType.MulticativeExp,token.getText());
-                        node.addChild(child1);
-                        node.addChild(child2);
-                    } else {
-                        throw new Exception("invalid multiplicative expression, expecting the right part.");
-                    }
-                } else {
-                    node = child1;
-                    //throw new Exception("invalid multiplicative expression, expecting * or /.");
-                }
+            if (token != null && (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)) {
+                token = tokens.read();
+                SimpleASTNode child2 = primary();
+                node = new SimpleASTNode(ASTNodeType.MulticativeExp, token.getText());
+                node.addChild(child1);
+                node.addChild(child2);
+                child1 = node;   
             } else {
-                node = child1;
+                break;
             }
         }
+        
         return node;
     }
 
@@ -122,7 +90,7 @@ public class SimpleParser2 {
         Token token = tokens.read();
         if (token != null) {
             if (token.getType() == TokenType.IntConstant) {
-                node = new SimpleASTNode(ASTNodeType.PrimaryExp,token.getText());
+                node = new SimpleASTNode(ASTNodeType.PrimaryExp, token.getText());
             } else {
                 throw new Exception("invalid multiplicative expression, expecting and int constant.");
             }
@@ -139,11 +107,11 @@ public class SimpleParser2 {
         ASTNodeType nodeType = null;
         String text = null;
 
-        public SimpleASTNode(){
+        public SimpleASTNode() {
 
         }
 
-        public SimpleASTNode(ASTNodeType nodeType, String text){
+        public SimpleASTNode(ASTNodeType nodeType, String text) {
             this.nodeType = nodeType;
             this.text = text;
         }
@@ -175,10 +143,10 @@ public class SimpleParser2 {
 
     }
 
-    private void dumpAST(ASTNode node, String indent){
-        System.out.println(indent + node.getType()+" "+node.getText());
-        for(ASTNode child: node.getChildren()){
-            dumpAST(child, indent+"\t");
+    private void dumpAST(ASTNode node, String indent) {
+        System.out.println(indent + node.getType() + " " + node.getText());
+        for (ASTNode child : node.getChildren()) {
+            dumpAST(child, indent + "\t");
         }
     }
 }
