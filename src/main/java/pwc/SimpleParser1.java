@@ -14,8 +14,9 @@ public class SimpleParser1 {
     public static void main(String[] args) {
         SimpleParser1 parser = new SimpleParser1();
         try {
-            ASTNode tree = parser.parse("3+5+2");
+            ASTNode tree = parser.parse("2+3*5");
             parser.dumpAST(tree, "");
+            parser.evaluate(tree, "");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -33,30 +34,103 @@ public class SimpleParser1 {
         return rootNode;
     }
 
+    private int evaluate(ASTNode node, String indent) {
+        int result = 0;
+        System.out.println(indent + "Calculating: " + node.getType());
+        switch (node.getType()) {
+        case Programm:
+            for (ASTNode child : node.getChildren()) {
+                result = evaluate(child, indent + "\t");
+            }
+            break;
+        case AdditiveExp:
+            ASTNode child1 = node.getChildren().get(0);
+            int value1 = evaluate(child1, indent + "\t");
+            ASTNode child2 = node.getChildren().get(1);
+            int value2 = evaluate(child2, indent + "\t");
+            if (node.getText().equals("+")) {
+                result = value1 + value2;
+            } else {
+                result = value1 - value2;
+            }
+            break;
+        case MulticativeExp:
+            child1 = node.getChildren().get(0);
+            value1 = evaluate(child1, indent + "\t");
+            child2 = node.getChildren().get(1);
+            value2 = evaluate(child2, indent + "\t");
+            if (node.getText().equals("*")) {
+                result = value1 * value2;
+            } else {
+                result = value1 / value2;
+            }
+            break;
+        case PrimaryExp:
+            result = Integer.valueOf(node.getText()).intValue();
+            break;
+        default:
+        }
+        System.out.println(indent + "Result: " + result);
+        return result;
+    }
+
     // 根节点
     private SimpleASTNode prog() throws Exception {
-        SimpleASTNode node = new SimpleASTNode();
-        node.nodeType = ASTNodeType.Programm;
+        SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "Calculator");
 
         SimpleASTNode child = additive();
-        if (child == null){
-           child = intDeclare();     
+        if (child == null) {
+            child = intDeclare1();
         }
 
-        node.addChild(child);
+        if (child != null) {
+            node.addChild(child);
+        }
         return node;
     }
 
-    private SimpleASTNode intDeclare() throws Exception {
+    private SimpleASTNode intDeclare1() throws Exception {
         SimpleASTNode node = null;
-        if (tokens.peek().getType() == TokenType.Int){
-            Token token = tokens.read();
-            if (tokens.peek().getType() == TokenType.Identifier){
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Int) {
+            token = tokens.read();
+            if (tokens.peek().getType() == TokenType.Identifier) {
                 token = tokens.read();
-                node = new SimpleASTNode(ASTNodeType.IntDeclaration,token.getText());
-            }
-            else{
+                node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
+                if (tokens.peek().getType() == TokenType.Assignment) {
+                    SimpleASTNode child = assignment1();
+                    if (child != null) {
+                        node.addChild(child);
+                    } else {
+                        throw new Exception("expecting an assignment expression");
+                    }
+                }
+            } else {
                 throw new Exception("variable name expected");
+            }
+        }
+        return node;
+    }
+
+    /**
+     * 赋值表达式，只支持整型常量
+     * 
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode assignment1() throws Exception {
+        SimpleASTNode node = null;
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Assignment) {
+            token = tokens.read();
+            node = new SimpleASTNode(ASTNodeType.AssignmentExp, token.getText());
+            token = tokens.peek();
+            if (token != null && token.getType() == TokenType.IntConstant) {
+                token = tokens.read();
+                SimpleASTNode child = new SimpleASTNode(ASTNodeType.IntConstant, token.getText());
+                node.addChild(child);
+            } else {
+                throw new Exception("invalide assignment expression, expecting an int constant");
             }
         }
         return node;
@@ -67,7 +141,7 @@ public class SimpleParser1 {
         SimpleASTNode node = child1;
 
         Token token = tokens.peek();
-        if (token != null) {
+        if (child1 != null && token != null) {
             if (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus) {
                 token = tokens.read();
                 SimpleASTNode child2 = additive();
@@ -80,9 +154,7 @@ public class SimpleParser1 {
                 }
             }
         }
-
         return node;
-
     }
 
     private SimpleASTNode multiplicative() throws Exception {
@@ -90,7 +162,7 @@ public class SimpleParser1 {
         SimpleASTNode node = child1;
 
         Token token = tokens.peek();
-        if (token != null) {
+        if (child1 != null && token != null) {
             if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash) {
                 token = tokens.read();
                 SimpleASTNode child2 = primary();
@@ -107,6 +179,16 @@ public class SimpleParser1 {
     }
 
     private SimpleASTNode primary() throws Exception {
+        SimpleASTNode node = null;
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.IntConstant) {
+            token = tokens.read();
+            node = new SimpleASTNode(ASTNodeType.PrimaryExp, token.getText());
+        }
+        return node;
+    }
+
+    private SimpleASTNode primary1() throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.read();
         if (token != null) {

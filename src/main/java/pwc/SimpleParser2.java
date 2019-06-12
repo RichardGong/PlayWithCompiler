@@ -14,7 +14,7 @@ public class SimpleParser2 {
     public static void main(String[] args) {
         SimpleParser2 parser = new SimpleParser2();
         try {
-            ASTNode tree = parser.parse("3+5+4*5*6");
+            ASTNode tree = parser.parse("2+3+4+5");
             parser.dumpAST(tree, "");
 
         } catch (Exception e) {
@@ -33,6 +33,46 @@ public class SimpleParser2 {
         return rootNode;
     }
 
+    private int evaluate(ASTNode node, String indent) {
+        int result = 0;
+        System.out.println(indent + "Calculating: " + node.getType());
+        switch (node.getType()) {
+        case Programm:
+            for (ASTNode child : node.getChildren()) {
+                result = evaluate(child, indent + "\t");
+            }
+            break;
+        case AdditiveExp:
+            ASTNode child1 = node.getChildren().get(0);
+            int value1 = evaluate(child1, indent + "\t");
+            ASTNode child2 = node.getChildren().get(1);
+            int value2 = evaluate(child2, indent + "\t");
+            if (node.getText().equals("+")) {
+                result = value1 + value2;
+            } else {
+                result = value1 - value2;
+            }
+            break;
+        case MulticativeExp:
+            child1 = node.getChildren().get(0);
+            value1 = evaluate(child1, indent + "\t");
+            child2 = node.getChildren().get(1);
+            value2 = evaluate(child2, indent + "\t");
+            if (node.getText().equals("*")) {
+                result = value1 * value2;
+            } else {
+                result = value1 / value2;
+            }
+            break;
+        case PrimaryExp:
+            result = Integer.valueOf(node.getText()).intValue();
+            break;
+        default:
+        }
+        System.out.println(indent + "Result: " + result);
+        return result;
+    }
+
     // 根节点
     private SimpleASTNode prog() throws Exception {
         SimpleASTNode node = new SimpleASTNode();
@@ -43,24 +83,93 @@ public class SimpleParser2 {
         return node;
     }
 
+    private SimpleASTNode statement() throws Exception {
+        SimpleASTNode node = new SimpleASTNode();
+        return node;
+    }
+
+    private SimpleASTNode expressionStatement() throws Exception {
+        SimpleASTNode node = new SimpleASTNode();
+        return node;
+    }
+    
+    private SimpleASTNode assignmentStatement() throws Exception {
+        SimpleASTNode node = null;
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Identifier) {
+            
+        }
+        return node;
+    }
+
+    private SimpleASTNode intDeclare() throws Exception {
+        SimpleASTNode node = null;
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Int) {
+            token = tokens.read();
+            if (tokens.peek().getType() == TokenType.Identifier) {
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
+                if (tokens.peek().getType() == TokenType.Assignment) {
+                    SimpleASTNode child = assignment();
+                    if (child != null) {
+                        node.addChild(child);
+                    } else {
+                        throw new Exception("expecting an assignment expression");
+                    }
+                }
+            } else {
+                throw new Exception("variable name expected");
+            }
+        }
+        return node;
+    }
+
+    /**
+     * 赋值表达式
+     * 
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode assignment() throws Exception {
+        SimpleASTNode node = null;
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Assignment) {
+            token = tokens.read();
+            node = new SimpleASTNode(ASTNodeType.AssignmentExp, token.getText());
+            token = tokens.peek();
+            if (token != null) {
+                SimpleASTNode child = additive();
+                if (child != null){
+                    node.addChild(child);
+                }else{
+                    throw new Exception("invalide assignment expression, expecting an additive expression");
+                }
+            } else {
+                throw new Exception("unexpected end of token");
+            }
+        }
+        return node;
+    }
+
     private SimpleASTNode additive() throws Exception {
         SimpleASTNode child1 = multiplicative();
         SimpleASTNode node = child1;
-
-        while (true) {
-            Token token = tokens.peek();
-            if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
-                token = tokens.read();
-                SimpleASTNode child2 = multiplicative();
-                node = new SimpleASTNode(ASTNodeType.AdditiveExp, token.getText());
-                node.addChild(child1);
-                node.addChild(child2);
-                child1 = node;   
-            } else {
-                break;
+        if (child1 != null) {
+            while (true) {
+                Token token = tokens.peek();
+                if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
+                    token = tokens.read();
+                    SimpleASTNode child2 = multiplicative();
+                    node = new SimpleASTNode(ASTNodeType.AdditiveExp, token.getText());
+                    node.addChild(child1);
+                    node.addChild(child2);
+                    child1 = node;
+                } else {
+                    break;
+                }
             }
         }
-        
         return node;
     }
 
@@ -76,12 +185,12 @@ public class SimpleParser2 {
                 node = new SimpleASTNode(ASTNodeType.MulticativeExp, token.getText());
                 node.addChild(child1);
                 node.addChild(child2);
-                child1 = node;   
+                child1 = node;
             } else {
                 break;
             }
         }
-        
+
         return node;
     }
 

@@ -8,5 +8,9 @@ public enum ASTNodeType{
 
     PrimaryExp,
     MulticativeExp,
-    AdditiveExp
+    AdditiveExp,
+
+    AssignmentExp,
+
+    IntConstant
 }
