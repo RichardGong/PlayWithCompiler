@@ -8,11 +8,11 @@ import java.util.List;
  * 实现一个计算器，但不支持左递归的加减乘除
  *
  */
-public class SimpleParser1 {
+public class SimpleCalculator {
     private TokenReader tokens = null;
 
     public static void main(String[] args) {
-        SimpleParser1 parser = new SimpleParser1();
+        SimpleCalculator parser = new SimpleCalculator();
         try {
             ASTNode tree = parser.parse("2+3*5");
             parser.dumpAST(tree, "");
@@ -188,20 +188,6 @@ public class SimpleParser1 {
         return node;
     }
 
-    private SimpleASTNode primary1() throws Exception {
-        SimpleASTNode node = null;
-        Token token = tokens.read();
-        if (token != null) {
-            if (token.getType() == TokenType.IntConstant) {
-                node = new SimpleASTNode(ASTNodeType.PrimaryExp, token.getText());
-            } else {
-                throw new Exception("invalid multiplicative expression, expecting and int constant.");
-            }
-        } else {
-            throw new Exception("invalid primary expression, out of token");
-        }
-        return node;
-    }
 
     private class SimpleASTNode implements ASTNode {
         SimpleASTNode parent = null;

@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - SimpleParser",
+            "request": "launch",
+            "mainClass": "pwc.SimpleParser",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - SimpleParser2",
             "request": "launch",
             "mainClass": "pwc.SimpleParser2",

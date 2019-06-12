@@ -13,6 +13,8 @@ public enum TokenType{
     LT,
 
     SemiColon,
+    LeftParen,
+    RightParen,
 
     Assignment,
 

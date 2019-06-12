@@ -1,0 +1,144 @@
+package pwc;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.io.*;
+
+/**
+ * Hello Parser
+ *
+ */
+public class SimpleScript {
+    private HashMap<String, Integer> variables = new HashMap<String, Integer>();
+    private static boolean verbose = false;
+
+    public static void main(String[] args) {
+        if (args.length > 0 && args[0].equals("-v")) {
+            verbose = true;
+            System.out.println("verbose mode");
+        }
+        System.out.println("Simple script language!");
+
+        SimpleParser parser = new SimpleParser();
+        SimpleScript script = new SimpleScript();
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+
+        String scriptText = "";
+        System.out.print("\n>");   //提示符
+
+        while (true) {
+            try {
+                String line = br.readLine().trim();
+                if (line.equals("exit();")) {
+                    break;
+                }
+                scriptText += line + "\n";
+                if (line.endsWith(";")) {
+                    ASTNode tree = parser.parse(scriptText);
+                    if (verbose) {
+                        parser.dumpAST(tree, "");
+                    }
+
+                    script.evaluate(tree, "");
+
+                    System.out.print("\n>");   //提示符
+
+                    scriptText = "";
+                }
+
+            } catch (Exception e) {
+                // e.printStackTrace();
+
+                System.out.println(e.getLocalizedMessage());
+                System.out.print("\n>");   //提示符
+                scriptText = "";
+            } 
+        }
+    }
+
+
+    private int evaluate(ASTNode node, String indent) throws Exception {
+        int result = 0;
+        if (verbose) {
+            System.out.println(indent + "Calculating: " + node.getType());
+        }
+
+        switch (node.getType()) {
+        case Programm:
+            for (ASTNode child : node.getChildren()) {
+                result = evaluate(child, indent);
+            }
+            break;
+        case AdditiveExp:
+            ASTNode child1 = node.getChildren().get(0);
+            int value1 = evaluate(child1, indent + "\t");
+            ASTNode child2 = node.getChildren().get(1);
+            int value2 = evaluate(child2, indent + "\t");
+            if (node.getText().equals("+")) {
+                result = value1 + value2;
+            } else {
+                result = value1 - value2;
+            }
+            break;
+        case MulticativeExp:
+            child1 = node.getChildren().get(0);
+            value1 = evaluate(child1, indent + "\t");
+            child2 = node.getChildren().get(1);
+            value2 = evaluate(child2, indent + "\t");
+            if (node.getText().equals("*")) {
+                result = value1 * value2;
+            } else {
+                result = value1 / value2;
+            }
+            break;
+        case IntConstant:
+            result = Integer.valueOf(node.getText()).intValue();
+            break;
+        case Identifier:
+            String varName = node.getText();
+            if (variables.containsKey(varName)) {
+                Integer value = variables.get(varName);
+                if (value != null) {
+                    result = value.intValue();
+                } else {
+                    throw new Exception("variable " + varName + " has not been set any value");
+                }
+            }
+            else{
+                throw new Exception("unknown variable: " + varName);
+            }
+            break;
+        case AssignmentStmt:
+            varName = node.getText();
+            if (!variables.containsKey(varName)){
+                throw new Exception("unknown variable: " + varName);
+            }
+        case IntDeclaration:
+            varName = node.getText();
+            Integer varValue = null;
+            if (node.getChildren().size() > 0) {
+                ASTNode child = node.getChildren().get(0);
+                result = evaluate(child, indent + "\t");
+                varValue = Integer.valueOf(result);
+            }
+            variables.put(varName, varValue);
+            break;
+
+        default:
+        }
+
+        if (verbose) {
+            System.out.println(indent + "Result: " + result);
+        } else if (indent.equals("")) { // 顶层的语句
+            if (node.getType() == ASTNodeType.IntDeclaration || node.getType() == ASTNodeType.AssignmentStmt) {
+                System.out.println(node.getText() + ": " + result);
+            }else if (node.getType() != ASTNodeType.Programm){
+                System.out.println(result);
+            }
+        }
+        return result;
+    }
+
+}

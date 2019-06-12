@@ -8,18 +8,22 @@ import java.util.List;
  * Hello Parser
  *
  */
-public class SimpleParser2 {
+public class SimpleParser {
     private TokenReader tokens = null;
 
     public static void main(String[] args) {
-        SimpleParser2 parser = new SimpleParser2();
+
+        SimpleParser parser = new SimpleParser();
+
         try {
-            ASTNode tree = parser.parse("2+3+4+5");
+            ASTNode tree = parser.parse("int age = 45; age+10*2;");
             parser.dumpAST(tree, "");
 
         } catch (Exception e) {
+
             e.printStackTrace();
         }
+
     }
 
     public ASTNode parse(String code) throws Exception {
@@ -33,71 +37,62 @@ public class SimpleParser2 {
         return rootNode;
     }
 
-    private int evaluate(ASTNode node, String indent) {
-        int result = 0;
-        System.out.println(indent + "Calculating: " + node.getType());
-        switch (node.getType()) {
-        case Programm:
-            for (ASTNode child : node.getChildren()) {
-                result = evaluate(child, indent + "\t");
-            }
-            break;
-        case AdditiveExp:
-            ASTNode child1 = node.getChildren().get(0);
-            int value1 = evaluate(child1, indent + "\t");
-            ASTNode child2 = node.getChildren().get(1);
-            int value2 = evaluate(child2, indent + "\t");
-            if (node.getText().equals("+")) {
-                result = value1 + value2;
-            } else {
-                result = value1 - value2;
-            }
-            break;
-        case MulticativeExp:
-            child1 = node.getChildren().get(0);
-            value1 = evaluate(child1, indent + "\t");
-            child2 = node.getChildren().get(1);
-            value2 = evaluate(child2, indent + "\t");
-            if (node.getText().equals("*")) {
-                result = value1 * value2;
-            } else {
-                result = value1 / value2;
-            }
-            break;
-        case PrimaryExp:
-            result = Integer.valueOf(node.getText()).intValue();
-            break;
-        default:
-        }
-        System.out.println(indent + "Result: " + result);
-        return result;
-    }
-
     // 根节点
     private SimpleASTNode prog() throws Exception {
-        SimpleASTNode node = new SimpleASTNode();
-        node.nodeType = ASTNodeType.Programm;
+        SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "pwc");
 
-        SimpleASTNode child = additive();
-        node.addChild(child);
-        return node;
-    }
+        while (tokens.peek() != null) {
+            SimpleASTNode child = expressionStatement();
+            if (child == null) {
+                child = intDeclare();
+            }
+            if (child == null) {
+                child = assignmentStatement();
+            }
 
-    private SimpleASTNode statement() throws Exception {
-        SimpleASTNode node = new SimpleASTNode();
+            if (child != null) {
+                node.addChild(child);
+            } else {
+                throw new Exception("unknown statement");
+            }
+        }
+
         return node;
     }
 
     private SimpleASTNode expressionStatement() throws Exception {
-        SimpleASTNode node = new SimpleASTNode();
+        int pos = tokens.getPosition();
+        SimpleASTNode node = additive();
+        if (node != null) {
+            Token token = tokens.peek();
+            if (token != null && token.getType() == TokenType.SemiColon) {
+                tokens.read();
+            } else {
+                node = null;
+                tokens.setPosition(pos); // 回溯
+            }
+        }
         return node;
     }
-    
+
     private SimpleASTNode assignmentStatement() throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.peek();
         if (token != null && token.getType() == TokenType.Identifier) {
-            
+            token = tokens.read();
+            SimpleASTNode child = assignment();
+            if (child != null) {
+                node = new SimpleASTNode(ASTNodeType.AssignmentStmt, token.getText());
+                node.addChild(child);
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.SemiColon) {
+                    tokens.read();
+                } else {
+                    throw new Exception("invalid statement, expecting semicolon");
+                }
+            } else {
+                tokens.unread();
+            }
         }
         return node;
     }
@@ -110,7 +105,8 @@ public class SimpleParser2 {
             if (tokens.peek().getType() == TokenType.Identifier) {
                 token = tokens.read();
                 node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
-                if (tokens.peek().getType() == TokenType.Assignment) {
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.Assignment) {
                     SimpleASTNode child = assignment();
                     if (child != null) {
                         node.addChild(child);
@@ -120,6 +116,15 @@ public class SimpleParser2 {
                 }
             } else {
                 throw new Exception("variable name expected");
+            }
+
+            if (node != null) {
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.SemiColon) {
+                    tokens.read();
+                } else {
+                    throw new Exception("invalid statement, expecting semicolon");
+                }
             }
         }
         return node;
@@ -136,17 +141,9 @@ public class SimpleParser2 {
         Token token = tokens.peek();
         if (token != null && token.getType() == TokenType.Assignment) {
             token = tokens.read();
-            node = new SimpleASTNode(ASTNodeType.AssignmentExp, token.getText());
-            token = tokens.peek();
-            if (token != null) {
-                SimpleASTNode child = additive();
-                if (child != null){
-                    node.addChild(child);
-                }else{
-                    throw new Exception("invalide assignment expression, expecting an additive expression");
-                }
-            } else {
-                throw new Exception("unexpected end of token");
+            node = additive();
+            if (node == null) {
+                throw new Exception("invalide assignment expression, expecting an additive expression");
             }
         }
         return node;
@@ -196,15 +193,28 @@ public class SimpleParser2 {
 
     private SimpleASTNode primary() throws Exception {
         SimpleASTNode node = null;
-        Token token = tokens.read();
+        Token token = tokens.peek();
         if (token != null) {
             if (token.getType() == TokenType.IntConstant) {
-                node = new SimpleASTNode(ASTNodeType.PrimaryExp, token.getText());
-            } else {
-                throw new Exception("invalid multiplicative expression, expecting and int constant.");
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.IntConstant, token.getText());
+            } else if (token.getType() == TokenType.Identifier) {
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.Identifier, token.getText());
+            } else if (token.getType() == TokenType.LeftParen) {
+                tokens.read();
+                node = additive();
+                if (node != null) {
+                    token = tokens.peek();
+                    if (token != null && token.getType() == TokenType.RightParen) {
+                        tokens.read();
+                    } else {
+                        throw new Exception("expecting right parenthesis");
+                    }
+                } else {
+                    throw new Exception("expecting an additive expression inside parenthesis");
+                }
             }
-        } else {
-            throw new Exception("invalid primary expression, out of token");
         }
         return node;
     }
@@ -252,7 +262,7 @@ public class SimpleParser2 {
 
     }
 
-    private void dumpAST(ASTNode node, String indent) {
+    void dumpAST(ASTNode node, String indent) {
         System.out.println(indent + node.getType() + " " + node.getText());
         for (ASTNode child : node.getChildren()) {
             dumpAST(child, indent + "\t");

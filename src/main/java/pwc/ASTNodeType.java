@@ -1,10 +1,13 @@
 package pwc;
 
+import sun.tools.java.Identifier;
+
 public enum ASTNodeType{
     Programm,
 
     IntDeclaration,
     ExpressionStmt,
+    AssignmentStmt,
 
     PrimaryExp,
     MulticativeExp,
@@ -12,5 +15,6 @@ public enum ASTNodeType{
 
     AssignmentExp,
 
+    Identifier,
     IntConstant
 }

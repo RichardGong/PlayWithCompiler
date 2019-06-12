@@ -32,7 +32,7 @@ public class SimpleLexer1 {
         if (tokenText.length() > 0) {
             token.text = tokenText.toString();
             tokens.add(token);
-            System.out.println(token.getType() + "\t" + token.getText());
+            // System.out.println(token.getType() + "\t" + token.getText());
 
             tokenText = new StringBuffer();
             token = new SimpleToken();
@@ -74,6 +74,14 @@ public class SimpleLexer1 {
         } else if (ch == ';') {
             newState = DfaState.SemiColon;
             token.type = TokenType.SemiColon;
+            tokenText.append(ch);
+        } else if (ch == '(') {
+            newState = DfaState.LeftParen;
+            token.type = TokenType.LeftParen;
+            tokenText.append(ch);
+        } else if (ch == ')') {
+            newState = DfaState.RightParen;
+            token.type = TokenType.RightParen;
             tokenText.append(ch);
         } else if (ch == '=') {
             newState = DfaState.Assignment;
@@ -123,6 +131,8 @@ public class SimpleLexer1 {
                 case Star:
                 case Slash:
                 case SemiColon:
+                case LeftParen:
+                case RightParen:
                     state = initToken(ch);
                     break;
                 case IntConstant:
@@ -207,6 +217,8 @@ public class SimpleLexer1 {
         Plus, Minus, Star, Slash,
 
         SemiColon,
+        LeftParen,
+        RightParen,
 
         IntConstant
     }
@@ -238,12 +250,24 @@ public class SimpleLexer1 {
             return null;
         }
 
-        // @Override
-        // public void unread() {
-        // if (pos > 0){
-        // pos --;
-        // }
-        // }
+        @Override
+        public void unread() {
+            if (pos > 0) {
+                pos--;
+            }
+        }
+
+        @Override
+        public int getPosition() {
+            return pos;
+        }
+
+        @Override
+        public void setPosition(int position) {
+            if (position >=0 && position < tokens.size()){
+                pos = position;
+            }
+        }
 
     }
 
