@@ -1,4 +1,4 @@
-package pwc;
+package craft;
 
 public interface Token{
     public TokenType getType();

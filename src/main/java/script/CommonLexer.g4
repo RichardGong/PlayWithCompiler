@@ -1,9 +1,12 @@
-lexer grammar Hello;
+lexer grammar CommonLexer;
 
-AssignmentOperator: '=' ;    
-RelationalOperator: '=='|'>'|'>='|'<' |'<=' ;    
-Star:               '*';
-Plus:               '+';
+Assignment: '=' ;
+Or:         '||';
+And:        '&&';    
+Not:        '!';
+Relational: '=='|'>'|'>='|'<' |'<=' ;    
+Add:                '+' | '-';
+Mul:                '*' | '/';
 Sharp:              '#';
 SemiColon:          ';';
 Dot:                '.';
@@ -15,9 +18,12 @@ RightBrace:         '}';
 LeftParen:          '(';
 RightParen:         ')';
 
-TypeSpecifier:      'char'  |  'int';
+TypeSpecifier:      'char'  |  'int'  | 'bool';
+
 If:                 'if' | '如果';
 Else:               'else';
+While:              'while';
+For:                'for';
 
 Identifier:         [a-zA-Z_] ([a-zA-Z_] | [0-9])*;
 

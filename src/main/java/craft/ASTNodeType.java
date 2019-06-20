@@ -1,6 +1,4 @@
-package pwc;
-
-import sun.tools.java.Identifier;
+package craft;
 
 public enum ASTNodeType{
     Programm,

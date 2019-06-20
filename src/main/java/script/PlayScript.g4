@@ -1,6 +1,10 @@
-grammar MyParser;
+grammar PlayScript;
 
-import Hello;
+import CommonLexer;
+
+@header {
+package script;
+}
 
 statement
     :   expressionStatement
@@ -10,7 +14,7 @@ statement
     ;
 
 expressionStatement
-    :   expression? ';'
+    :   expression? SemiColon
     ;
 
 declaration          
@@ -19,32 +23,30 @@ declaration
     ;
 
 initializer
-    :   assignmentExpression
-    //|   '{' initializerList '}'
-    //|   '{' initializerList ',' '}'
+    :   Assignment assignmentExpression
+    //|   LeftBrace initializerList RightBrace
+    //|   LeftBrace initializerList Comm RightBrace
     ;
 
 
 expression
     :   assignmentExpression
-    |   expression ',' assignmentExpression
+    |   expression Comm assignmentExpression
     ;
 
 assignmentExpression
     :   additiveExpression
-    |   Identifier AssignmentOperator additiveExpression
+    |   Identifier Assignment additiveExpression
     ;
 
 additiveExpression
     :   multiplicativeExpression
-    |   additiveExpression '+' multiplicativeExpression
-    |   additiveExpression '-' multiplicativeExpression
+    |   additiveExpression Add multiplicativeExpression
     ;
 
 multiplicativeExpression
     :   primaryExpression
-    |   multiplicativeExpression '*' primaryExpression
-    |   multiplicativeExpression '/' primaryExpression
+    |   multiplicativeExpression Mul primaryExpression
     ;
 
 primaryExpression
@@ -52,16 +54,16 @@ primaryExpression
     |   Constant
     |   Identifier LeftParen argumentExpressionList? RightParen
     //|   StringLiteral+
-    |   '(' expression ')'
+    |   LeftParen expression RightParen
     ;
 
 argumentExpressionList
     :   assignmentExpression
-    |   argumentExpressionList ',' assignmentExpression
+    |   argumentExpressionList Comm assignmentExpression
     ;
 
 compoundStatement
-    :   '{' blockItemList? '}'
+    :   LeftBrace blockItemList? RightBrace
     ;
 
 blockItemList

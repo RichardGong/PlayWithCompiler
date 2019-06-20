@@ -1,4 +1,4 @@
-package pwc;
+package craft;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class SimpleCalculator {
     }
 
     public ASTNode parse(String code) throws Exception {
-        SimpleLexer1 lexer = new SimpleLexer1();
+        SimpleLexer lexer = new SimpleLexer();
         tokens = lexer.tokenize(code);
         // Token token = null;
         // while ((token= tokens.read())!=null){

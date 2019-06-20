@@ -1,4 +1,4 @@
-package pwc;
+package craft;
 
 public enum TokenType{
     Plus,

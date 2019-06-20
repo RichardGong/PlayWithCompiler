@@ -1,14 +1,14 @@
-package pwc;
+package craft;
 
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SimpleLexer1 {
+public class SimpleLexer {
 
     public static void main(String args[]) {
-        SimpleLexer1 lexer = new SimpleLexer1();
+        SimpleLexer lexer = new SimpleLexer();
         lexer.tokenize("inta age = 45");
     }
 
