@@ -6,7 +6,7 @@ import CommonLexer;
 package script;
 }
 
-statement
+statements
     :   expressionStatement
     |    compoundStatement
     //|   selectionStatement
