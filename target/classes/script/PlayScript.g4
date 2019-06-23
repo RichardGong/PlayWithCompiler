@@ -6,7 +6,23 @@ import CommonLexer;
 package script;
 }
 
-statements
+
+literal
+	:	IntegerLiteral
+	|	FloatingPointLiteral
+	|	BooleanLiteral
+	|	CharacterLiteral
+	|	StringLiteral
+	|	NullLiteral
+	;
+
+primitiveType
+    :   'Number'
+    |   'String'
+    |   'var'
+    ;
+
+statement
     :   expressionStatement
     |    compoundStatement
     //|   selectionStatement
@@ -14,16 +30,16 @@ statements
     ;
 
 expressionStatement
-    :   expression? SemiColon
+    :   expression? ';'
     ;
 
 declaration          
-    : TypeSpecifier Identifier 
-    | TypeSpecifier Identifier initializer
+    : primitiveType Identifier 
+    | primitiveType Identifier initializer
     ;
 
 initializer
-    :   Assignment assignmentExpression
+    :   assignmentOperator assignmentExpression
     //|   LeftBrace initializerList RightBrace
     //|   LeftBrace initializerList Comm RightBrace
     ;
@@ -31,39 +47,56 @@ initializer
 
 expression
     :   assignmentExpression
-    |   expression Comm assignmentExpression
+    |   expression ',' assignmentExpression
     ;
 
 assignmentExpression
     :   additiveExpression
-    |   Identifier Assignment additiveExpression
+    |   Identifier assignmentOperator additiveExpression
     ;
+
+assignmentOperator
+	:	'='
+	|	'*='
+	|	'/='
+	|	'%='
+	|	'+='
+	|	'-='
+	|	'<<='
+	|	'>>='
+	|	'>>>='
+	|	'&='
+	|	'^='
+	|	'|='
+	;
 
 additiveExpression
     :   multiplicativeExpression
-    |   additiveExpression Add multiplicativeExpression
+    |   additiveExpression '+' multiplicativeExpression
+    |   additiveExpression '-' multiplicativeExpression
     ;
 
 multiplicativeExpression
     :   primaryExpression
-    |   multiplicativeExpression Mul primaryExpression
+    |   multiplicativeExpression '*' primaryExpression
+    |   multiplicativeExpression '/' primaryExpression
+    |   multiplicativeExpression '%' primaryExpression
     ;
 
 primaryExpression
     :   Identifier
-    |   Constant
-    |   Identifier LeftParen argumentExpressionList? RightParen
-    //|   StringLiteral+
-    |   LeftParen expression RightParen
+    |   literal
+    |   Identifier '(' argumentExpressionList? ')'
+    |   '(' expression ')'
     ;
 
 argumentExpressionList
     :   assignmentExpression
-    |   argumentExpressionList Comm assignmentExpression
+    |   argumentExpressionList ',' assignmentExpression
     ;
 
 compoundStatement
-    :   LeftBrace blockItemList? RightBrace
+    :   '{' blockItemList? '}'
     ;
 
 blockItemList

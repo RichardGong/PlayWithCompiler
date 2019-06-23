@@ -1,4 +1,4 @@
-// Generated from PlayScript.g4 by ANTLR 4.7.2
+// Generated from /Users/richard/projects/compiler/compiler/src/main/java/script/PlayScript.g4 by ANTLR 4.7.1
 
 package script;
 
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 @SuppressWarnings({"all", "warnings", "unchecked", "unused", "cast"})
 public class PlayScriptParser extends Parser {
-	static { RuntimeMetaData.checkVersion("4.7.2", RuntimeMetaData.VERSION); }
+	static { RuntimeMetaData.checkVersion("4.7.1", RuntimeMetaData.VERSION); }
 
 	protected static final DFA[] _decisionToDFA;
 	protected static final PredictionContextCache _sharedContextCache =
@@ -40,52 +40,43 @@ public class PlayScriptParser extends Parser {
 		RULE_assignmentOperator = 8, RULE_additiveExpression = 9, RULE_multiplicativeExpression = 10, 
 		RULE_primaryExpression = 11, RULE_argumentExpressionList = 12, RULE_compoundStatement = 13, 
 		RULE_blockItemList = 14, RULE_blockItem = 15;
-	private static String[] makeRuleNames() {
-		return new String[] {
-			"literal", "primitiveType", "statement", "expressionStatement", "declaration", 
-			"initializer", "expression", "assignmentExpression", "assignmentOperator", 
-			"additiveExpression", "multiplicativeExpression", "primaryExpression", 
-			"argumentExpressionList", "compoundStatement", "blockItemList", "blockItem"
-		};
-	}
-	public static final String[] ruleNames = makeRuleNames();
+	public static final String[] ruleNames = {
+		"literal", "primitiveType", "statement", "expressionStatement", "declaration", 
+		"initializer", "expression", "assignmentExpression", "assignmentOperator", 
+		"additiveExpression", "multiplicativeExpression", "primaryExpression", 
+		"argumentExpressionList", "compoundStatement", "blockItemList", "blockItem"
+	};
 
-	private static String[] makeLiteralNames() {
-		return new String[] {
-			null, "'Number'", "'String'", "'var'", "'boolean'", "'break'", "'byte'", 
-			"'case'", "'catch'", "'char'", "'class'", "'const'", "'continue'", "'default'", 
-			"'do'", "'double'", "'else'", "'enum'", "'extends'", "'final'", "'finally'", 
-			"'float'", "'for'", "'if'", "'implements'", "'import'", "'instanceof'", 
-			"'int'", "'interface'", "'long'", "'native'", "'new'", "'package'", "'private'", 
-			"'protected'", "'public'", "'return'", "'short'", "'super'", "'switch'", 
-			"'this'", "'void'", "'while'", null, null, null, null, null, "'null'", 
-			"'('", "')'", "'{'", "'}'", "'['", "']'", "';'", "','", "'.'", "'...'", 
-			"'@'", "'::'", "'='", "'>'", "'<'", "'!'", "'~'", "'?'", "':'", "'->'", 
-			"'=='", "'<='", "'>='", "'!='", "'&&'", "'||'", "'++'", "'--'", "'+'", 
-			"'-'", "'*'", "'/'", "'&'", "'|'", "'^'", "'%'", "'+='", "'-='", "'*='", 
-			"'/='", "'&='", "'|='", "'^='", "'%='", "'<<='", "'>>='", "'>>>='"
-		};
-	}
-	private static final String[] _LITERAL_NAMES = makeLiteralNames();
-	private static String[] makeSymbolicNames() {
-		return new String[] {
-			null, null, null, null, "BOOLEAN", "BREAK", "BYTE", "CASE", "CATCH", 
-			"CHAR", "CLASS", "CONST", "CONTINUE", "DEFAULT", "DO", "DOUBLE", "ELSE", 
-			"ENUM", "EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR", "IF", "IMPLEMENTS", 
-			"IMPORT", "INSTANCEOF", "INT", "INTERFACE", "LONG", "NATIVE", "NEW", 
-			"PACKAGE", "PRIVATE", "PROTECTED", "PUBLIC", "RETURN", "SHORT", "SUPER", 
-			"SWITCH", "THIS", "VOID", "WHILE", "IntegerLiteral", "FloatingPointLiteral", 
-			"BooleanLiteral", "CharacterLiteral", "StringLiteral", "NullLiteral", 
-			"LPAREN", "RPAREN", "LBRACE", "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", 
-			"DOT", "ELLIPSIS", "AT", "COLONCOLON", "ASSIGN", "GT", "LT", "BANG", 
-			"TILDE", "QUESTION", "COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL", 
-			"AND", "OR", "INC", "DEC", "ADD", "SUB", "MUL", "DIV", "BITAND", "BITOR", 
-			"CARET", "MOD", "ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN", 
-			"AND_ASSIGN", "OR_ASSIGN", "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN", 
-			"RSHIFT_ASSIGN", "URSHIFT_ASSIGN", "Identifier", "WS", "COMMENT", "LINE_COMMENT"
-		};
-	}
-	private static final String[] _SYMBOLIC_NAMES = makeSymbolicNames();
+	private static final String[] _LITERAL_NAMES = {
+		null, "'Number'", "'String'", "'var'", "'boolean'", "'break'", "'byte'", 
+		"'case'", "'catch'", "'char'", "'class'", "'const'", "'continue'", "'default'", 
+		"'do'", "'double'", "'else'", "'enum'", "'extends'", "'final'", "'finally'", 
+		"'float'", "'for'", "'if'", "'implements'", "'import'", "'instanceof'", 
+		"'int'", "'interface'", "'long'", "'native'", "'new'", "'package'", "'private'", 
+		"'protected'", "'public'", "'return'", "'short'", "'super'", "'switch'", 
+		"'this'", "'void'", "'while'", null, null, null, null, null, "'null'", 
+		"'('", "')'", "'{'", "'}'", "'['", "']'", "';'", "','", "'.'", "'...'", 
+		"'@'", "'::'", "'='", "'>'", "'<'", "'!'", "'~'", "'?'", "':'", "'->'", 
+		"'=='", "'<='", "'>='", "'!='", "'&&'", "'||'", "'++'", "'--'", "'+'", 
+		"'-'", "'*'", "'/'", "'&'", "'|'", "'^'", "'%'", "'+='", "'-='", "'*='", 
+		"'/='", "'&='", "'|='", "'^='", "'%='", "'<<='", "'>>='", "'>>>='"
+	};
+	private static final String[] _SYMBOLIC_NAMES = {
+		null, null, null, null, "BOOLEAN", "BREAK", "BYTE", "CASE", "CATCH", "CHAR", 
+		"CLASS", "CONST", "CONTINUE", "DEFAULT", "DO", "DOUBLE", "ELSE", "ENUM", 
+		"EXTENDS", "FINAL", "FINALLY", "FLOAT", "FOR", "IF", "IMPLEMENTS", "IMPORT", 
+		"INSTANCEOF", "INT", "INTERFACE", "LONG", "NATIVE", "NEW", "PACKAGE", 
+		"PRIVATE", "PROTECTED", "PUBLIC", "RETURN", "SHORT", "SUPER", "SWITCH", 
+		"THIS", "VOID", "WHILE", "IntegerLiteral", "FloatingPointLiteral", "BooleanLiteral", 
+		"CharacterLiteral", "StringLiteral", "NullLiteral", "LPAREN", "RPAREN", 
+		"LBRACE", "RBRACE", "LBRACK", "RBRACK", "SEMI", "COMMA", "DOT", "ELLIPSIS", 
+		"AT", "COLONCOLON", "ASSIGN", "GT", "LT", "BANG", "TILDE", "QUESTION", 
+		"COLON", "ARROW", "EQUAL", "LE", "GE", "NOTEQUAL", "AND", "OR", "INC", 
+		"DEC", "ADD", "SUB", "MUL", "DIV", "BITAND", "BITOR", "CARET", "MOD", 
+		"ADD_ASSIGN", "SUB_ASSIGN", "MUL_ASSIGN", "DIV_ASSIGN", "AND_ASSIGN", 
+		"OR_ASSIGN", "XOR_ASSIGN", "MOD_ASSIGN", "LSHIFT_ASSIGN", "RSHIFT_ASSIGN", 
+		"URSHIFT_ASSIGN", "Identifier", "WS", "COMMENT", "LINE_COMMENT"
+	};
 	public static final Vocabulary VOCABULARY = new VocabularyImpl(_LITERAL_NAMES, _SYMBOLIC_NAMES);
 
 	/**
@@ -135,7 +126,6 @@ public class PlayScriptParser extends Parser {
 		super(input);
 		_interp = new ParserATNSimulator(this,_ATN,_decisionToDFA,_sharedContextCache);
 	}
-
 	public static class LiteralContext extends ParserRuleContext {
 		public TerminalNode IntegerLiteral() { return getToken(PlayScriptParser.IntegerLiteral, 0); }
 		public TerminalNode FloatingPointLiteral() { return getToken(PlayScriptParser.FloatingPointLiteral, 0); }
@@ -147,11 +137,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_literal; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitLiteral(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final LiteralContext literal() throws RecognitionException {
@@ -189,11 +174,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_primitiveType; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitPrimitiveType(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final PrimitiveTypeContext primitiveType() throws RecognitionException {
@@ -237,11 +217,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_statement; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final StatementContext statement() throws RecognitionException {
@@ -289,7 +264,6 @@ public class PlayScriptParser extends Parser {
 	}
 
 	public static class ExpressionStatementContext extends ParserRuleContext {
-		public TerminalNode SEMI() { return getToken(PlayScriptParser.SEMI, 0); }
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
@@ -297,11 +271,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expressionStatement; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitExpressionStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ExpressionStatementContext expressionStatement() throws RecognitionException {
@@ -348,11 +317,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_declaration; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitDeclaration(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final DeclarationContext declaration() throws RecognitionException {
@@ -406,11 +370,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_initializer; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitInitializer(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final InitializerContext initializer() throws RecognitionException {
@@ -443,16 +402,10 @@ public class PlayScriptParser extends Parser {
 		public ExpressionContext expression() {
 			return getRuleContext(ExpressionContext.class,0);
 		}
-		public TerminalNode COMMA() { return getToken(PlayScriptParser.COMMA, 0); }
 		public ExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_expression; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ExpressionContext expression() throws RecognitionException {
@@ -524,11 +477,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assignmentExpression; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitAssignmentExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AssignmentExpressionContext assignmentExpression() throws RecognitionException {
@@ -570,27 +518,10 @@ public class PlayScriptParser extends Parser {
 	}
 
 	public static class AssignmentOperatorContext extends ParserRuleContext {
-		public TerminalNode ASSIGN() { return getToken(PlayScriptParser.ASSIGN, 0); }
-		public TerminalNode MUL_ASSIGN() { return getToken(PlayScriptParser.MUL_ASSIGN, 0); }
-		public TerminalNode DIV_ASSIGN() { return getToken(PlayScriptParser.DIV_ASSIGN, 0); }
-		public TerminalNode MOD_ASSIGN() { return getToken(PlayScriptParser.MOD_ASSIGN, 0); }
-		public TerminalNode ADD_ASSIGN() { return getToken(PlayScriptParser.ADD_ASSIGN, 0); }
-		public TerminalNode SUB_ASSIGN() { return getToken(PlayScriptParser.SUB_ASSIGN, 0); }
-		public TerminalNode LSHIFT_ASSIGN() { return getToken(PlayScriptParser.LSHIFT_ASSIGN, 0); }
-		public TerminalNode RSHIFT_ASSIGN() { return getToken(PlayScriptParser.RSHIFT_ASSIGN, 0); }
-		public TerminalNode URSHIFT_ASSIGN() { return getToken(PlayScriptParser.URSHIFT_ASSIGN, 0); }
-		public TerminalNode AND_ASSIGN() { return getToken(PlayScriptParser.AND_ASSIGN, 0); }
-		public TerminalNode XOR_ASSIGN() { return getToken(PlayScriptParser.XOR_ASSIGN, 0); }
-		public TerminalNode OR_ASSIGN() { return getToken(PlayScriptParser.OR_ASSIGN, 0); }
 		public AssignmentOperatorContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_assignmentOperator; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitAssignmentOperator(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AssignmentOperatorContext assignmentOperator() throws RecognitionException {
@@ -630,17 +561,10 @@ public class PlayScriptParser extends Parser {
 		public AdditiveExpressionContext additiveExpression() {
 			return getRuleContext(AdditiveExpressionContext.class,0);
 		}
-		public TerminalNode ADD() { return getToken(PlayScriptParser.ADD, 0); }
-		public TerminalNode SUB() { return getToken(PlayScriptParser.SUB, 0); }
 		public AdditiveExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_additiveExpression; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitAdditiveExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final AdditiveExpressionContext additiveExpression() throws RecognitionException {
@@ -725,18 +649,10 @@ public class PlayScriptParser extends Parser {
 		public MultiplicativeExpressionContext multiplicativeExpression() {
 			return getRuleContext(MultiplicativeExpressionContext.class,0);
 		}
-		public TerminalNode MUL() { return getToken(PlayScriptParser.MUL, 0); }
-		public TerminalNode DIV() { return getToken(PlayScriptParser.DIV, 0); }
-		public TerminalNode MOD() { return getToken(PlayScriptParser.MOD, 0); }
 		public MultiplicativeExpressionContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_multiplicativeExpression; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitMultiplicativeExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final MultiplicativeExpressionContext multiplicativeExpression() throws RecognitionException {
@@ -831,8 +747,6 @@ public class PlayScriptParser extends Parser {
 		public LiteralContext literal() {
 			return getRuleContext(LiteralContext.class,0);
 		}
-		public TerminalNode LPAREN() { return getToken(PlayScriptParser.LPAREN, 0); }
-		public TerminalNode RPAREN() { return getToken(PlayScriptParser.RPAREN, 0); }
 		public ArgumentExpressionListContext argumentExpressionList() {
 			return getRuleContext(ArgumentExpressionListContext.class,0);
 		}
@@ -843,11 +757,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_primaryExpression; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitPrimaryExpression(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final PrimaryExpressionContext primaryExpression() throws RecognitionException {
@@ -924,16 +833,10 @@ public class PlayScriptParser extends Parser {
 		public ArgumentExpressionListContext argumentExpressionList() {
 			return getRuleContext(ArgumentExpressionListContext.class,0);
 		}
-		public TerminalNode COMMA() { return getToken(PlayScriptParser.COMMA, 0); }
 		public ArgumentExpressionListContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_argumentExpressionList; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitArgumentExpressionList(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final ArgumentExpressionListContext argumentExpressionList() throws RecognitionException {
@@ -994,8 +897,6 @@ public class PlayScriptParser extends Parser {
 	}
 
 	public static class CompoundStatementContext extends ParserRuleContext {
-		public TerminalNode LBRACE() { return getToken(PlayScriptParser.LBRACE, 0); }
-		public TerminalNode RBRACE() { return getToken(PlayScriptParser.RBRACE, 0); }
 		public BlockItemListContext blockItemList() {
 			return getRuleContext(BlockItemListContext.class,0);
 		}
@@ -1003,11 +904,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_compoundStatement; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitCompoundStatement(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final CompoundStatementContext compoundStatement() throws RecognitionException {
@@ -1055,11 +951,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_blockItemList; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitBlockItemList(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final BlockItemListContext blockItemList() throws RecognitionException {
@@ -1128,11 +1019,6 @@ public class PlayScriptParser extends Parser {
 			super(parent, invokingState);
 		}
 		@Override public int getRuleIndex() { return RULE_blockItem; }
-		@Override
-		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitBlockItem(this);
-			else return visitor.visitChildren(this);
-		}
 	}
 
 	public final BlockItemContext blockItem() throws RecognitionException {
