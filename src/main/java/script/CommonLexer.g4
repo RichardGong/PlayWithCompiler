@@ -1,4 +1,4 @@
-lexer grammar CommonLexer;
+lexer grammar CommonLexer;  //lexer关键字意味着这是一个词法规则
 
 // §3.9 Keywords
 

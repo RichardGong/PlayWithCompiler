@@ -79,8 +79,8 @@ public class SimpleParser {
         SimpleASTNode node = null;
         Token token = tokens.peek();
         if (token != null && token.getType() == TokenType.Identifier) {
-            token = tokens.read();
-            SimpleASTNode child = assignment();
+            token = tokens.read();              //读入标识符
+            SimpleASTNode child = assignment(); //匹配赋值表达式
             if (child != null) {
                 node = new SimpleASTNode(ASTNodeType.AssignmentStmt, token.getText());
                 node.addChild(child);
@@ -91,7 +91,7 @@ public class SimpleParser {
                     throw new Exception("invalid statement, expecting semicolon");
                 }
             } else {
-                tokens.unread();
+                tokens.unread();              //回溯，吐出之前消化掉的标识符
             }
         }
         return node;
@@ -226,9 +226,9 @@ public class SimpleParser {
         ASTNodeType nodeType = null;
         String text = null;
 
-        public SimpleASTNode() {
+        // public SimpleASTNode() {
 
-        }
+        // }
 
         public SimpleASTNode(ASTNodeType nodeType, String text) {
             this.nodeType = nodeType;

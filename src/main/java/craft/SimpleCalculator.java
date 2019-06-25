@@ -196,9 +196,9 @@ public class SimpleCalculator {
         ASTNodeType nodeType = null;
         String text = null;
 
-        public SimpleASTNode() {
+        // public SimpleASTNode() {
 
-        }
+        // }
 
         public SimpleASTNode(ASTNodeType nodeType, String text) {
             this.nodeType = nodeType;

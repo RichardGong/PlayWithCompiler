@@ -21,15 +21,16 @@ public class SimpleScript {
 
         SimpleParser parser = new SimpleParser();
         SimpleScript script = new SimpleScript();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         String scriptText = "";
         System.out.print("\n>");   //提示符
 
         while (true) {
             try {
-                String line = br.readLine().trim();
+                String line = reader.readLine().trim();
                 if (line.equals("exit();")) {
+                    System.out.println("good bye!");
                     break;
                 }
                 scriptText += line + "\n";
@@ -58,7 +59,7 @@ public class SimpleScript {
 
 
     private int evaluate(ASTNode node, String indent) throws Exception {
-        int result = 0;
+        int result = 0;   
         if (verbose) {
             System.out.println(indent + "Calculating: " + node.getType());
         }
@@ -112,7 +113,7 @@ public class SimpleScript {
             varName = node.getText();
             if (!variables.containsKey(varName)){
                 throw new Exception("unknown variable: " + varName);
-            }
+            }   //接着执行下面的代码
         case IntDeclaration:
             varName = node.getText();
             Integer varValue = null;
