@@ -1,9 +1,5 @@
 lexer grammar CommonLexer;
 
-@header {
-package script2;
-}
-
 // Keywords
 
 ABSTRACT:           'abstract';
