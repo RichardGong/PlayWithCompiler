@@ -13,7 +13,7 @@ package script2;
 
 
 variableDeclarators
-    : variableDeclarator (',' variableDeclarator)*
+    : typeType variableDeclarator (',' variableDeclarator)*
     ;
 
 variableDeclarator
@@ -55,9 +55,16 @@ floatLiteral
     ;
 
 // STATEMENTS / BLOCKS
+prog
+    : blockStatements
+    ;
 
 block
-    : '{' blockStatement* '}'
+    : '{' blockStatements '}'
+    ;
+
+blockStatements
+    : blockStatement*
     ;
 
 blockStatement

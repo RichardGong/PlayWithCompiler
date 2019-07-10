@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - PlayScript",
+            "request": "launch",
+            "mainClass": "script2.PlayScript",
+            "projectName": "compiler"
+        }
+    ]
+}

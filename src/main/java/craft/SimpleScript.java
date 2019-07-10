@@ -58,8 +58,8 @@ public class SimpleScript {
     }
 
 
-    private int evaluate(ASTNode node, String indent) throws Exception {
-        int result = 0;   
+    private Integer evaluate(ASTNode node, String indent) throws Exception {
+        Integer result = null;   
         if (verbose) {
             System.out.println(indent + "Calculating: " + node.getType());
         }
@@ -72,9 +72,9 @@ public class SimpleScript {
             break;
         case AdditiveExp:
             ASTNode child1 = node.getChildren().get(0);
-            int value1 = evaluate(child1, indent + "\t");
+            Integer value1 = evaluate(child1, indent + "\t");
             ASTNode child2 = node.getChildren().get(1);
-            int value2 = evaluate(child2, indent + "\t");
+            Integer value2 = evaluate(child2, indent + "\t");
             if (node.getText().equals("+")) {
                 result = value1 + value2;
             } else {

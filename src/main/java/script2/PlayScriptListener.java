@@ -90,6 +90,16 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitFloatLiteral(PlayScriptParser.FloatLiteralContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#prog}.
+	 * @param ctx the parse tree
+	 */
+	void enterProg(PlayScriptParser.ProgContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#prog}.
+	 * @param ctx the parse tree
+	 */
+	void exitProg(PlayScriptParser.ProgContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#block}.
 	 * @param ctx the parse tree
 	 */
@@ -99,6 +109,16 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBlock(PlayScriptParser.BlockContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#blockStatements}.
+	 * @param ctx the parse tree
+	 */
+	void enterBlockStatements(PlayScriptParser.BlockStatementsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#blockStatements}.
+	 * @param ctx the parse tree
+	 */
+	void exitBlockStatements(PlayScriptParser.BlockStatementsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#blockStatement}.
 	 * @param ctx the parse tree

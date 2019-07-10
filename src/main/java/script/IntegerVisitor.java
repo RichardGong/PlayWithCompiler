@@ -20,7 +20,7 @@ import script.PlayScriptParser.PrimaryExpressionContext;
 import script.PlayScriptParser.PrimitiveTypeContext;
 import script.PlayScriptParser.StatementContext;
 
-public class CalcVisitor extends PlayScriptBaseVisitor<Integer> {
+public class IntegerVisitor extends PlayScriptBaseVisitor<Integer> {
     Map<String, Integer> memory = new HashMap<String, Integer>();
 
     @Override

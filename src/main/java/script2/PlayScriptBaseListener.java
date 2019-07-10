@@ -114,6 +114,18 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterProg(PlayScriptParser.ProgContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitProg(PlayScriptParser.ProgContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBlock(PlayScriptParser.BlockContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -121,6 +133,18 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBlock(PlayScriptParser.BlockContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterBlockStatements(PlayScriptParser.BlockStatementsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitBlockStatements(PlayScriptParser.BlockStatementsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

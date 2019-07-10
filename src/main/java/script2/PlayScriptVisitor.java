@@ -61,11 +61,23 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitFloatLiteral(PlayScriptParser.FloatLiteralContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#prog}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitProg(PlayScriptParser.ProgContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#block}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitBlock(PlayScriptParser.BlockContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#blockStatements}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitBlockStatements(PlayScriptParser.BlockStatementsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#blockStatement}.
 	 * @param ctx the parse tree
