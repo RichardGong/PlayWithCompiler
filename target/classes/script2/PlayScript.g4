@@ -11,6 +11,51 @@ import CommonLexer;
 package script2;
 }
 
+methodDeclaration
+    : typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')*
+      (THROWS qualifiedNameList)?
+      methodBody
+    ;
+
+methodBody
+    : block
+    | ';'
+    ;
+
+typeTypeOrVoid
+    : typeType
+    | VOID
+    ;
+
+qualifiedNameList
+    : qualifiedName (',' qualifiedName)*
+    ;
+
+formalParameters
+    : '(' formalParameterList? ')'
+    ;
+
+formalParameterList
+    : formalParameter (',' formalParameter)* (',' lastFormalParameter)?
+    | lastFormalParameter
+    ;
+
+formalParameter
+    : variableModifier* typeType variableDeclaratorId
+    ;
+
+lastFormalParameter
+    : variableModifier* typeType '...' variableDeclaratorId
+    ;
+
+variableModifier
+    : FINAL
+    //| annotation
+    ;
+
+qualifiedName
+    : IDENTIFIER ('.' IDENTIFIER)*
+    ;
 
 variableDeclarators
     : typeType variableDeclarator (',' variableDeclarator)*
@@ -90,7 +135,7 @@ statement
     | CONTINUE IDENTIFIER? ';'
     | SEMI
     | statementExpression=expression ';'
-    // | identifierLabel=IDENTIFIER ':' statement
+    | identifierLabel=IDENTIFIER ':' statement
     ;
 
 /** Matches cases then statements, both of which are mandatory.
@@ -129,6 +174,12 @@ expressionList
     : expression (',' expression)*
     ;
 
+methodCall
+    : IDENTIFIER '(' expressionList? ')'
+    | THIS '(' expressionList? ')'
+    | SUPER '(' expressionList? ')'
+    ;
+
 expression
     : primary
     // | expression bop='.'
@@ -140,7 +191,7 @@ expression
     //   | explicitGenericInvocation
     //   )
     | expression '[' expression ']'
-    // | methodCall
+    | methodCall
     // | NEW creator
     // | '(' typeType ')' expression
     | expression postfix=('++' | '--')

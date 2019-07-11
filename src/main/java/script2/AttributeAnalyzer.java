@@ -7,6 +7,8 @@ import org.antlr.v4.runtime.ParserRuleContext;
 
 import script2.PlayScriptParser.BlockContext;
 import script2.PlayScriptParser.EnhancedForControlContext;
+import script2.PlayScriptParser.MethodCallContext;
+import script2.PlayScriptParser.MethodDeclarationContext;
 import script2.PlayScriptParser.PrimaryContext;
 import script2.PlayScriptParser.ProgContext;
 import script2.PlayScriptParser.StatementContext;
@@ -18,7 +20,7 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
 
     protected Scope scopeTree = null;
 
-    //遍历过程中的临时变量
+    // 遍历过程中的临时变量
     private Scope currentScope = null;
 
     /**
@@ -38,18 +40,18 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
         return symbol;
     }
 
-    private boolean underForStatement(BlockContext ctx){
+    private boolean underForStatement(BlockContext ctx) {
         return (ctx.parent != null // Statement
-        && ctx.parent.parent != null && ctx.parent.parent instanceof StatementContext  //Statement
-        && ((StatementContext) ctx.parent.parent).FOR() != null);// FOR Statement
+                && ctx.parent.parent != null && ctx.parent.parent instanceof StatementContext // Statement
+                && ((StatementContext) ctx.parent.parent).FOR() != null);// FOR Statement
     }
 
     @Override
     public void enterBlock(BlockContext ctx) {
-        if  (!underForStatement(ctx)) {
-            Scope scope = new Scope(currentScope, ctx);
-            currentScope = scope;
-        }
+        // if (!underForStatement(ctx)) {
+        //     Scope scope = new Scope(currentScope, ctx);
+        //     currentScope = scope;
+        // }
     }
 
     @Override
@@ -80,7 +82,7 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
 
     @Override
     public void enterStatement(StatementContext ctx) {
-        if (ctx.FOR() != null) {
+        if (ctx.FOR() != null || ctx.WHILE() !=null) {
             Scope scope = new Scope(currentScope, ctx);
             currentScope = scope;
         }
@@ -89,7 +91,7 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
     @Override
     public void enterVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         String idName = ctx.IDENTIFIER().getText();
-        if (currentScope.symbols.containsKey(idName)){
+        if (currentScope.symbols.containsKey(idName)) {
             System.out.println("Variable already Declared: " + idName);
         } else {
             Symbol symbol = new Symbol(SymbolType.Variable, currentScope);
@@ -100,9 +102,9 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
 
     @Override
     public void exitBlock(BlockContext ctx) {
-        if  (!underForStatement(ctx)) {
-            currentScope = currentScope.parent;
-        }
+        // if (!underForStatement(ctx)) {
+        //     currentScope = currentScope.parent;
+        // }
     }
 
     @Override
@@ -117,9 +119,30 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
 
     @Override
     public void exitStatement(StatementContext ctx) {
-        if (ctx.FOR() != null) {
+        if (ctx.FOR() != null || ctx.WHILE() !=null) {
             currentScope = currentScope.parent;
         }
+    }
+
+    @Override
+    public void enterMethodCall(MethodCallContext ctx) {
+        super.enterMethodCall(ctx);
+    }
+
+    @Override
+    public void enterMethodDeclaration(MethodDeclarationContext ctx) {
+        Scope scope = new Scope(currentScope, ctx);
+        currentScope = scope;
+    }
+
+    @Override
+    public void exitMethodCall(MethodCallContext ctx) {
+        super.exitMethodCall(ctx);
+    }
+
+    @Override
+    public void exitMethodDeclaration(MethodDeclarationContext ctx) {
+        currentScope = currentScope.parent;
     }
 
 }

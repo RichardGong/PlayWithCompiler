@@ -13,6 +13,66 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#methodBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMethodBody(PlayScriptParser.MethodBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#typeTypeOrVoid}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeTypeOrVoid(PlayScriptParser.TypeTypeOrVoidContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#qualifiedNameList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitQualifiedNameList(PlayScriptParser.QualifiedNameListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#formalParameters}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalParameters(PlayScriptParser.FormalParametersContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#formalParameterList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalParameterList(PlayScriptParser.FormalParameterListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#formalParameter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFormalParameter(PlayScriptParser.FormalParameterContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#lastFormalParameter}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLastFormalParameter(PlayScriptParser.LastFormalParameterContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#variableModifier}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitVariableModifier(PlayScriptParser.VariableModifierContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#qualifiedName}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitQualifiedName(PlayScriptParser.QualifiedNameContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#variableDeclarators}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -132,6 +192,12 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitExpressionList(PlayScriptParser.ExpressionListContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#methodCall}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMethodCall(PlayScriptParser.MethodCallContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#expression}.
 	 * @param ctx the parse tree

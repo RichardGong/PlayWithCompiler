@@ -10,6 +10,106 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface PlayScriptListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#methodBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodBody(PlayScriptParser.MethodBodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#methodBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodBody(PlayScriptParser.MethodBodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#typeTypeOrVoid}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeTypeOrVoid(PlayScriptParser.TypeTypeOrVoidContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#typeTypeOrVoid}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeTypeOrVoid(PlayScriptParser.TypeTypeOrVoidContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#qualifiedNameList}.
+	 * @param ctx the parse tree
+	 */
+	void enterQualifiedNameList(PlayScriptParser.QualifiedNameListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#qualifiedNameList}.
+	 * @param ctx the parse tree
+	 */
+	void exitQualifiedNameList(PlayScriptParser.QualifiedNameListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#formalParameters}.
+	 * @param ctx the parse tree
+	 */
+	void enterFormalParameters(PlayScriptParser.FormalParametersContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#formalParameters}.
+	 * @param ctx the parse tree
+	 */
+	void exitFormalParameters(PlayScriptParser.FormalParametersContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#formalParameterList}.
+	 * @param ctx the parse tree
+	 */
+	void enterFormalParameterList(PlayScriptParser.FormalParameterListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#formalParameterList}.
+	 * @param ctx the parse tree
+	 */
+	void exitFormalParameterList(PlayScriptParser.FormalParameterListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#formalParameter}.
+	 * @param ctx the parse tree
+	 */
+	void enterFormalParameter(PlayScriptParser.FormalParameterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#formalParameter}.
+	 * @param ctx the parse tree
+	 */
+	void exitFormalParameter(PlayScriptParser.FormalParameterContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#lastFormalParameter}.
+	 * @param ctx the parse tree
+	 */
+	void enterLastFormalParameter(PlayScriptParser.LastFormalParameterContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#lastFormalParameter}.
+	 * @param ctx the parse tree
+	 */
+	void exitLastFormalParameter(PlayScriptParser.LastFormalParameterContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#variableModifier}.
+	 * @param ctx the parse tree
+	 */
+	void enterVariableModifier(PlayScriptParser.VariableModifierContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#variableModifier}.
+	 * @param ctx the parse tree
+	 */
+	void exitVariableModifier(PlayScriptParser.VariableModifierContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#qualifiedName}.
+	 * @param ctx the parse tree
+	 */
+	void enterQualifiedName(PlayScriptParser.QualifiedNameContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#qualifiedName}.
+	 * @param ctx the parse tree
+	 */
+	void exitQualifiedName(PlayScriptParser.QualifiedNameContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#variableDeclarators}.
 	 * @param ctx the parse tree
 	 */
@@ -209,6 +309,16 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitExpressionList(PlayScriptParser.ExpressionListContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#methodCall}.
+	 * @param ctx the parse tree
+	 */
+	void enterMethodCall(PlayScriptParser.MethodCallContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#methodCall}.
+	 * @param ctx the parse tree
+	 */
+	void exitMethodCall(PlayScriptParser.MethodCallContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#expression}.
 	 * @param ctx the parse tree

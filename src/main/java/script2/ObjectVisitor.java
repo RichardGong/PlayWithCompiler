@@ -90,18 +90,19 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
 
     @Override
     public Object visitBlock(BlockContext ctx) {
-        //添加ActivationRecord
-        Scope scope = scopeTree.findDescendantByContext(ctx);
-        if (scope !=null){
-            ActivationRecord record = new ActivationRecord(scope);
-            activationRecordStack.push(record);
-        }
-        
+        // // 添加ActivationRecord
+        // Scope scope = scopeTree.findDescendantByContext(ctx);
+        // if (scope != null) {
+        //     ActivationRecord record = new ActivationRecord(scope);
+        //     activationRecordStack.push(record);
+        // }
+
         Object rtn = visitBlockStatements(ctx.blockStatements());
 
-
-        //去掉ActivationRecord
-        activationRecordStack.pop();
+        // // 去掉ActivationRecord
+        // if (scope != null){
+        //     activationRecordStack.pop();
+        // }
         return rtn;
     }
 
@@ -161,20 +162,47 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
                 rtn = (Integer) left > (Integer) right;
                 break;
             case PlayScriptParser.ASSIGN:
-                setIdValue(ctx.expression(0).getText(),ctx, right);
+                //在赋值语句的情况下，left应该返回一个左值，即变量引用才对。暂时凑合一下。
+                if (ctx.expression(0).primary() != null){
+                    setIdValue(ctx.expression(0).getText(), ctx.expression(0).primary(), right);
+                    rtn = right;
+                }
+                else{
+                    System.out.println("Unsupported feature during assignment");
+                }
                 break;
             default:
                 break;
             }
         } else if (ctx.primary() != null) {
             rtn = visitPrimary(ctx.primary());
+        } else if (ctx.postfix != null) {
+            String idName = ctx.expression(0).getText(); // todo:这里后面要改为对象引用
+            Integer value = (Integer) getIdValue(idName, ctx.expression(0).primary());
+            switch (ctx.postfix.getType()) {
+            case PlayScriptParser.INC:
+                setIdValue(idName,ctx.expression(0).primary(),value+1);
+                rtn = value;  //返回值还是原值。如果++放在前面，返回值要加1。
+                break;
+            case PlayScriptParser.DEC:
+                setIdValue(idName,ctx.expression(0).primary(),value-1);
+                rtn = value;
+                break;
+            default:
+                break;
+            }
         }
+
         return rtn;
     }
 
     @Override
     public Object visitExpressionList(ExpressionListContext ctx) {
-        return super.visitExpressionList(ctx);
+        Object rtn = null;
+        for (ExpressionContext child : ctx.expression()){
+            rtn = visitExpression(child);
+        }
+        return rtn;
     }
 
     @Override
@@ -183,13 +211,15 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitForControl(ForControlContext ctx) {
-        return super.visitForControl(ctx);
-    }
-
-    @Override
     public Object visitForInit(ForInitContext ctx) {
-        return super.visitForInit(ctx);
+        Object rtn = null;
+        if (ctx.variableDeclarators()!=null){
+            rtn = visitVariableDeclarators(ctx.variableDeclarators());
+        }
+        else if (ctx.expressionList() != null){
+            rtn = visitExpressionList(ctx.expressionList());
+        }
+        return rtn;
     }
 
     @Override
@@ -221,7 +251,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
-            rtn = getIdValue(ctx.IDENTIFIER().getText(),ctx);
+            rtn = getIdValue(ctx.IDENTIFIER().getText(), ctx);
         }
         return rtn;
     }
@@ -262,22 +292,44 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
                 rtn = visitStatement(ctx.statement(1));
             }
         } else if (ctx.FOR() != null) {
-            //添加ActivationRecord
+            // 添加ActivationRecord
             Scope scope = scopeTree.findDescendantByContext(ctx);
             ActivationRecord record = new ActivationRecord(scope);
             activationRecordStack.push(record);
 
-            while (true) {
-                if ((Boolean) visitForControl(ctx.forControl())) {
-                    rtn=visitStatement(ctx.statement(0));
-                } else {
-                    break;
+            ForControlContext forControl = ctx.forControl();
+            if (forControl.enhancedForControl() != null){
+                
+            }
+            else{
+                //初始化部分做一次
+                if (forControl.forInit() != null){
+                    rtn = visitForInit(forControl.forInit());
+                }
+
+                while (true) {
+                    Boolean condition = true;  //如果没有条件判断部分，意味着一直循环
+                    if (forControl.expression() != null){
+                        condition = (Boolean) visitExpression(forControl.expression());
+                    }
+
+                    if (condition){
+                        //执行for的语句体
+                        rtn = visitStatement(ctx.statement(0));
+
+                        //执行forUpdate，通常是“i++”这样的语句。这个执行顺序不能出错。
+                        if (forControl.forUpdate !=null){
+                            visitExpressionList(forControl.forUpdate);
+                        }
+                    } else{
+                        break;
+                    }
                 }
             }
 
-            //去掉ActivationRecord
+            // 去掉ActivationRecord
             activationRecordStack.pop();
-        } else if (ctx.blockLabel != null){
+        } else if (ctx.blockLabel != null) {
             rtn = visitBlock(ctx.blockLabel);
         }
         return rtn;
@@ -309,7 +361,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         String id = (String) visitVariableDeclaratorId(ctx.variableDeclaratorId());
         if (ctx.variableInitializer() != null) {
             rtn = visitVariableInitializer(ctx.variableInitializer());
-            setIdValue(id,ctx.variableDeclaratorId(), rtn);
+            setIdValue(id, ctx.variableDeclaratorId(), rtn);
         }
         return rtn;
     }
