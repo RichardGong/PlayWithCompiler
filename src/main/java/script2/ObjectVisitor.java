@@ -1,5 +1,7 @@
 package script2;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
@@ -10,28 +12,46 @@ import script2.PlayScriptParser.ArrayInitializerContext;
 import script2.PlayScriptParser.BlockContext;
 import script2.PlayScriptParser.BlockStatementContext;
 import script2.PlayScriptParser.BlockStatementsContext;
+import script2.PlayScriptParser.ClassBodyContext;
+import script2.PlayScriptParser.ClassBodyDeclarationContext;
+import script2.PlayScriptParser.ClassDeclarationContext;
+import script2.PlayScriptParser.ConstructorDeclarationContext;
+import script2.PlayScriptParser.CreatorContext;
 import script2.PlayScriptParser.EnhancedForControlContext;
-import script2.PlayScriptParser.ExplicitGenericInvocationSuffixContext;
 import script2.PlayScriptParser.ExpressionContext;
 import script2.PlayScriptParser.ExpressionListContext;
+import script2.PlayScriptParser.FieldDeclarationContext;
 import script2.PlayScriptParser.FloatLiteralContext;
 import script2.PlayScriptParser.ForControlContext;
 import script2.PlayScriptParser.ForInitContext;
+import script2.PlayScriptParser.FormalParameterContext;
+import script2.PlayScriptParser.FormalParameterListContext;
+import script2.PlayScriptParser.FormalParametersContext;
 import script2.PlayScriptParser.IntegerLiteralContext;
 import script2.PlayScriptParser.LiteralContext;
+import script2.PlayScriptParser.MemberDeclarationContext;
+import script2.PlayScriptParser.MethodBodyContext;
+import script2.PlayScriptParser.MethodCallContext;
+import script2.PlayScriptParser.MethodDeclarationContext;
 import script2.PlayScriptParser.ParExpressionContext;
 import script2.PlayScriptParser.PrimaryContext;
 import script2.PlayScriptParser.PrimitiveTypeContext;
 import script2.PlayScriptParser.ProgContext;
+import script2.PlayScriptParser.QualifiedNameContext;
+import script2.PlayScriptParser.QualifiedNameListContext;
 import script2.PlayScriptParser.StatementContext;
 import script2.PlayScriptParser.SuperSuffixContext;
 import script2.PlayScriptParser.SwitchBlockStatementGroupContext;
 import script2.PlayScriptParser.SwitchLabelContext;
+import script2.PlayScriptParser.TypeArgumentContext;
+import script2.PlayScriptParser.TypeListContext;
 import script2.PlayScriptParser.TypeTypeContext;
+import script2.PlayScriptParser.TypeTypeOrVoidContext;
 import script2.PlayScriptParser.VariableDeclaratorContext;
 import script2.PlayScriptParser.VariableDeclaratorIdContext;
 import script2.PlayScriptParser.VariableDeclaratorsContext;
 import script2.PlayScriptParser.VariableInitializerContext;
+import script2.PlayScriptParser.VariableModifierContext;
 
 public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     private Map<ParserRuleContext, Symbol> id2Symbol = null;
@@ -93,15 +113,15 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         // // 添加ActivationRecord
         // Scope scope = scopeTree.findDescendantByContext(ctx);
         // if (scope != null) {
-        //     ActivationRecord record = new ActivationRecord(scope);
-        //     activationRecordStack.push(record);
+        // ActivationRecord record = new ActivationRecord(scope);
+        // activationRecordStack.push(record);
         // }
 
         Object rtn = visitBlockStatements(ctx.blockStatements());
 
         // // 去掉ActivationRecord
         // if (scope != null){
-        //     activationRecordStack.pop();
+        // activationRecordStack.pop();
         // }
         return rtn;
     }
@@ -123,16 +143,15 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitExplicitGenericInvocationSuffix(ExplicitGenericInvocationSuffixContext ctx) {
-        return super.visitExplicitGenericInvocationSuffix(ctx);
-    }
-
-    @Override
     public Object visitExpression(ExpressionContext ctx) {
         Object rtn = null;
         if (ctx.bop != null) {
-            Object left = visitExpression(ctx.expression(0));
-            Object right = visitExpression(ctx.expression(1));
+            Object left = null;
+            Object right = null;
+            left = visitExpression(ctx.expression(0));
+            if (ctx.expression().size() >=2){
+                right = visitExpression(ctx.expression(1));
+            }
             switch (ctx.bop.getType()) {
             case PlayScriptParser.ADD:
                 rtn = (Integer) left + (Integer) right;
@@ -162,13 +181,21 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
                 rtn = (Integer) left > (Integer) right;
                 break;
             case PlayScriptParser.ASSIGN:
-                //在赋值语句的情况下，left应该返回一个左值，即变量引用才对。暂时凑合一下。
-                if (ctx.expression(0).primary() != null){
+                // 在赋值语句的情况下，left应该返回一个左值，即变量引用才对。暂时凑合一下。
+                if (ctx.expression(0).primary() != null) {
                     setIdValue(ctx.expression(0).getText(), ctx.expression(0).primary(), right);
                     rtn = right;
-                }
-                else{
+                } else {
                     System.out.println("Unsupported feature during assignment");
+                }
+                break;
+            case PlayScriptParser.DOT:
+                if (ctx.expression(0).primary() !=null){
+                    String idName = ctx.expression(0).primary().getText();
+                    Symbol symbol = id2Symbol.get(ctx.expression(0).primary());
+                    if (symbol.definition instanceof ClassDeclarationContext){
+                        ClassDeclarationContext classContext = (ClassDeclarationContext) symbol.definition;
+                    }
                 }
                 break;
             default:
@@ -176,30 +203,31 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             }
         } else if (ctx.primary() != null) {
             rtn = visitPrimary(ctx.primary());
-        } else if (ctx.postfix != null) {
+        } else if (ctx.postfix != null) { // i++ 或 i-- 类型的语法
             String idName = ctx.expression(0).getText(); // todo:这里后面要改为对象引用
             Integer value = (Integer) getIdValue(idName, ctx.expression(0).primary());
             switch (ctx.postfix.getType()) {
             case PlayScriptParser.INC:
-                setIdValue(idName,ctx.expression(0).primary(),value+1);
-                rtn = value;  //返回值还是原值。如果++放在前面，返回值要加1。
+                setIdValue(idName, ctx.expression(0).primary(), value + 1);
+                rtn = value; // 返回值还是原值。如果++放在前面，返回值要加1。
                 break;
             case PlayScriptParser.DEC:
-                setIdValue(idName,ctx.expression(0).primary(),value-1);
+                setIdValue(idName, ctx.expression(0).primary(), value - 1);
                 rtn = value;
                 break;
             default:
                 break;
             }
-        }
-
+        } else if (ctx.methodCall() != null) {// methodCall
+            rtn = visitMethodCall(ctx.methodCall());
+        } 
         return rtn;
     }
 
     @Override
     public Object visitExpressionList(ExpressionListContext ctx) {
         Object rtn = null;
-        for (ExpressionContext child : ctx.expression()){
+        for (ExpressionContext child : ctx.expression()) {
             rtn = visitExpression(child);
         }
         return rtn;
@@ -213,10 +241,9 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitForInit(ForInitContext ctx) {
         Object rtn = null;
-        if (ctx.variableDeclarators()!=null){
+        if (ctx.variableDeclarators() != null) {
             rtn = visitVariableDeclarators(ctx.variableDeclarators());
-        }
-        else if (ctx.expressionList() != null){
+        } else if (ctx.expressionList() != null) {
             rtn = visitExpressionList(ctx.expressionList());
         }
         return rtn;
@@ -298,30 +325,29 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             activationRecordStack.push(record);
 
             ForControlContext forControl = ctx.forControl();
-            if (forControl.enhancedForControl() != null){
-                
-            }
-            else{
-                //初始化部分做一次
-                if (forControl.forInit() != null){
+            if (forControl.enhancedForControl() != null) {
+
+            } else {
+                // 初始化部分做一次
+                if (forControl.forInit() != null) {
                     rtn = visitForInit(forControl.forInit());
                 }
 
                 while (true) {
-                    Boolean condition = true;  //如果没有条件判断部分，意味着一直循环
-                    if (forControl.expression() != null){
+                    Boolean condition = true; // 如果没有条件判断部分，意味着一直循环
+                    if (forControl.expression() != null) {
                         condition = (Boolean) visitExpression(forControl.expression());
                     }
 
-                    if (condition){
-                        //执行for的语句体
+                    if (condition) {
+                        // 执行for的语句体
                         rtn = visitStatement(ctx.statement(0));
 
-                        //执行forUpdate，通常是“i++”这样的语句。这个执行顺序不能出错。
-                        if (forControl.forUpdate !=null){
+                        // 执行forUpdate，通常是“i++”这样的语句。这个执行顺序不能出错。
+                        if (forControl.forUpdate != null) {
                             visitExpressionList(forControl.forUpdate);
                         }
-                    } else{
+                    } else {
                         break;
                     }
                 }
@@ -331,6 +357,11 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             activationRecordStack.pop();
         } else if (ctx.blockLabel != null) {
             rtn = visitBlock(ctx.blockLabel);
+
+        } else if (ctx.RETURN() != null) {
+            if (ctx.expression() != null) {
+                rtn = visitExpression(ctx.expression());
+            }
         }
         return rtn;
     }
@@ -409,6 +440,137 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         activationRecordStack.pop();
 
         return rtn;
+    }
+
+    @Override
+    public Object visitFormalParameter(FormalParameterContext ctx) {
+        return super.visitFormalParameter(ctx);
+    }
+
+    @Override
+    public Object visitFormalParameterList(FormalParameterListContext ctx) {
+        return super.visitFormalParameterList(ctx);
+    }
+
+    @Override
+    public Object visitFormalParameters(FormalParametersContext ctx) {
+        return super.visitFormalParameters(ctx);
+    }
+
+    @Override
+    public Object visitMethodCall(MethodCallContext ctx) {
+        Object rtn = null;
+        Symbol symbol = id2Symbol.get(ctx);
+        MethodDeclarationContext method = (MethodDeclarationContext) symbol.definition;
+
+        // 添加ActivationRecord
+        Scope scope = scopeTree.findDescendantByContext(method);
+        ActivationRecord record = new ActivationRecord(scope);
+        activationRecordStack.push(record);
+
+        // 往活动记录绑定形参和实参，它们要能够一一对应
+        List<Object> realParams = new LinkedList<Object>();
+        if (ctx.expressionList() != null) {
+            for (ExpressionContext exp : ctx.expressionList().expression()) {
+                realParams.add(visitExpression(exp));
+            }
+        }
+
+        if (method.formalParameters().formalParameterList() != null) {
+            for (int i = 0; i < method.formalParameters().formalParameterList().formalParameter().size(); i++) {
+                FormalParameterContext param = method.formalParameters().formalParameterList().formalParameter(i);
+                String paramName = param.variableDeclaratorId().IDENTIFIER().getText();
+                record.variables.put(paramName, realParams.get(i));
+            }
+        }
+
+        // 调用方法体
+        rtn = visitMethodDeclaration(method);
+
+        // 去掉ActivationRecord
+        activationRecordStack.pop();
+        return rtn;
+    }
+
+    @Override
+    public Object visitMethodDeclaration(MethodDeclarationContext ctx) {
+        Object rtn = null;
+        rtn = visitMethodBody(ctx.methodBody());
+        return rtn;
+    }
+
+    @Override
+    public Object visitMethodBody(MethodBodyContext ctx) {
+        Object rtn = null;
+        if (ctx.block() != null) {
+            rtn = visitBlock(ctx.block());
+        }
+        return rtn;
+    }
+
+    @Override
+    public Object visitQualifiedName(QualifiedNameContext ctx) {
+        return super.visitQualifiedName(ctx);
+    }
+
+    @Override
+    public Object visitQualifiedNameList(QualifiedNameListContext ctx) {
+        return super.visitQualifiedNameList(ctx);
+    }
+
+    @Override
+    public Object visitTypeTypeOrVoid(TypeTypeOrVoidContext ctx) {
+        return super.visitTypeTypeOrVoid(ctx);
+    }
+
+    @Override
+    public Object visitClassBody(ClassBodyContext ctx) {
+        return super.visitClassBody(ctx);
+    }
+
+    @Override
+    public Object visitClassBodyDeclaration(ClassBodyDeclarationContext ctx) {
+        return super.visitClassBodyDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitClassDeclaration(ClassDeclarationContext ctx) {
+        return super.visitClassDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitConstructorDeclaration(ConstructorDeclarationContext ctx) {
+        return super.visitConstructorDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitCreator(CreatorContext ctx) {
+        return super.visitCreator(ctx);
+    }
+
+    @Override
+    public Object visitFieldDeclaration(FieldDeclarationContext ctx) {
+        return super.visitFieldDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitMemberDeclaration(MemberDeclarationContext ctx) {
+        return super.visitMemberDeclaration(ctx);
+    }
+
+    @Override
+    public Object visitTypeArgument(TypeArgumentContext ctx) {
+        return super.visitTypeArgument(ctx);
+    }
+
+    @Override
+    public Object visitTypeList(TypeListContext ctx) {
+        return super.visitTypeList(ctx);
+    }
+
+    @Override
+    public Object visitVariableModifier(VariableModifierContext ctx) {
+        return super.visitVariableModifier(ctx);
     }
 
 }

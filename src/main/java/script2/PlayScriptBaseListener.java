@@ -18,6 +18,54 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterClassDeclaration(PlayScriptParser.ClassDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassDeclaration(PlayScriptParser.ClassDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterClassBody(PlayScriptParser.ClassBodyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassBody(PlayScriptParser.ClassBodyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterClassBodyDeclaration(PlayScriptParser.ClassBodyDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassBodyDeclaration(PlayScriptParser.ClassBodyDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -138,6 +186,30 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFieldDeclaration(PlayScriptParser.FieldDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFieldDeclaration(PlayScriptParser.FieldDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterConstructorDeclaration(PlayScriptParser.ConstructorDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitConstructorDeclaration(PlayScriptParser.ConstructorDeclarationContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterVariableDeclarators(PlayScriptParser.VariableDeclaratorsContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -193,6 +265,30 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitArrayInitializer(PlayScriptParser.ArrayInitializerContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterClassOrInterfaceType(PlayScriptParser.ClassOrInterfaceTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitClassOrInterfaceType(PlayScriptParser.ClassOrInterfaceTypeContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterTypeArgument(PlayScriptParser.TypeArgumentContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTypeArgument(PlayScriptParser.TypeArgumentContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -414,6 +510,18 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTypeList(PlayScriptParser.TypeListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTypeList(PlayScriptParser.TypeListContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterTypeType(PlayScriptParser.TypeTypeContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -438,6 +546,18 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterCreator(PlayScriptParser.CreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitCreator(PlayScriptParser.CreatorContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterSuperSuffix(PlayScriptParser.SuperSuffixContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -445,18 +565,6 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitSuperSuffix(PlayScriptParser.SuperSuffixContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterExplicitGenericInvocationSuffix(PlayScriptParser.ExplicitGenericInvocationSuffixContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitExplicitGenericInvocationSuffix(PlayScriptParser.ExplicitGenericInvocationSuffixContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

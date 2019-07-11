@@ -11,6 +11,39 @@ import CommonLexer;
 package script2;
 }
 
+classDeclaration
+    : CLASS IDENTIFIER
+      (EXTENDS typeType)?
+      (IMPLEMENTS typeList)?
+      classBody
+    ;
+
+classBody
+    : '{' classBodyDeclaration* '}'
+    ;
+
+// interfaceBody
+//     : '{' interfaceBodyDeclaration* '}'
+//     ;
+
+classBodyDeclaration
+    : ';'
+    //| STATIC? block
+    | memberDeclaration
+    ;
+
+memberDeclaration
+    : methodDeclaration
+//    | genericMethodDeclaration
+    | fieldDeclaration
+    | constructorDeclaration
+    // | genericConstructorDeclaration
+    // | interfaceDeclaration
+    // | annotationTypeDeclaration
+    // | classDeclaration
+    // | enumDeclaration
+    ;
+
 methodDeclaration
     : typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
@@ -57,6 +90,15 @@ qualifiedName
     : IDENTIFIER ('.' IDENTIFIER)*
     ;
 
+fieldDeclaration
+    //: typeType variableDeclarators ';'
+    : variableDeclarators ';'
+    ;
+
+constructorDeclaration
+    : IDENTIFIER formalParameters (THROWS qualifiedNameList)? constructorBody=block
+    ;
+
 variableDeclarators
     : typeType variableDeclarator (',' variableDeclarator)*
     ;
@@ -76,6 +118,16 @@ variableInitializer
 
 arrayInitializer
     : '{' (variableInitializer (',' variableInitializer)* (',')? )? '}'
+    ;
+
+classOrInterfaceType
+    // : IDENTIFIER ('.' IDENTIFIER)*
+    : IDENTIFIER
+    ;
+
+typeArgument
+    : typeType
+    | '?' ((EXTENDS | SUPER) typeType)?
     ;
 
 literal
@@ -116,6 +168,8 @@ blockStatement
     : variableDeclarators ';'
     | statement
    // | localTypeDeclaration
+    | methodDeclaration
+    | classDeclaration
     ;
 
 statement
@@ -182,14 +236,14 @@ methodCall
 
 expression
     : primary
-    // | expression bop='.'
-    //   ( IDENTIFIER
-    //   | methodCall
+    | expression bop='.'
+      ( IDENTIFIER
+      | methodCall
     //   | THIS
     //   | NEW nonWildcardTypeArguments? innerCreator
     //   | SUPER superSuffix
     //   | explicitGenericInvocation
-    //   )
+      )
     | expression '[' expression ']'
     | methodCall
     // | NEW creator
@@ -223,21 +277,19 @@ expression
 
 primary
     : '(' expression ')'
-    // | THIS
+    | THIS
     // | SUPER
     | literal
     | IDENTIFIER
     // | typeTypeOrVoid '.' CLASS
-    // | nonWildcardTypeArguments (explicitGenericInvocationSuffix | THIS arguments)
     ;
 
-// typeList
-//     : typeType (',' typeType)*
-//     ;
+typeList
+    : typeType (',' typeType)*
+    ;
 
 typeType
-    //: (classOrInterfaceType | primitiveType) ('[' ']')*
-    :  primitiveType ('[' ']')*
+    : (classOrInterfaceType | primitiveType) ('[' ']')*
     ;
 
 primitiveType
@@ -251,14 +303,13 @@ primitiveType
     | DOUBLE
     ;
 
+creator
+    : IDENTIFIER arguments
+    ;
+
 superSuffix
     : arguments
     | '.' IDENTIFIER arguments?
-    ;
-
-explicitGenericInvocationSuffix
-    : SUPER superSuffix
-    | IDENTIFIER arguments
     ;
 
 arguments

@@ -10,6 +10,46 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface PlayScriptListener extends ParseTreeListener {
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#classDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassDeclaration(PlayScriptParser.ClassDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#classDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassDeclaration(PlayScriptParser.ClassDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#classBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassBody(PlayScriptParser.ClassBodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#classBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassBody(PlayScriptParser.ClassBodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#classBodyDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassBodyDeclaration(PlayScriptParser.ClassBodyDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#classBodyDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassBodyDeclaration(PlayScriptParser.ClassBodyDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#memberDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#memberDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
 	 * @param ctx the parse tree
 	 */
@@ -110,6 +150,26 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitQualifiedName(PlayScriptParser.QualifiedNameContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#fieldDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterFieldDeclaration(PlayScriptParser.FieldDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#fieldDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitFieldDeclaration(PlayScriptParser.FieldDeclarationContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#constructorDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void enterConstructorDeclaration(PlayScriptParser.ConstructorDeclarationContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#constructorDeclaration}.
+	 * @param ctx the parse tree
+	 */
+	void exitConstructorDeclaration(PlayScriptParser.ConstructorDeclarationContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#variableDeclarators}.
 	 * @param ctx the parse tree
 	 */
@@ -159,6 +219,26 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitArrayInitializer(PlayScriptParser.ArrayInitializerContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#classOrInterfaceType}.
+	 * @param ctx the parse tree
+	 */
+	void enterClassOrInterfaceType(PlayScriptParser.ClassOrInterfaceTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#classOrInterfaceType}.
+	 * @param ctx the parse tree
+	 */
+	void exitClassOrInterfaceType(PlayScriptParser.ClassOrInterfaceTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#typeArgument}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeArgument(PlayScriptParser.TypeArgumentContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#typeArgument}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeArgument(PlayScriptParser.TypeArgumentContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#literal}.
 	 * @param ctx the parse tree
@@ -340,6 +420,16 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitPrimary(PlayScriptParser.PrimaryContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#typeList}.
+	 * @param ctx the parse tree
+	 */
+	void enterTypeList(PlayScriptParser.TypeListContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#typeList}.
+	 * @param ctx the parse tree
+	 */
+	void exitTypeList(PlayScriptParser.TypeListContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#typeType}.
 	 * @param ctx the parse tree
 	 */
@@ -360,6 +450,16 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitPrimitiveType(PlayScriptParser.PrimitiveTypeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void enterCreator(PlayScriptParser.CreatorContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#creator}.
+	 * @param ctx the parse tree
+	 */
+	void exitCreator(PlayScriptParser.CreatorContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#superSuffix}.
 	 * @param ctx the parse tree
 	 */
@@ -369,16 +469,6 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitSuperSuffix(PlayScriptParser.SuperSuffixContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link PlayScriptParser#explicitGenericInvocationSuffix}.
-	 * @param ctx the parse tree
-	 */
-	void enterExplicitGenericInvocationSuffix(PlayScriptParser.ExplicitGenericInvocationSuffixContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link PlayScriptParser#explicitGenericInvocationSuffix}.
-	 * @param ctx the parse tree
-	 */
-	void exitExplicitGenericInvocationSuffix(PlayScriptParser.ExplicitGenericInvocationSuffixContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#arguments}.
 	 * @param ctx the parse tree

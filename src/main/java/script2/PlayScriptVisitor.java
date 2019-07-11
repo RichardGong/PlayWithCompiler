@@ -13,6 +13,30 @@ import org.antlr.v4.runtime.tree.ParseTreeVisitor;
  */
 public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#classDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassDeclaration(PlayScriptParser.ClassDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#classBody}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassBody(PlayScriptParser.ClassBodyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#classBodyDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassBodyDeclaration(PlayScriptParser.ClassBodyDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#memberDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -73,6 +97,18 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitQualifiedName(PlayScriptParser.QualifiedNameContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#fieldDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFieldDeclaration(PlayScriptParser.FieldDeclarationContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#constructorDeclaration}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitConstructorDeclaration(PlayScriptParser.ConstructorDeclarationContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#variableDeclarators}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -102,6 +138,18 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitArrayInitializer(PlayScriptParser.ArrayInitializerContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#classOrInterfaceType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitClassOrInterfaceType(PlayScriptParser.ClassOrInterfaceTypeContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#typeArgument}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeArgument(PlayScriptParser.TypeArgumentContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#literal}.
 	 * @param ctx the parse tree
@@ -211,6 +259,12 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimary(PlayScriptParser.PrimaryContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#typeList}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTypeList(PlayScriptParser.TypeListContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#typeType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -223,17 +277,17 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitPrimitiveType(PlayScriptParser.PrimitiveTypeContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#creator}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitCreator(PlayScriptParser.CreatorContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#superSuffix}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitSuperSuffix(PlayScriptParser.SuperSuffixContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link PlayScriptParser#explicitGenericInvocationSuffix}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitExplicitGenericInvocationSuffix(PlayScriptParser.ExplicitGenericInvocationSuffixContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#arguments}.
 	 * @param ctx the parse tree
