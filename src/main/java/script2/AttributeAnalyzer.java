@@ -204,17 +204,31 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
                     System.out.println("unknown object: " + idName);
                 } else {
                     id2Symbol.put(ctx, symbol);
+                    if(symbol.definition instanceof ClassDeclarationContext){
+                        //把类的scope变成当前scope,这有两个前提：
+                        //1.类的声明在当前中，是当前scope的子scope；
+                        //2.类的声明在引用之前，其scope对象已经被建立起来。
+                        currentScope = scopeTree.findDescendantByContext(symbol.definition);   
+                    }
                 }
-
-                //设置成类的scope
-
             }         
         }
     }
 
     @Override
     public void exitExpression(ExpressionContext ctx) {
-        super.exitExpression(ctx);
+        if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
+
+            if (ctx.expression(0).primary() !=null){
+                String idName = ctx.expression(0).primary().getText();
+                Symbol symbol = id2Symbol.get(ctx.expression(0).primary());
+                if (symbol == null) {
+                    System.out.println("unknown object: " + idName);
+                } else {
+                    currentScope = currentScope.parent;
+                }
+            }         
+        }
     }
 
 }

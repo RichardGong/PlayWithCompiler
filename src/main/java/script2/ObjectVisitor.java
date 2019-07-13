@@ -61,6 +61,11 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
 
     private void setIdValue(String idName, ParserRuleContext ctx, Object value) {
         Symbol symbol = id2Symbol.get(ctx);
+
+        //首先在当前的活动记录中查找
+
+        //之后，顺着scope链逐级网上查找
+        //todo 需要修改
         boolean found = false;
         for (ActivationRecord record : activationRecordStack) {
             if (record.scope == symbol.scope) {
@@ -78,6 +83,12 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     private Object getIdValue(String idName, ParserRuleContext ctx) {
         Object rtn = null;
         Symbol symbol = id2Symbol.get(ctx);
+
+        //首先在当前的活动记录中查找
+
+        //之后，顺着scope链逐级网上查找
+        //todo 需要修改
+        
         boolean found = false;
         for (ActivationRecord record : activationRecordStack) {
             if (record.scope == symbol.scope) {
@@ -192,9 +203,10 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             case PlayScriptParser.DOT:
                 if (ctx.expression(0).primary() !=null){
                     String idName = ctx.expression(0).primary().getText();
-                    Symbol symbol = id2Symbol.get(ctx.expression(0).primary());
+                    Symbol symbol = id2Symbol.get(ctx);
                     if (symbol.definition instanceof ClassDeclarationContext){
                         ClassDeclarationContext classContext = (ClassDeclarationContext) symbol.definition;
+                        
                     }
                 }
                 break;
