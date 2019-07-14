@@ -14,7 +14,11 @@ public class Symbol {
     // 方法或变量的定义
     // protected ParserRuleContext definition = null;
 
-    public Symbol(String name, Type type, Scope scope) {
+    public Symbol(String name, Scope scope) {
+        this.name = name;
+        this.scope = scope;
+    }
+    public Symbol(String name, Scope scope, Type type) {
         this.name = name;
         this.type = type;
         this.scope = scope;
@@ -32,7 +36,11 @@ public class Symbol {
 
     @Override
     public int hashCode() {
-        return name.hashCode() + type.hashCode() + scope.hashCode();
+        int rtn = name.hashCode() + scope.hashCode();
+        if (type != null){
+            rtn += type.hashCode();
+        }
+        return rtn;
     }
 
 }

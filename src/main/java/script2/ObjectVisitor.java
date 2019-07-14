@@ -2,9 +2,6 @@ package script2;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
-
-import org.antlr.v4.runtime.ParserRuleContext;
 
 import script2.PlayScriptParser.ArgumentsContext;
 import script2.PlayScriptParser.ArrayInitializerContext;
@@ -53,66 +50,16 @@ import script2.PlayScriptParser.VariableInitializerContext;
 import script2.PlayScriptParser.VariableModifierContext;
 
 public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
-    private Map<ParserRuleContext, Symbol> id2Symbol = null;
 
-    //AST节点对应的Scope，如for、函数调用会启动新的Scope
-    protected Map<ParserRuleContext, Scope> node2Scope = null;
-
-    private Scope scopeTree = null;
-
+    //之前的编译结果
+    private CompilationRecord cr = null;
+    
+    //局部变量的栈
     private VMStack stack = new VMStack();
-    // private Stack<ActivationRecord> activationRecordStack = new
-    // Stack<ActivationRecord>();
+    
 
-    // private void setIdValue(String idName, ParserRuleContext ctx, Object value) {
-    // Symbol symbol = id2Symbol.get(ctx);
-
-    // //首先在当前的活动记录中查找
-
-    // //之后，顺着scope链逐级网上查找
-    // //todo 需要修改
-    // boolean found = false;
-    // for (ActivationRecord record : activationRecordStack) {
-    // if (record.scope == symbol.scope) {
-    // found = true;
-    // record.variables.put(idName, value);
-    // break;
-    // }
-    // }
-
-    // if (!found) {
-    // System.out.println("Unable to set variable value: " + idName);
-    // }
-    // }
-
-    // private Object getIdValue(String idName, ParserRuleContext ctx) {
-    // Object rtn = null;
-    // Symbol symbol = id2Symbol.get(ctx);
-
-    // //首先在当前的活动记录中查找
-
-    // //之后，顺着scope链逐级网上查找
-    // //todo 需要修改
-
-    // boolean found = false;
-    // for (ActivationRecord record : activationRecordStack) {
-    // if (record.scope == symbol.scope) {
-    // found = true;
-    // rtn = record.variables.get(idName);
-    // break;
-    // }
-    // }
-
-    // if (!found) {
-    // System.out.println("Unable to get variable value: " + idName);
-    // }
-    // return rtn;
-    // }
-
-    public ObjectVisitor(Map<ParserRuleContext, Symbol> id2Symbol, Map<ParserRuleContext, Scope> node2Scope, Scope scopeTree) {
-        this.id2Symbol = id2Symbol;
-        this.node2Scope = node2Scope;
-        this.scopeTree = scopeTree;
+    public ObjectVisitor(CompilationRecord cr) {
+        this.cr = cr;
     }
 
     @Override
@@ -221,8 +168,8 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
                 break;
             case PlayScriptParser.DOT:
                 if (leftObject instanceof LValue) {
-                    Symbol symbol = id2Symbol.get(ctx);
-                    if (symbol.type.typeType == TypeType.Class){
+                    Symbol symbol = cr.node2Symbol.get(ctx);
+                    if (symbol.type instanceof Class){
                         //找到类的成员
                     }
                 } else {
@@ -309,7 +256,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
-            Symbol symbol = id2Symbol.get(ctx);
+            Symbol symbol = cr.node2Symbol.get(ctx);
             rtn = stack.getLValue(symbol);
         }
         return rtn;
@@ -352,7 +299,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             }
         } else if (ctx.FOR() != null) {
             // 添加StackFrame
-            Scope scope = node2Scope.get(ctx);
+            Scope scope = cr.node2Scope.get(ctx);
             StackFrame frame = new StackFrame(scope);
             frame.parentFrame = stack.peek();
             stack.push(frame);
@@ -433,7 +380,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         Object rtn = null;
-        Symbol symbol = id2Symbol.get(ctx);
+        Symbol symbol = cr.node2Symbol.get(ctx);
         rtn = stack.getLValue(symbol);
         return rtn;
     }
@@ -469,7 +416,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitProg(ProgContext ctx) {
         Object rtn = null;
-        stack.push(new StackFrame(scopeTree));
+        stack.push(new StackFrame(cr.scopeTree));
 
         rtn = visitBlockStatements(ctx.blockStatements());
 
@@ -496,11 +443,11 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitMethodCall(MethodCallContext ctx) {
         Object rtn = null;
-        Symbol symbol = id2Symbol.get(ctx);
-        MethodDeclarationContext method = (MethodDeclarationContext) symbol.type.code;
+        Symbol symbol = cr.node2Symbol.get(ctx);
+        MethodDeclarationContext method = (MethodDeclarationContext) cr.type2Node.get(symbol.type);
 
         // 添加StackFrame
-        Scope scope = node2Scope.get(method);
+        Scope scope = cr.node2Scope.get(method);
         StackFrame frame = new StackFrame(scope);
 
         //TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
