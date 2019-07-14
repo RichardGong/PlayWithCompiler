@@ -3,7 +3,6 @@ package script2;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -55,57 +54,64 @@ import script2.PlayScriptParser.VariableModifierContext;
 
 public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     private Map<ParserRuleContext, Symbol> id2Symbol = null;
+
+    //AST节点对应的Scope，如for、函数调用会启动新的Scope
+    protected Map<ParserRuleContext, Scope> node2Scope = null;
+
     private Scope scopeTree = null;
 
-    private Stack<ActivationRecord> activationRecordStack = new Stack<ActivationRecord>();
+    private VMStack stack = new VMStack();
+    // private Stack<ActivationRecord> activationRecordStack = new
+    // Stack<ActivationRecord>();
 
-    private void setIdValue(String idName, ParserRuleContext ctx, Object value) {
-        Symbol symbol = id2Symbol.get(ctx);
+    // private void setIdValue(String idName, ParserRuleContext ctx, Object value) {
+    // Symbol symbol = id2Symbol.get(ctx);
 
-        //首先在当前的活动记录中查找
+    // //首先在当前的活动记录中查找
 
-        //之后，顺着scope链逐级网上查找
-        //todo 需要修改
-        boolean found = false;
-        for (ActivationRecord record : activationRecordStack) {
-            if (record.scope == symbol.scope) {
-                found = true;
-                record.variables.put(idName, value);
-                break;
-            }
-        }
+    // //之后，顺着scope链逐级网上查找
+    // //todo 需要修改
+    // boolean found = false;
+    // for (ActivationRecord record : activationRecordStack) {
+    // if (record.scope == symbol.scope) {
+    // found = true;
+    // record.variables.put(idName, value);
+    // break;
+    // }
+    // }
 
-        if (!found) {
-            System.out.println("Unable to set variable value: " + idName);
-        }
-    }
+    // if (!found) {
+    // System.out.println("Unable to set variable value: " + idName);
+    // }
+    // }
 
-    private Object getIdValue(String idName, ParserRuleContext ctx) {
-        Object rtn = null;
-        Symbol symbol = id2Symbol.get(ctx);
+    // private Object getIdValue(String idName, ParserRuleContext ctx) {
+    // Object rtn = null;
+    // Symbol symbol = id2Symbol.get(ctx);
 
-        //首先在当前的活动记录中查找
+    // //首先在当前的活动记录中查找
 
-        //之后，顺着scope链逐级网上查找
-        //todo 需要修改
-        
-        boolean found = false;
-        for (ActivationRecord record : activationRecordStack) {
-            if (record.scope == symbol.scope) {
-                found = true;
-                rtn = record.variables.get(idName);
-                break;
-            }
-        }
+    // //之后，顺着scope链逐级网上查找
+    // //todo 需要修改
 
-        if (!found) {
-            System.out.println("Unable to get variable value: " + idName);
-        }
-        return rtn;
-    }
+    // boolean found = false;
+    // for (ActivationRecord record : activationRecordStack) {
+    // if (record.scope == symbol.scope) {
+    // found = true;
+    // rtn = record.variables.get(idName);
+    // break;
+    // }
+    // }
 
-    public ObjectVisitor(Map<ParserRuleContext, Symbol> id2Symbol, Scope scopeTree) {
+    // if (!found) {
+    // System.out.println("Unable to get variable value: " + idName);
+    // }
+    // return rtn;
+    // }
+
+    public ObjectVisitor(Map<ParserRuleContext, Symbol> id2Symbol, Map<ParserRuleContext, Scope> node2Scope, Scope scopeTree) {
         this.id2Symbol = id2Symbol;
+        this.node2Scope = node2Scope;
         this.scopeTree = scopeTree;
     }
 
@@ -157,57 +163,70 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     public Object visitExpression(ExpressionContext ctx) {
         Object rtn = null;
         if (ctx.bop != null) {
-            Object left = null;
-            Object right = null;
-            left = visitExpression(ctx.expression(0));
-            if (ctx.expression().size() >=2){
-                right = visitExpression(ctx.expression(1));
+            Object leftObject = visitExpression(ctx.expression(0));
+            Object rightObject = null;
+            Integer left = 0;
+            Integer right = 0;
+            if (ctx.expression().size() >= 2) {
+                rightObject = visitExpression(ctx.expression(1));
             }
+
+            if (leftObject instanceof LValue) {
+                left = (Integer) ((LValue) leftObject).getValue();
+            } else if (leftObject instanceof Integer){
+                left = (Integer) leftObject;
+            }
+            
+            if (rightObject instanceof LValue) {
+                right = (Integer) ((LValue) rightObject).getValue();
+            }else if (rightObject instanceof Integer){
+                right = (Integer) rightObject;
+            }
+
             switch (ctx.bop.getType()) {
             case PlayScriptParser.ADD:
-                rtn = (Integer) left + (Integer) right;
+                rtn = left + right;
                 break;
             case PlayScriptParser.SUB:
-                rtn = (Integer) left - (Integer) right;
+                rtn = left - right;
                 break;
             case PlayScriptParser.MUL:
-                rtn = (Integer) left * (Integer) right;
+                rtn = left * right;
                 break;
             case PlayScriptParser.DIV:
-                rtn = (Integer) left / (Integer) right;
+                rtn = left / right;
                 break;
             case PlayScriptParser.EQUAL:
-                rtn = (Integer) left == (Integer) right;
+                rtn = left == right;
                 break;
             case PlayScriptParser.LE:
-                rtn = (Integer) left <= (Integer) right;
+                rtn = left <= right;
                 break;
             case PlayScriptParser.LT:
-                rtn = (Integer) left < (Integer) right;
+                rtn = left < right;
                 break;
             case PlayScriptParser.GE:
-                rtn = (Integer) left >= (Integer) right;
+                rtn = left >= right;
                 break;
             case PlayScriptParser.GT:
-                rtn = (Integer) left > (Integer) right;
+                rtn = left > right;
                 break;
             case PlayScriptParser.ASSIGN:
-                // 在赋值语句的情况下，left应该返回一个左值，即变量引用才对。暂时凑合一下。
-                if (ctx.expression(0).primary() != null) {
-                    setIdValue(ctx.expression(0).getText(), ctx.expression(0).primary(), right);
+                if (leftObject instanceof LValue) {
+                    ((LValue) leftObject).setValue(right);
                     rtn = right;
                 } else {
                     System.out.println("Unsupported feature during assignment");
                 }
                 break;
             case PlayScriptParser.DOT:
-                if (ctx.expression(0).primary() !=null){
-                    String idName = ctx.expression(0).primary().getText();
+                if (leftObject instanceof LValue) {
                     Symbol symbol = id2Symbol.get(ctx);
-                    if (symbol.definition instanceof ClassDeclarationContext){
-                        ClassDeclarationContext classContext = (ClassDeclarationContext) symbol.definition;
-                        
+                    if (symbol.type.typeType == TypeType.Class){
+                        //找到类的成员
                     }
+                } else {
+                    System.out.println("Expecting an Object Reference");
                 }
                 break;
             default:
@@ -216,15 +235,15 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         } else if (ctx.primary() != null) {
             rtn = visitPrimary(ctx.primary());
         } else if (ctx.postfix != null) { // i++ 或 i-- 类型的语法
-            String idName = ctx.expression(0).getText(); // todo:这里后面要改为对象引用
-            Integer value = (Integer) getIdValue(idName, ctx.expression(0).primary());
+            LValue lValue = (LValue)visitExpression(ctx.expression(0));
+            Integer value = (Integer) lValue.getValue();
             switch (ctx.postfix.getType()) {
             case PlayScriptParser.INC:
-                setIdValue(idName, ctx.expression(0).primary(), value + 1);
+                lValue.setValue(value + 1);
                 rtn = value; // 返回值还是原值。如果++放在前面，返回值要加1。
                 break;
             case PlayScriptParser.DEC:
-                setIdValue(idName, ctx.expression(0).primary(), value - 1);
+                lValue.setValue(value - 1);
                 rtn = value;
                 break;
             default:
@@ -232,7 +251,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             }
         } else if (ctx.methodCall() != null) {// methodCall
             rtn = visitMethodCall(ctx.methodCall());
-        } 
+        }
         return rtn;
     }
 
@@ -290,7 +309,8 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
-            rtn = getIdValue(ctx.IDENTIFIER().getText(), ctx);
+            Symbol symbol = id2Symbol.get(ctx);
+            rtn = stack.getLValue(symbol);
         }
         return rtn;
     }
@@ -331,16 +351,17 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
                 rtn = visitStatement(ctx.statement(1));
             }
         } else if (ctx.FOR() != null) {
-            // 添加ActivationRecord
-            Scope scope = scopeTree.findDescendantByContext(ctx);
-            ActivationRecord record = new ActivationRecord(scope);
-            activationRecordStack.push(record);
+            // 添加StackFrame
+            Scope scope = node2Scope.get(ctx);
+            StackFrame frame = new StackFrame(scope);
+            frame.parentFrame = stack.peek();
+            stack.push(frame);
 
             ForControlContext forControl = ctx.forControl();
             if (forControl.enhancedForControl() != null) {
 
             } else {
-                // 初始化部分做一次
+                // 初始化部分执行一次
                 if (forControl.forInit() != null) {
                     rtn = visitForInit(forControl.forInit());
                 }
@@ -366,7 +387,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             }
 
             // 去掉ActivationRecord
-            activationRecordStack.pop();
+            stack.pop();
         } else if (ctx.blockLabel != null) {
             rtn = visitBlock(ctx.blockLabel);
 
@@ -401,17 +422,20 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitVariableDeclarator(VariableDeclaratorContext ctx) {
         Object rtn = null;
-        String id = (String) visitVariableDeclaratorId(ctx.variableDeclaratorId());
+        LValue lValue = (LValue)visitVariableDeclaratorId(ctx.variableDeclaratorId());
         if (ctx.variableInitializer() != null) {
             rtn = visitVariableInitializer(ctx.variableInitializer());
-            setIdValue(id, ctx.variableDeclaratorId(), rtn);
+            lValue.setValue(rtn);
         }
         return rtn;
     }
 
     @Override
     public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
-        return ctx.IDENTIFIER().getText();
+        Object rtn = null;
+        Symbol symbol = id2Symbol.get(ctx);
+        rtn = stack.getLValue(symbol);
+        return rtn;
     }
 
     @Override
@@ -445,11 +469,11 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitProg(ProgContext ctx) {
         Object rtn = null;
-        activationRecordStack.push(new ActivationRecord(scopeTree));
+        stack.push(new StackFrame(scopeTree));
 
         rtn = visitBlockStatements(ctx.blockStatements());
 
-        activationRecordStack.pop();
+        stack.pop();
 
         return rtn;
     }
@@ -473,34 +497,42 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     public Object visitMethodCall(MethodCallContext ctx) {
         Object rtn = null;
         Symbol symbol = id2Symbol.get(ctx);
-        MethodDeclarationContext method = (MethodDeclarationContext) symbol.definition;
+        MethodDeclarationContext method = (MethodDeclarationContext) symbol.type.code;
 
-        // 添加ActivationRecord
-        Scope scope = scopeTree.findDescendantByContext(method);
-        ActivationRecord record = new ActivationRecord(scope);
-        activationRecordStack.push(record);
+        // 添加StackFrame
+        Scope scope = node2Scope.get(method);
+        StackFrame frame = new StackFrame(scope);
+
+        //TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
+        frame.parentFrame = stack.peek();   
+
+        stack.push(frame);
 
         // 往活动记录绑定形参和实参，它们要能够一一对应
         List<Object> realParams = new LinkedList<Object>();
         if (ctx.expressionList() != null) {
             for (ExpressionContext exp : ctx.expressionList().expression()) {
-                realParams.add(visitExpression(exp));
+                Object value = visitExpression(exp);
+                if (value instanceof LValue){
+                    value = ((LValue)value).getValue();
+                }
+                realParams.add(value);
             }
         }
 
         if (method.formalParameters().formalParameterList() != null) {
             for (int i = 0; i < method.formalParameters().formalParameterList().formalParameter().size(); i++) {
                 FormalParameterContext param = method.formalParameters().formalParameterList().formalParameter(i);
-                String paramName = param.variableDeclaratorId().IDENTIFIER().getText();
-                record.variables.put(paramName, realParams.get(i));
+                LValue lValue= (LValue)visitVariableDeclaratorId(param.variableDeclaratorId());
+                lValue.setValue(realParams.get(i));
             }
         }
 
         // 调用方法体
         rtn = visitMethodDeclaration(method);
 
-        // 去掉ActivationRecord
-        activationRecordStack.pop();
+        // 弹出StackFrame
+        stack.pop();
         return rtn;
     }
 

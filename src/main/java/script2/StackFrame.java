@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StackFrame {
-    Map<String, Object> variables = new HashMap<String, Object>();
+    Map<Symbol, Object> variables = new HashMap<Symbol, Object>();
 
     //该frame所对应的scope
     Scope scope = null;

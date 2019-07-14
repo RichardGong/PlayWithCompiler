@@ -8,7 +8,7 @@ import java.util.Map;
  * 类型字典。单例。
  */
 public final class TypeDict{
-    private TypeDict instance = null;
+    private static TypeDict instance = null;
 
     private Map<String, Type> types = new HashMap<String, Type>();
 
@@ -17,7 +17,7 @@ public final class TypeDict{
         put("Integer","", new Type(TypeType.Integer));
     }
 
-    private TypeDict instance(){
+    public static TypeDict instance(){
         if (instance == null){
             instance = new TypeDict();
         }
@@ -30,5 +30,9 @@ public final class TypeDict{
 
     public void put(String name, String namespace, Type type){
         types.put(namespace+"."+name, type);
+    }
+
+    public Type IntegerType(){
+        return lookup("Integer","");
     }
 }
