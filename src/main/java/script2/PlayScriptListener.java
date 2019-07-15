@@ -50,25 +50,25 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
+	 * Enter a parse tree produced by {@link PlayScriptParser#functionDeclaration}.
 	 * @param ctx the parse tree
 	 */
-	void enterMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx);
+	void enterFunctionDeclaration(PlayScriptParser.FunctionDeclarationContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
+	 * Exit a parse tree produced by {@link PlayScriptParser#functionDeclaration}.
 	 * @param ctx the parse tree
 	 */
-	void exitMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx);
+	void exitFunctionDeclaration(PlayScriptParser.FunctionDeclarationContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PlayScriptParser#methodBody}.
+	 * Enter a parse tree produced by {@link PlayScriptParser#functionBody}.
 	 * @param ctx the parse tree
 	 */
-	void enterMethodBody(PlayScriptParser.MethodBodyContext ctx);
+	void enterFunctionBody(PlayScriptParser.FunctionBodyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link PlayScriptParser#methodBody}.
+	 * Exit a parse tree produced by {@link PlayScriptParser#functionBody}.
 	 * @param ctx the parse tree
 	 */
-	void exitMethodBody(PlayScriptParser.MethodBodyContext ctx);
+	void exitFunctionBody(PlayScriptParser.FunctionBodyContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#typeTypeOrVoid}.
 	 * @param ctx the parse tree
@@ -390,15 +390,15 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitExpressionList(PlayScriptParser.ExpressionListContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link PlayScriptParser#methodCall}.
+	 * Enter a parse tree produced by {@link PlayScriptParser#functionCall}.
 	 * @param ctx the parse tree
 	 */
-	void enterMethodCall(PlayScriptParser.MethodCallContext ctx);
+	void enterFunctionCall(PlayScriptParser.FunctionCallContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link PlayScriptParser#methodCall}.
+	 * Exit a parse tree produced by {@link PlayScriptParser#functionCall}.
 	 * @param ctx the parse tree
 	 */
-	void exitMethodCall(PlayScriptParser.MethodCallContext ctx);
+	void exitFunctionCall(PlayScriptParser.FunctionCallContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#expression}.
 	 * @param ctx the parse tree

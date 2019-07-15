@@ -33,8 +33,8 @@ classBodyDeclaration
     ;
 
 memberDeclaration
-    : methodDeclaration
-//    | genericMethodDeclaration
+    : functionDeclaration
+//    | genericFunctionDeclaration
     | fieldDeclaration
     | constructorDeclaration
     // | genericConstructorDeclaration
@@ -44,13 +44,13 @@ memberDeclaration
     // | enumDeclaration
     ;
 
-methodDeclaration
+functionDeclaration
     : typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
-      methodBody
+      functionBody
     ;
 
-methodBody
+functionBody
     : block
     | ';'
     ;
@@ -168,7 +168,7 @@ blockStatement
     : variableDeclarators ';'
     | statement
    // | localTypeDeclaration
-    | methodDeclaration
+    | functionDeclaration
     | classDeclaration
     ;
 
@@ -228,7 +228,7 @@ expressionList
     : expression (',' expression)*
     ;
 
-methodCall
+functionCall
     : IDENTIFIER '(' expressionList? ')'
     | THIS '(' expressionList? ')'
     | SUPER '(' expressionList? ')'
@@ -238,15 +238,15 @@ expression
     : primary
     | expression bop='.'
       ( IDENTIFIER
-      | methodCall
+      | functionCall
     //   | THIS
     //   | NEW nonWildcardTypeArguments? innerCreator
     //   | SUPER superSuffix
     //   | explicitGenericInvocation
       )
     | expression '[' expression ']'
-    | methodCall
-    // | NEW creator
+    | functionCall
+    // | NEW creator   //不用new关键字，而是用类名相同的函数直接生成对象。
     // | '(' typeType ')' expression
     | expression postfix=('++' | '--')
     | prefix=('+'|'-'|'++'|'--') expression
@@ -268,7 +268,7 @@ expression
       expression
     // | lambdaExpression // Java8
 
-    // Java 8 methodReference
+    // Java 8 functionReference
     // | expression '::' typeArguments? IDENTIFIER
     // | typeType '::' (typeArguments? IDENTIFIER | NEW)
     // | classType '::' typeArguments? NEW

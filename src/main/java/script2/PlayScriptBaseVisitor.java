@@ -47,14 +47,14 @@ public class PlayScriptBaseVisitor<T> extends AbstractParseTreeVisitor<T> implem
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFunctionDeclaration(PlayScriptParser.FunctionDeclarationContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMethodBody(PlayScriptParser.MethodBodyContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFunctionBody(PlayScriptParser.FunctionBodyContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -285,7 +285,7 @@ public class PlayScriptBaseVisitor<T> extends AbstractParseTreeVisitor<T> implem
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMethodCall(PlayScriptParser.MethodCallContext ctx) { return visitChildren(ctx); }
+	@Override public T visitFunctionCall(PlayScriptParser.FunctionCallContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -26,9 +26,9 @@ import script2.PlayScriptParser.FormalParametersContext;
 import script2.PlayScriptParser.IntegerLiteralContext;
 import script2.PlayScriptParser.LiteralContext;
 import script2.PlayScriptParser.MemberDeclarationContext;
-import script2.PlayScriptParser.MethodBodyContext;
-import script2.PlayScriptParser.MethodCallContext;
-import script2.PlayScriptParser.MethodDeclarationContext;
+import script2.PlayScriptParser.FunctionBodyContext;
+import script2.PlayScriptParser.FunctionCallContext;
+import script2.PlayScriptParser.FunctionDeclarationContext;
 import script2.PlayScriptParser.ParExpressionContext;
 import script2.PlayScriptParser.PrimaryContext;
 import script2.PlayScriptParser.PrimitiveTypeContext;
@@ -49,7 +49,7 @@ import script2.PlayScriptParser.VariableDeclaratorsContext;
 import script2.PlayScriptParser.VariableInitializerContext;
 import script2.PlayScriptParser.VariableModifierContext;
 
-public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
+public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     //之前的编译结果
     private CompilationRecord cr = null;
@@ -58,7 +58,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     private VMStack stack = new VMStack();
     
 
-    public ObjectVisitor(CompilationRecord cr) {
+    public ASTEvaluator(CompilationRecord cr) {
         this.cr = cr;
     }
 
@@ -168,8 +168,8 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
                 break;
             case PlayScriptParser.DOT:
                 if (leftObject instanceof LValue) {
-                    Symbol symbol = cr.node2Symbol.get(ctx);
-                    if (symbol.type instanceof Class){
+                    Variable variable = (Variable)cr.node2Symbol.get(ctx);
+                    if (variable.type instanceof Class){
                         //找到类的成员
                     }
                 } else {
@@ -196,8 +196,8 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             default:
                 break;
             }
-        } else if (ctx.methodCall() != null) {// methodCall
-            rtn = visitMethodCall(ctx.methodCall());
+        } else if (ctx.functionCall() != null) {// functionCall
+            rtn = visitFunctionCall(ctx.functionCall());
         }
         return rtn;
     }
@@ -257,7 +257,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
             Symbol symbol = cr.node2Symbol.get(ctx);
-            rtn = stack.getLValue(symbol);
+            rtn = stack.getLValue((Variable)symbol);
         }
         return rtn;
     }
@@ -381,7 +381,7 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         Object rtn = null;
         Symbol symbol = cr.node2Symbol.get(ctx);
-        rtn = stack.getLValue(symbol);
+        rtn = stack.getLValue((Variable)symbol);
         return rtn;
     }
 
@@ -441,13 +441,13 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMethodCall(MethodCallContext ctx) {
+    public Object visitFunctionCall(FunctionCallContext ctx) {
         Object rtn = null;
-        Symbol symbol = cr.node2Symbol.get(ctx);
-        MethodDeclarationContext method = (MethodDeclarationContext) cr.type2Node.get(symbol.type);
+        Function function= (Function)cr.node2Symbol.get(ctx);
+        FunctionDeclarationContext functionCode = (FunctionDeclarationContext) cr.type2Node.get(function);
 
         // 添加StackFrame
-        Scope scope = cr.node2Scope.get(method);
+        Scope scope = cr.node2Scope.get(functionCode);
         StackFrame frame = new StackFrame(scope);
 
         //TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
@@ -467,16 +467,16 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
             }
         }
 
-        if (method.formalParameters().formalParameterList() != null) {
-            for (int i = 0; i < method.formalParameters().formalParameterList().formalParameter().size(); i++) {
-                FormalParameterContext param = method.formalParameters().formalParameterList().formalParameter(i);
+        if (functionCode.formalParameters().formalParameterList() != null) {
+            for (int i = 0; i < functionCode.formalParameters().formalParameterList().formalParameter().size(); i++) {
+                FormalParameterContext param = functionCode.formalParameters().formalParameterList().formalParameter(i);
                 LValue lValue= (LValue)visitVariableDeclaratorId(param.variableDeclaratorId());
                 lValue.setValue(realParams.get(i));
             }
         }
 
         // 调用方法体
-        rtn = visitMethodDeclaration(method);
+        rtn = visitFunctionDeclaration(functionCode);
 
         // 弹出StackFrame
         stack.pop();
@@ -484,14 +484,14 @@ public class ObjectVisitor extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitMethodDeclaration(MethodDeclarationContext ctx) {
+    public Object visitFunctionDeclaration(FunctionDeclarationContext ctx) {
         Object rtn = null;
-        rtn = visitMethodBody(ctx.methodBody());
+        rtn = visitFunctionBody(ctx.functionBody());
         return rtn;
     }
 
     @Override
-    public Object visitMethodBody(MethodBodyContext ctx) {
+    public Object visitFunctionBody(FunctionBodyContext ctx) {
         Object rtn = null;
         if (ctx.block() != null) {
             rtn = visitBlock(ctx.block());

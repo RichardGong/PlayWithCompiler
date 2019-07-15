@@ -231,8 +231,8 @@ classDeclaration
 classBody
 classBodyDeclaration
 memberDeclaration
-methodDeclaration
-methodBody
+functionDeclaration
+functionBody
 typeTypeOrVoid
 qualifiedNameList
 formalParameters
@@ -265,7 +265,7 @@ forInit
 enhancedForControl
 parExpression
 expressionList
-methodCall
+functionCall
 expression
 primary
 typeList

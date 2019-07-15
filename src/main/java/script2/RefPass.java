@@ -2,40 +2,45 @@ package script2;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
-import script2.PlayScriptCompiler.FunctionImp;
-import script2.PlayScriptCompiler.ClassImp;
-
 import script2.PlayScriptParser.BlockContext;
 import script2.PlayScriptParser.ClassDeclarationContext;
 import script2.PlayScriptParser.EnhancedForControlContext;
 import script2.PlayScriptParser.ExpressionContext;
-import script2.PlayScriptParser.MethodCallContext;
-import script2.PlayScriptParser.MethodDeclarationContext;
+import script2.PlayScriptParser.FunctionCallContext;
+import script2.PlayScriptParser.FunctionDeclarationContext;
 import script2.PlayScriptParser.PrimaryContext;
 import script2.PlayScriptParser.ProgContext;
 import script2.PlayScriptParser.StatementContext;
 import script2.PlayScriptParser.VariableDeclaratorIdContext;
 
-public class AttributeAnalyzer extends PlayScriptBaseListener {
+/**
+ * 解析符号之间的引用关系。
+ */
+public class RefPass extends PlayScriptBaseListener {
 
     // 遍历过程中的临时变量
     private Scope currentScope = null;
 
     private CompilationRecord cr = null;
 
-    public AttributeAnalyzer(CompilationRecord cr){
+    public RefPass(CompilationRecord cr){
         this.cr = cr;
     }
 
     private Scope createAndPushScope(ParserRuleContext ctx){
         Scope scope = new Scope(currentScope);
         cr.node2Scope.put(ctx,scope);
+        scope.ctx = ctx;
         currentScope = scope;
         return scope;
     }
 
     private void popScope(){
         currentScope = currentScope.parent;
+    }
+
+    private void createVariable(){
+
     }
 
     // private boolean underForStatement(BlockContext ctx) {
@@ -62,11 +67,11 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
     public void enterPrimary(PrimaryContext ctx) {
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
-            Symbol symbol = cr.findSymbol(currentScope, idName);
-            if (symbol == null) {
-                System.out.println("unknown variable: " + idName);
+            Variable variable = cr.findVariable(currentScope, idName);
+            if (variable == null) {
+                cr.log("unknown variable: " + idName, ctx);
             } else {
-                cr.node2Symbol.put(ctx, symbol);
+                cr.node2Symbol.put(ctx, variable);
             }
         }
     }
@@ -86,12 +91,19 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
     @Override
     public void enterVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         String idName = ctx.IDENTIFIER().getText();
-        Symbol symbol = new Symbol(idName, currentScope);  //TODO 根据上下文确定正确的类型
-        if (currentScope.symbols.contains(symbol)) {
-            System.out.println("Variable already Declared: " + idName);
-        } else {
-            currentScope.symbols.add(symbol);
-            cr.node2Symbol.put(ctx, symbol);
+        Variable variable = new Variable(idName, currentScope);  //TODO 根据上下文确定正确的类型
+
+        if (cr.findVariable(currentScope, idName) !=null) {
+            cr.log("Variable already Declared: " + idName, ctx);
+        }
+
+        currentScope.symbols.add(variable);
+        cr.node2Symbol.put(ctx, variable);
+
+        //如果是在Class的定义中，则要添加field
+        if (currentScope.ctx instanceof ClassDeclarationContext){
+            Class theClass = (Class)cr.node2Symbol.get(currentScope.ctx); 
+            theClass.fields.add(variable);
         }
     }
 
@@ -120,45 +132,47 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
     }
 
     @Override
-    public void enterMethodCall(MethodCallContext ctx) {
+    public void enterFunctionCall(FunctionCallContext ctx) {
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
-            Symbol symbol = cr.findSymbol(currentScope, idName); //TODO 要更精确的查找方法
-            if (symbol == null) {
-                System.out.println("unknown method: " + idName);
+            Function function = cr.findFunction(currentScope, idName, null); //TODO 要更精确的查找方法
+            if (function == null) {
+                cr.log("unknown function: " + idName, ctx);
             } else {
-                cr.node2Symbol.put(ctx, symbol);
+                cr.node2Symbol.put(ctx, function);
             }
         }
     }
 
     @Override
-    public void enterMethodDeclaration(MethodDeclarationContext ctx) {
+    public void enterFunctionDeclaration(FunctionDeclarationContext ctx) {
         // 把方法的签名存到符号表中,目前不支持方法的重载，每个方法名称必须唯一，并且也不能跟变量名称冲突
         String idName = ctx.IDENTIFIER().getText();
-        FunctionImp function = new FunctionImp(idName);
+        Function function = new Function(idName,currentScope);
         cr.types.add(function);
         cr.type2Node.put(function, ctx);
         
-        Symbol symbol = new Symbol(idName, currentScope, function);
+        //TODO 需要查重
+        currentScope.symbols.add(function);
 
-        if (currentScope.symbols.contains(symbol)){
-            System.out.println("Symbol already Declared: " + idName);
-        } else {
-            currentScope.symbols.add(symbol);
-        }
+    
+        //如果是在Class的定义中，则要添加成员
+        if (currentScope.ctx instanceof ClassDeclarationContext){
+            Class theClass = (Class)cr.node2Symbol.get(currentScope.ctx); 
+            theClass.functions.add(function);
+        }    
 
         // 创建一个新的scope
         createAndPushScope(ctx);
     }
 
     @Override
-    public void exitMethodCall(MethodCallContext ctx) {
-        super.exitMethodCall(ctx);
+    public void exitFunctionCall(FunctionCallContext ctx) {
+        super.exitFunctionCall(ctx);
     }
 
     @Override
-    public void exitMethodDeclaration(MethodDeclarationContext ctx) {
+    public void exitFunctionDeclaration(FunctionDeclarationContext ctx) {
         popScope();
     }
 
@@ -167,16 +181,14 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
         // 把类的签名存到符号表中，不能跟已有符号名称冲突
         String idName = ctx.IDENTIFIER().getText();
 
-        Class type = new ClassImp(idName);
-        cr.types.add(type);
-       
-        Symbol symbol = new Symbol(idName, currentScope, type);
-
-        if (currentScope.symbols.contains(symbol)) {
-            System.out.println("Class name conflict with existing symbol: " + idName);
-        } else {
-            currentScope.symbols.add(symbol);
+        Class theClass = new Class(idName,currentScope);
+        cr.types.add(theClass);
+    
+        if (cr.findClass(currentScope, idName) !=null){
+            cr.log("duplicate class name:" + idName, ctx); //只是报警，但仍然继续解析
         }
+
+        currentScope.symbols.add(theClass); 
 
         // 创建一个新的scope
         createAndPushScope(ctx);
@@ -192,40 +204,40 @@ public class AttributeAnalyzer extends PlayScriptBaseListener {
 
     @Override
     public void enterExpression(ExpressionContext ctx) {
-        if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
+        // if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
 
-            if (ctx.expression(0).primary() !=null){
-                String idName = ctx.expression(0).primary().getText();
-                Symbol symbol = cr.node2Symbol.get(ctx.expression(0).primary());
-                if (symbol == null) {
-                    System.out.println("unknown object: " + idName);
-                } else {
-                    cr.node2Symbol.put(ctx, symbol);
-                    // if(symbol.definition instanceof ClassDeclarationContext){
-                    //     //把类的scope变成当前scope,这有两个前提：
-                    //     //1.类的声明在当前中，是当前scope的子scope；
-                    //     //2.类的声明在引用之前，其scope对象已经被建立起来。
-                    //     currentScope = scopeTree.findDescendantByContext(symbol.definition);   
-                    // }
-                }
-            }         
-        }
+        //     if (ctx.expression(0).primary() !=null){
+        //         String idName = ctx.expression(0).primary().getText();
+        //         Symbol symbol = cr.node2Symbol.get(ctx.expression(0).primary());
+        //         if (symbol == null) {
+        //             System.out.println("unknown object: " + idName);
+        //         } else {
+        //             cr.node2Symbol.put(ctx, symbol);
+        //             // if(symbol.definition instanceof ClassDeclarationContext){
+        //             //     //把类的scope变成当前scope,这有两个前提：
+        //             //     //1.类的声明在当前中，是当前scope的子scope；
+        //             //     //2.类的声明在引用之前，其scope对象已经被建立起来。
+        //             //     currentScope = scopeTree.findDescendantByContext(symbol.definition);   
+        //             // }
+        //         }
+        //     }         
+        // }
     }
 
     @Override
     public void exitExpression(ExpressionContext ctx) {
-        if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
+        // if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
 
-            if (ctx.expression(0).primary() !=null){
-                String idName = ctx.expression(0).primary().getText();
-                Symbol symbol = cr.node2Symbol.get(ctx.expression(0).primary());
-                if (symbol == null) {
-                    System.out.println("unknown object: " + idName);
-                } else {
-                    popScope();
-                }
-            }         
-        }
+        //     if (ctx.expression(0).primary() !=null){
+        //         String idName = ctx.expression(0).primary().getText();
+        //         Symbol symbol = cr.node2Symbol.get(ctx.expression(0).primary());
+        //         if (symbol == null) {
+        //             System.out.println("unknown object: " + idName);
+        //         } else {
+        //             popScope();
+        //         }
+        //     }         
+        // }
     }
 
 }

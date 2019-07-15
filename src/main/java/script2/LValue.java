@@ -9,7 +9,7 @@ public interface LValue {
 
     public void setValue(Object value);
 
-    public Symbol getSymbol();
+    public Variable getVariable();
 
     public StackFrame getFrame();
 }

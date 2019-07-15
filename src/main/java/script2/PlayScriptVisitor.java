@@ -37,17 +37,17 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitMemberDeclaration(PlayScriptParser.MemberDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PlayScriptParser#methodDeclaration}.
+	 * Visit a parse tree produced by {@link PlayScriptParser#functionDeclaration}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx);
+	T visitFunctionDeclaration(PlayScriptParser.FunctionDeclarationContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PlayScriptParser#methodBody}.
+	 * Visit a parse tree produced by {@link PlayScriptParser#functionBody}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMethodBody(PlayScriptParser.MethodBodyContext ctx);
+	T visitFunctionBody(PlayScriptParser.FunctionBodyContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#typeTypeOrVoid}.
 	 * @param ctx the parse tree
@@ -241,11 +241,11 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitExpressionList(PlayScriptParser.ExpressionListContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link PlayScriptParser#methodCall}.
+	 * Visit a parse tree produced by {@link PlayScriptParser#functionCall}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	T visitMethodCall(PlayScriptParser.MethodCallContext ctx);
+	T visitFunctionCall(PlayScriptParser.FunctionCallContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#expression}.
 	 * @param ctx the parse tree

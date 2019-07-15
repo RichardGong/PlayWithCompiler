@@ -25,14 +25,14 @@ public class VMStack {
     /**
      * 这是获得LValue的唯一出口，所以在这里可以确保。（但如果再赋值给别的变量，就先不管了。除非从根上管理赋值操作。，比如通过CopyLValue()的方法）
      */
-    public LValue getLValue(Symbol symbol){
+    public LValue getLValue(Variable variable){
         //todo 增加reference中的计数器
 
         MyLValue lvalue = new MyLValue();
-        lvalue.symbol = symbol;
+        lvalue.variable = variable;
         StackFrame f = data.peek();
         while (f != null){
-            if (f.scope == symbol.scope){
+            if (f.scope == variable.scope){
                 lvalue.frame = f;
                 break; 
             }
@@ -43,7 +43,7 @@ public class VMStack {
 
     public LValue copyLValue(LValue lValue){
         MyLValue newValue = new MyLValue();
-        newValue.symbol = lValue.getSymbol();
+        newValue.variable = lValue.getVariable();
         newValue.frame = lValue.getFrame();
 
         //TODO 增加reference计数器的值
@@ -51,22 +51,22 @@ public class VMStack {
     }
 
     private final class MyLValue implements LValue{
-        private Symbol symbol;
+        private Variable variable;
         private StackFrame frame;  //所在的栈桢
     
         @Override
         public Object getValue() {
-            return frame.variables.get(symbol);
+            return frame.variables.get(variable);
         }
     
         @Override
         public void setValue(Object value){
-            frame.variables.put(symbol, value);
+            frame.variables.put(variable, value);
         }
 
         @Override
-        public Symbol getSymbol() {
-            return symbol;
+        public Variable getVariable() {
+            return variable;
         }
 
         @Override

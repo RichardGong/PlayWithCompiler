@@ -1,14 +1,15 @@
 package script2;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public interface Function extends Type {
+public class Function extends Type {
+    // function的属性
+    protected List<Variable> parameters = new LinkedList<Variable>();
+    protected Type returnType = null;
 
-    //函数的参数列表。
-    //todo 可以有特殊参数。支持多个值。
-    public List<Parameter> parameters();
-    
-    //返回值的类型，只允许一个返回值
-    public Type getReturnType();
-    
+    protected Function(String name, Scope scope) {
+        this.name = name;
+        this.scope = scope;
+    }
 }

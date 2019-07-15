@@ -9,10 +9,10 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 public class CompilationRecord {
-    //AST
+    // AST
     protected ParseTree ast = null;
 
-    //解析出来的所有类型，包括类和函数，以后还可以包括数组和枚举。类的方法也作为单独的要素放进去。
+    // 解析出来的所有类型，包括类和函数，以后还可以包括数组和枚举。类的方法也作为单独的要素放进去。
     protected List<Type> types = new LinkedList<Type>();
 
     // AST节点对应的Symbol
@@ -24,31 +24,117 @@ public class CompilationRecord {
     // 编译后形成的scope树
     protected Scope scopeTree = null;
 
-    // class、method等对应的代码的位置，可以是AST节点，后面可以是IR
+    // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
     protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
 
+    protected CompilationRecord() {
+        // 初始化一些基本类型
+        types.add(new Class("Integer", null));
+    }
+
+    protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
+
+    protected void log(String message, ParserRuleContext ctx){
+        CompilationLog log = new CompilationLog();
+        log.ctx = ctx;
+        log.message = message;
+        log.line = ctx.getStart().getLine();
+        log.positionInLine = ctx.getStart().getStartIndex();
+        log.type = CompilationLog.ERROR;
+
+        System.out.println(log);
+    }
+
     /**
-     * 通过id查找Symbol
+     * 通过名称查找Variable
      * 
      * @param scope
      * @param idName
      * @return
      */
-    // TODO 如果支持方法重载，还需要比较方法签名
-    protected Symbol findSymbol(Scope scope, String idName) {
-        Symbol symbol = null;
+    protected Variable findVariable(Scope scope, String idName) {
+        Variable rtn = null;
         for (Symbol s : scope.symbols) {
             // typeType是可选的参数
-            if (s.name.equals(idName)) {
-                symbol = s;
+            if (s instanceof Variable && s.name.equals(idName)) {
+                rtn = (Variable) s;
                 break;
             }
         }
 
-        if (symbol == null) {
-            symbol = findSymbol(scope.parent, idName);
+        if (rtn == null && scope.parent != null) {
+            rtn = findVariable(scope.parent, idName);
         }
-        return symbol;
+        return rtn;
+    }
+
+    /**
+     * 通过名称查找Class
+     * 
+     * @param scope
+     * @param idName
+     * @return
+     */
+    protected Class findClass(Scope scope, String idName) {
+        Class rtn = null;
+        for (Symbol s : scope.symbols) {
+            // typeType是可选的参数
+            if (s instanceof Class && s.name.equals(idName)) {
+                rtn = (Class) s;
+                break;
+            }
+        }
+
+        if (rtn == null && scope.parent != null) {
+            rtn = findClass(scope.parent, idName);
+        }
+        return rtn;
+    }
+
+    /**
+     * 通过方法的名称和方法签名查找Function
+     * 
+     * @param scope
+     * @param idName
+     * @param params
+     * @return
+     */
+    protected Function findFunction(Scope scope, String idName, List<Variable> params) {
+        Function rtn = null;
+        for (Symbol s : scope.symbols) {
+            // typeType是可选的参数
+            if (s instanceof Function && s.name.equals(idName)) {
+                Function function = (Function) s;
+
+                if (params != null) {
+                    // 比较每个参数
+                    if (function.parameters.size() != params.size()) {
+                        break;
+                    }
+
+                    for (int i = 0; i < params.size(); i++) {
+                        Variable v1 = params.get(i);
+                        Variable v2 = params.get(i);
+                        if (v1.type == v2.type) {
+                            rtn = function;
+                            break;
+                        }
+                    }
+                } else {
+                    // TODO 临时的，弱比较，不比较参数
+                    rtn = function;
+                }
+
+                if (rtn != null) {
+                    break;
+                }
+            }
+        }
+
+        if (rtn == null && scope.parent != null) {
+            rtn = findFunction(scope.parent, idName, params);
+        }
+        return rtn;
     }
 
 }

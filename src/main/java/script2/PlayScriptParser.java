@@ -38,7 +38,7 @@ public class PlayScriptParser extends Parser {
 		AT=106, ELLIPSIS=107, WS=108, COMMENT=109, LINE_COMMENT=110, IDENTIFIER=111;
 	public static final int
 		RULE_classDeclaration = 0, RULE_classBody = 1, RULE_classBodyDeclaration = 2, 
-		RULE_memberDeclaration = 3, RULE_methodDeclaration = 4, RULE_methodBody = 5, 
+		RULE_memberDeclaration = 3, RULE_functionDeclaration = 4, RULE_functionBody = 5, 
 		RULE_typeTypeOrVoid = 6, RULE_qualifiedNameList = 7, RULE_formalParameters = 8, 
 		RULE_formalParameterList = 9, RULE_formalParameter = 10, RULE_lastFormalParameter = 11, 
 		RULE_variableModifier = 12, RULE_qualifiedName = 13, RULE_fieldDeclaration = 14, 
@@ -49,13 +49,13 @@ public class PlayScriptParser extends Parser {
 		RULE_blockStatements = 28, RULE_blockStatement = 29, RULE_statement = 30, 
 		RULE_switchBlockStatementGroup = 31, RULE_switchLabel = 32, RULE_forControl = 33, 
 		RULE_forInit = 34, RULE_enhancedForControl = 35, RULE_parExpression = 36, 
-		RULE_expressionList = 37, RULE_methodCall = 38, RULE_expression = 39, 
+		RULE_expressionList = 37, RULE_functionCall = 38, RULE_expression = 39, 
 		RULE_primary = 40, RULE_typeList = 41, RULE_typeType = 42, RULE_primitiveType = 43, 
 		RULE_creator = 44, RULE_superSuffix = 45, RULE_arguments = 46;
 	private static String[] makeRuleNames() {
 		return new String[] {
 			"classDeclaration", "classBody", "classBodyDeclaration", "memberDeclaration", 
-			"methodDeclaration", "methodBody", "typeTypeOrVoid", "qualifiedNameList", 
+			"functionDeclaration", "functionBody", "typeTypeOrVoid", "qualifiedNameList", 
 			"formalParameters", "formalParameterList", "formalParameter", "lastFormalParameter", 
 			"variableModifier", "qualifiedName", "fieldDeclaration", "constructorDeclaration", 
 			"variableDeclarators", "variableDeclarator", "variableDeclaratorId", 
@@ -63,7 +63,7 @@ public class PlayScriptParser extends Parser {
 			"literal", "integerLiteral", "floatLiteral", "prog", "block", "blockStatements", 
 			"blockStatement", "statement", "switchBlockStatementGroup", "switchLabel", 
 			"forControl", "forInit", "enhancedForControl", "parExpression", "expressionList", 
-			"methodCall", "expression", "primary", "typeList", "typeType", "primitiveType", 
+			"functionCall", "expression", "primary", "typeList", "typeType", "primitiveType", 
 			"creator", "superSuffix", "arguments"
 		};
 	}
@@ -378,8 +378,8 @@ public class PlayScriptParser extends Parser {
 	}
 
 	public static class MemberDeclarationContext extends ParserRuleContext {
-		public MethodDeclarationContext methodDeclaration() {
-			return getRuleContext(MethodDeclarationContext.class,0);
+		public FunctionDeclarationContext functionDeclaration() {
+			return getRuleContext(FunctionDeclarationContext.class,0);
 		}
 		public FieldDeclarationContext fieldDeclaration() {
 			return getRuleContext(FieldDeclarationContext.class,0);
@@ -417,7 +417,7 @@ public class PlayScriptParser extends Parser {
 				enterOuterAlt(_localctx, 1);
 				{
 				setState(119);
-				methodDeclaration();
+				functionDeclaration();
 				}
 				break;
 			case 2:
@@ -447,7 +447,7 @@ public class PlayScriptParser extends Parser {
 		return _localctx;
 	}
 
-	public static class MethodDeclarationContext extends ParserRuleContext {
+	public static class FunctionDeclarationContext extends ParserRuleContext {
 		public TypeTypeOrVoidContext typeTypeOrVoid() {
 			return getRuleContext(TypeTypeOrVoidContext.class,0);
 		}
@@ -455,8 +455,8 @@ public class PlayScriptParser extends Parser {
 		public FormalParametersContext formalParameters() {
 			return getRuleContext(FormalParametersContext.class,0);
 		}
-		public MethodBodyContext methodBody() {
-			return getRuleContext(MethodBodyContext.class,0);
+		public FunctionBodyContext functionBody() {
+			return getRuleContext(FunctionBodyContext.class,0);
 		}
 		public List<TerminalNode> LBRACK() { return getTokens(PlayScriptParser.LBRACK); }
 		public TerminalNode LBRACK(int i) {
@@ -470,28 +470,28 @@ public class PlayScriptParser extends Parser {
 		public QualifiedNameListContext qualifiedNameList() {
 			return getRuleContext(QualifiedNameListContext.class,0);
 		}
-		public MethodDeclarationContext(ParserRuleContext parent, int invokingState) {
+		public FunctionDeclarationContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_methodDeclaration; }
+		@Override public int getRuleIndex() { return RULE_functionDeclaration; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).enterMethodDeclaration(this);
+			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).enterFunctionDeclaration(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).exitMethodDeclaration(this);
+			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).exitFunctionDeclaration(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitMethodDeclaration(this);
+			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitFunctionDeclaration(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final MethodDeclarationContext methodDeclaration() throws RecognitionException {
-		MethodDeclarationContext _localctx = new MethodDeclarationContext(_ctx, getState());
-		enterRule(_localctx, 8, RULE_methodDeclaration);
+	public final FunctionDeclarationContext functionDeclaration() throws RecognitionException {
+		FunctionDeclarationContext _localctx = new FunctionDeclarationContext(_ctx, getState());
+		enterRule(_localctx, 8, RULE_functionDeclaration);
 		int _la;
 		try {
 			enterOuterAlt(_localctx, 1);
@@ -531,7 +531,7 @@ public class PlayScriptParser extends Parser {
 			}
 
 			setState(138);
-			methodBody();
+			functionBody();
 			}
 		}
 		catch (RecognitionException re) {
@@ -545,33 +545,33 @@ public class PlayScriptParser extends Parser {
 		return _localctx;
 	}
 
-	public static class MethodBodyContext extends ParserRuleContext {
+	public static class FunctionBodyContext extends ParserRuleContext {
 		public BlockContext block() {
 			return getRuleContext(BlockContext.class,0);
 		}
 		public TerminalNode SEMI() { return getToken(PlayScriptParser.SEMI, 0); }
-		public MethodBodyContext(ParserRuleContext parent, int invokingState) {
+		public FunctionBodyContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_methodBody; }
+		@Override public int getRuleIndex() { return RULE_functionBody; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).enterMethodBody(this);
+			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).enterFunctionBody(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).exitMethodBody(this);
+			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).exitFunctionBody(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitMethodBody(this);
+			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitFunctionBody(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final MethodBodyContext methodBody() throws RecognitionException {
-		MethodBodyContext _localctx = new MethodBodyContext(_ctx, getState());
-		enterRule(_localctx, 10, RULE_methodBody);
+	public final FunctionBodyContext functionBody() throws RecognitionException {
+		FunctionBodyContext _localctx = new FunctionBodyContext(_ctx, getState());
+		enterRule(_localctx, 10, RULE_functionBody);
 		try {
 			setState(142);
 			_errHandler.sync(this);
@@ -2143,8 +2143,8 @@ public class PlayScriptParser extends Parser {
 		public StatementContext statement() {
 			return getRuleContext(StatementContext.class,0);
 		}
-		public MethodDeclarationContext methodDeclaration() {
-			return getRuleContext(MethodDeclarationContext.class,0);
+		public FunctionDeclarationContext functionDeclaration() {
+			return getRuleContext(FunctionDeclarationContext.class,0);
 		}
 		public ClassDeclarationContext classDeclaration() {
 			return getRuleContext(ClassDeclarationContext.class,0);
@@ -2195,7 +2195,7 @@ public class PlayScriptParser extends Parser {
 				enterOuterAlt(_localctx, 3);
 				{
 				setState(297);
-				methodDeclaration();
+				functionDeclaration();
 				}
 				break;
 			case 4:
@@ -3011,7 +3011,7 @@ public class PlayScriptParser extends Parser {
 		return _localctx;
 	}
 
-	public static class MethodCallContext extends ParserRuleContext {
+	public static class FunctionCallContext extends ParserRuleContext {
 		public TerminalNode IDENTIFIER() { return getToken(PlayScriptParser.IDENTIFIER, 0); }
 		public TerminalNode LPAREN() { return getToken(PlayScriptParser.LPAREN, 0); }
 		public TerminalNode RPAREN() { return getToken(PlayScriptParser.RPAREN, 0); }
@@ -3020,28 +3020,28 @@ public class PlayScriptParser extends Parser {
 		}
 		public TerminalNode THIS() { return getToken(PlayScriptParser.THIS, 0); }
 		public TerminalNode SUPER() { return getToken(PlayScriptParser.SUPER, 0); }
-		public MethodCallContext(ParserRuleContext parent, int invokingState) {
+		public FunctionCallContext(ParserRuleContext parent, int invokingState) {
 			super(parent, invokingState);
 		}
-		@Override public int getRuleIndex() { return RULE_methodCall; }
+		@Override public int getRuleIndex() { return RULE_functionCall; }
 		@Override
 		public void enterRule(ParseTreeListener listener) {
-			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).enterMethodCall(this);
+			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).enterFunctionCall(this);
 		}
 		@Override
 		public void exitRule(ParseTreeListener listener) {
-			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).exitMethodCall(this);
+			if ( listener instanceof PlayScriptListener ) ((PlayScriptListener)listener).exitFunctionCall(this);
 		}
 		@Override
 		public <T> T accept(ParseTreeVisitor<? extends T> visitor) {
-			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitMethodCall(this);
+			if ( visitor instanceof PlayScriptVisitor ) return ((PlayScriptVisitor<? extends T>)visitor).visitFunctionCall(this);
 			else return visitor.visitChildren(this);
 		}
 	}
 
-	public final MethodCallContext methodCall() throws RecognitionException {
-		MethodCallContext _localctx = new MethodCallContext(_ctx, getState());
-		enterRule(_localctx, 76, RULE_methodCall);
+	public final FunctionCallContext functionCall() throws RecognitionException {
+		FunctionCallContext _localctx = new FunctionCallContext(_ctx, getState());
+		enterRule(_localctx, 76, RULE_functionCall);
 		int _la;
 		try {
 			setState(439);
@@ -3132,8 +3132,8 @@ public class PlayScriptParser extends Parser {
 		public PrimaryContext primary() {
 			return getRuleContext(PrimaryContext.class,0);
 		}
-		public MethodCallContext methodCall() {
-			return getRuleContext(MethodCallContext.class,0);
+		public FunctionCallContext functionCall() {
+			return getRuleContext(FunctionCallContext.class,0);
 		}
 		public List<ExpressionContext> expression() {
 			return getRuleContexts(ExpressionContext.class);
@@ -3236,7 +3236,7 @@ public class PlayScriptParser extends Parser {
 			case 2:
 				{
 				setState(443);
-				methodCall();
+				functionCall();
 				}
 				break;
 			case 3:
@@ -3527,7 +3527,7 @@ public class PlayScriptParser extends Parser {
 						case 2:
 							{
 							setState(500);
-							methodCall();
+							functionCall();
 							}
 							break;
 						}

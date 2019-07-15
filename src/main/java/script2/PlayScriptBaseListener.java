@@ -66,25 +66,25 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx) { }
+	@Override public void enterFunctionDeclaration(PlayScriptParser.FunctionDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMethodDeclaration(PlayScriptParser.MethodDeclarationContext ctx) { }
+	@Override public void exitFunctionDeclaration(PlayScriptParser.FunctionDeclarationContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMethodBody(PlayScriptParser.MethodBodyContext ctx) { }
+	@Override public void enterFunctionBody(PlayScriptParser.FunctionBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMethodBody(PlayScriptParser.MethodBodyContext ctx) { }
+	@Override public void exitFunctionBody(PlayScriptParser.FunctionBodyContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -474,13 +474,13 @@ public class PlayScriptBaseListener implements PlayScriptListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterMethodCall(PlayScriptParser.MethodCallContext ctx) { }
+	@Override public void enterFunctionCall(PlayScriptParser.FunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void exitMethodCall(PlayScriptParser.MethodCallContext ctx) { }
+	@Override public void exitFunctionCall(PlayScriptParser.FunctionCallContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
