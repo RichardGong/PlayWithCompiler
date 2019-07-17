@@ -24,5 +24,6 @@ public class BlockFrame extends StackFrame {
         if (objects == null){
             objects = new HashMap<Variable, Object>();
         }
+        objects.put(variable, value);
     }
 }

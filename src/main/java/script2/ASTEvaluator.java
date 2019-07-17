@@ -190,7 +190,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                         rtn = lValue;
                     }
                     else if (ctx.functionCall() != null){
-                        visitFunctionCall(ctx.functionCall());
+                        rtn = visitFunctionCall(ctx.functionCall());
                     }
                 }
             } else {
@@ -481,6 +481,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 stack.push(classFrame);
             }
         }
+       
 
         // if (classFrame != null) {
         //     functionFrame.parentFrame = classFrame;

@@ -23,16 +23,15 @@ public class VMHeap {
             ClassObject newObject = new ClassObject();
             obj.type = theClass.parentClass;
             theObject.parentObject = newObject;
+            ancestorChain.push(newObject);
 
             theClass = theClass.parentClass;
             theObject = newObject;
         }
 
         // 执行缺省的初始化方法
-        ClassObject object = ancestorChain.pop();
-        while (object != null) {
+        for(ClassObject object : ancestorChain){
             defaultObjectInit(object);
-            object = ancestorChain.pop();
         }
 
         return obj;

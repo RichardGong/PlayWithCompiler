@@ -115,14 +115,19 @@ public class CompilationRecord {
                         break;
                     }
 
+                    boolean match = true;
                     for (int i = 0; i < paramTypes.size(); i++) {
                         Variable var = function.parameters.get(i);
                         Type type = paramTypes.get(i);
-                        if (var.type == type) {  //TODO 这里应该做类型兼容性测试，只要类型能够转换，或者是其子类都可以。
-                            rtn = function;
+                        if (var.type != type) {  //TODO 这里应该做类型兼容性测试，只要类型能够转换，或者是其子类都可以。
+                            match = false;
                             break;
                         }
                     }
+                    if (match){
+                        rtn = function;
+                    }
+
                 } else {
                     // TODO 临时的，弱比较，不比较参数
                     rtn = function;

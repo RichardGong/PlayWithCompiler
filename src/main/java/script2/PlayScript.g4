@@ -36,7 +36,7 @@ memberDeclaration
     : functionDeclaration
 //    | genericFunctionDeclaration
     | fieldDeclaration
-    | constructorDeclaration
+    // | constructorDeclaration
     // | genericConstructorDeclaration
     // | interfaceDeclaration
     // | annotationTypeDeclaration
@@ -45,10 +45,11 @@ memberDeclaration
     ;
 
 functionDeclaration
-    : typeTypeOrVoid IDENTIFIER formalParameters ('[' ']')*
+    : typeTypeOrVoid? IDENTIFIER formalParameters ('[' ']')*
       (THROWS qualifiedNameList)?
       functionBody
     ;
+
 
 functionBody
     : block

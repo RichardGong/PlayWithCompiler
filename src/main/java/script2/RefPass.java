@@ -10,14 +10,20 @@ import script2.PlayScriptParser.ClassDeclarationContext;
 import script2.PlayScriptParser.ClassOrInterfaceTypeContext;
 import script2.PlayScriptParser.EnhancedForControlContext;
 import script2.PlayScriptParser.ExpressionContext;
+import script2.PlayScriptParser.FloatLiteralContext;
 import script2.PlayScriptParser.FormalParameterContext;
 import script2.PlayScriptParser.FunctionCallContext;
 import script2.PlayScriptParser.FunctionDeclarationContext;
+import script2.PlayScriptParser.FunctionTypeContext;
+import script2.PlayScriptParser.IntegerLiteralContext;
+import script2.PlayScriptParser.LiteralContext;
 import script2.PlayScriptParser.PrimaryContext;
 import script2.PlayScriptParser.PrimitiveTypeContext;
 import script2.PlayScriptParser.ProgContext;
 import script2.PlayScriptParser.StatementContext;
+import script2.PlayScriptParser.TypeListContext;
 import script2.PlayScriptParser.TypeTypeContext;
+import script2.PlayScriptParser.TypeTypeOrVoidContext;
 import script2.PlayScriptParser.VariableDeclaratorContext;
 import script2.PlayScriptParser.VariableDeclaratorIdContext;
 import script2.PlayScriptParser.VariableDeclaratorsContext;
@@ -70,7 +76,7 @@ public class RefPass extends PlayScriptBaseListener {
     }
 
     @Override
-    public void enterPrimary(PrimaryContext ctx) {
+    public void exitPrimary(PrimaryContext ctx) {
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
             Variable variable = cr.findVariable(currentScope, idName);
@@ -78,7 +84,14 @@ public class RefPass extends PlayScriptBaseListener {
                 cr.log("unknown variable: " + idName, ctx);
             } else {
                 cr.node2Symbol.put(ctx, variable);
+
+                // 记录类型
+                cr.node2Type.put(ctx, variable.type);
             }
+        } else if (ctx.literal() != null) {
+            cr.node2Type.put(ctx, cr.node2Type.get(ctx.literal()));
+        } else if (ctx.expression() != null) {
+            cr.node2Type.put(ctx, cr.node2Type.get(ctx.expression()));
         }
     }
 
@@ -110,11 +123,13 @@ public class RefPass extends PlayScriptBaseListener {
 
         // TODO 这里的类型推断先用比较简单的方法，后面要兼顾各种用到variableDeclaratorId的情况
         // if (ctx.parent instanceof VariableDeclaratorContext
-        //         && ctx.parent.parent instanceof VariableDeclaratorsContext) {
-        //     VariableDeclaratorsContext vdc = (VariableDeclaratorsContext) ctx.parent.parent;
-        //     if (vdc.typeType().classOrInterfaceType() != null) {
-        //         variable.type = (Type) cr.node2Symbol.get(vdc.typeType().classOrInterfaceType());
-        //     }
+        // && ctx.parent.parent instanceof VariableDeclaratorsContext) {
+        // VariableDeclaratorsContext vdc = (VariableDeclaratorsContext)
+        // ctx.parent.parent;
+        // if (vdc.typeType().classOrInterfaceType() != null) {
+        // variable.type = (Type)
+        // cr.node2Symbol.get(vdc.typeType().classOrInterfaceType());
+        // }
         // }
 
         // 如果是在Class的定义中，则要添加field
@@ -150,18 +165,48 @@ public class RefPass extends PlayScriptBaseListener {
 
     @Override
     public void exitFunctionCall(FunctionCallContext ctx) {
-        //获得类型
+        // 获得参数类型
         List<Type> paramTypes = new LinkedList<Type>();
-        if (ctx.expressionList() != null){
-            for (ExpressionContext exp: ctx.expressionList().expression()){
+        if (ctx.expressionList() != null) {
+            for (ExpressionContext exp : ctx.expressionList().expression()) {
                 Type type = cr.node2Type.get(exp);
                 paramTypes.add(type);
             }
         }
 
-        if (ctx.IDENTIFIER() != null) {
+        Function function = null;
+        // 看看是不是在被作为类的方法调用，从而确定正确的查找范围
+        if (ctx.parent instanceof ExpressionContext) {
+            ExpressionContext exp = (ExpressionContext)ctx.parent;
+            if (exp.bop != null && exp.bop.getType() == PlayScriptParser.DOT) {
+                // 这是个左递归，要不断的把左边的节点的计算结果存到node2Symbol，所以要在exitExpression里操作
+                Symbol symbol = cr.node2Symbol.get(exp.expression(0));
+                if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
+                    Class theClass = (Class) ((Variable) symbol).type;
+                    Scope classScope = cr.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
+
+                    if (ctx.IDENTIFIER() != null) {
+                        String idName = ctx.IDENTIFIER().getText();
+                        function = cr.findFunction(classScope, idName,paramTypes);
+                        if (function != null) {
+                            cr.node2Symbol.put(exp, function);
+                            cr.node2Type.put(exp, function.returnType);
+                            cr.node2Symbol.put(ctx, function);    //父节点也加上
+                            cr.node2Type.put(ctx, function.returnType);
+                        } else {
+                            cr.log("unable to find field " + idName + " in Class " + theClass.name, exp);
+                        }
+                    }
+
+                } else {
+                    cr.log("unable to resolve a class", ctx);
+                }
+            }
+        }
+
+        if (function == null && ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
-            Function function = cr.findFunction(currentScope, idName, paramTypes); // TODO 要更精确的查找方法
+            function = cr.findFunction(currentScope, idName, paramTypes); // TODO 要更精确的查找方法
             if (function == null) {
                 // 看看是不是类的构建函数
                 Class theClass = cr.findClass(currentScope, idName);
@@ -173,11 +218,13 @@ public class RefPass extends PlayScriptBaseListener {
                     } else {
                         cr.node2Symbol.put(ctx, theClass); // TODO 直接赋予class
                     }
+                    cr.node2Type.put(ctx, theClass); // 这次函数调用是返回一个对象
                 } else {
                     cr.log("unknown function or class: " + idName, ctx);
                 }
             } else {
                 cr.node2Symbol.put(ctx, function);
+                cr.node2Type.put(ctx, function.returnType);
             }
         }
     }
@@ -188,8 +235,8 @@ public class RefPass extends PlayScriptBaseListener {
         String idName = ctx.IDENTIFIER().getText();
         Function function = new Function(idName, currentScope, ctx);
 
-        //cr.types.add(function);
-        //cr.type2Node.put(function, ctx);
+        cr.types.add(function);
+        // cr.type2Node.put(function, ctx);
 
         // TODO 需要查重
         currentScope.symbols.add(function);
@@ -204,11 +251,31 @@ public class RefPass extends PlayScriptBaseListener {
         pushScope(function, ctx);
     }
 
-
     @Override
     public void exitFunctionDeclaration(FunctionDeclarationContext ctx) {
+        if (ctx.typeTypeOrVoid() != null) {
+            Function function = (Function) currentScope;
+            function.returnType = cr.node2Type.get(ctx.typeTypeOrVoid());
+        }
+
         popScope();
     }
+
+    // @Override
+    // public void enterConstructorDeclaration(ConstructorDeclarationContext ctx) {
+    // String idName = ctx.IDENTIFIER().getText();
+    // Function function = new Function(idName, currentScope, ctx);
+
+    // currentScope.symbols.add(function);
+
+    // // 创建一个新的scope
+    // pushScope(function, ctx);
+    // }
+
+    // @Override
+    // public void exitConstructorDeclaration(ConstructorDeclarationContext ctx) {
+    // popScope();
+    // }
 
     @Override
     public void enterClassDeclaration(ClassDeclarationContext ctx) {
@@ -259,6 +326,7 @@ public class RefPass extends PlayScriptBaseListener {
                     Variable variable = cr.findVariable(classScope, idName);
                     if (variable != null) {
                         cr.node2Symbol.put(ctx, variable);
+                        cr.node2Type.put(ctx, variable.type);
                     } else {
                         cr.log("unable to find field " + idName + " in Class " + theClass.name, ctx);
                     }
@@ -275,6 +343,62 @@ public class RefPass extends PlayScriptBaseListener {
             cr.node2Symbol.put(ctx, variable);
         }
 
+        // 设置类型
+        if (ctx.primary() != null) {
+            cr.node2Type.put(ctx, cr.node2Type.get(ctx.primary()));
+        } else if (ctx.functionCall() != null) {
+            cr.node2Type.put(ctx, cr.node2Type.get(ctx.functionCall()));
+        } else if (ctx.bop != null && ctx.expression().size() >= 2) {
+            Type type1 = cr.node2Type.get(ctx.expression(0));
+            Type type2 = cr.node2Type.get(ctx.expression(1));
+            Type type = null;
+
+            switch (ctx.bop.getType()) {
+            case PlayScriptParser.ADD:
+            case PlayScriptParser.SUB:
+            case PlayScriptParser.MUL:
+            case PlayScriptParser.DIV:
+                if (type1 == PrimitiveType.String || type2 == PrimitiveType.String) {
+                    type = PrimitiveType.String;
+                } else if (type1 == PrimitiveType.Double || type2 == PrimitiveType.Double) {
+                    type = PrimitiveType.Double;
+                } else if (type1 == PrimitiveType.Float || type2 == PrimitiveType.Float) {
+                    type = PrimitiveType.Float;
+                } else if (type1 == PrimitiveType.Long || type2 == PrimitiveType.Long) {
+                    type = PrimitiveType.Long;
+                } else if (type1 == PrimitiveType.Integer || type2 == PrimitiveType.Integer) {
+                    type = PrimitiveType.Integer;
+                } else if (type1 == PrimitiveType.Short || type2 == PrimitiveType.Short) {
+                    type = PrimitiveType.Short;
+                } else {
+                    type = PrimitiveType.Byte; // TODO 以上这些规则有没有漏洞？
+                }
+                break;
+            case PlayScriptParser.EQUAL:
+            case PlayScriptParser.LE:
+            case PlayScriptParser.LT:
+            case PlayScriptParser.GE:
+            case PlayScriptParser.GT:
+                type = PrimitiveType.Boolean;
+                break;
+            case PlayScriptParser.ASSIGN:
+            case PlayScriptParser.ADD_ASSIGN:
+            case PlayScriptParser.SUB_ASSIGN:
+            case PlayScriptParser.MUL_ASSIGN:
+            case PlayScriptParser.DIV_ASSIGN:
+            case PlayScriptParser.AND_ASSIGN:
+            case PlayScriptParser.OR_ASSIGN:
+            case PlayScriptParser.XOR_ASSIGN:
+            case PlayScriptParser.MOD_ASSIGN:
+            case PlayScriptParser.LSHIFT_ASSIGN:
+            case PlayScriptParser.RSHIFT_ASSIGN:
+            case PlayScriptParser.URSHIFT_ASSIGN:
+                type = type1;
+                break;
+            }
+
+            cr.node2Type.put(ctx, type);
+        }
     }
 
     @Override
@@ -287,13 +411,6 @@ public class RefPass extends PlayScriptBaseListener {
     }
 
     @Override
-    public void enterPrimitiveType(PrimitiveTypeContext ctx) {
-        if (ctx.BOOLEAN() != null) {
-
-        }
-    }
-
-    @Override
     public void exitFormalParameter(FormalParameterContext ctx) {
         // 设置参数类型
         Type type = cr.node2Type.get(ctx.typeType());
@@ -301,8 +418,8 @@ public class RefPass extends PlayScriptBaseListener {
         variable.type = (Type) type;
 
         // 添加到函数的参数列表里
-        if (currentScope instanceof Function){
-           ((Function)currentScope).parameters.add(variable);
+        if (currentScope instanceof Function) {
+            ((Function) currentScope).parameters.add(variable);
         }
     }
 
@@ -312,19 +429,105 @@ public class RefPass extends PlayScriptBaseListener {
         if (ctx.classOrInterfaceType() != null) {
             Type type = (Type) cr.node2Type.get(ctx.classOrInterfaceType());
             cr.node2Type.put(ctx, type);
+        } else if (ctx.functionType() != null) {
+            Type type = (Type) cr.node2Type.get(ctx.functionType());
+            cr.node2Type.put(ctx, type);
+        } else if (ctx.primitiveType() != null) {
+            Type type = (Type) cr.node2Type.get(ctx.primitiveType());
+            cr.node2Type.put(ctx, type);
         }
 
     }
 
     @Override
     public void exitVariableDeclarators(VariableDeclaratorsContext ctx) {
-        //设置变量类型
+        // 设置变量类型
         Type type = (Type) cr.node2Type.get(ctx.typeType());
 
-        for (VariableDeclaratorContext child: ctx.variableDeclarator()){
+        for (VariableDeclaratorContext child : ctx.variableDeclarator()) {
             Variable variable = (Variable) cr.node2Symbol.get(child.variableDeclaratorId());
             variable.type = type;
         }
+    }
+
+    @Override
+    public void exitFunctionType(FunctionTypeContext ctx) {
+        DefaultFunctionType functionType = new DefaultFunctionType();
+        cr.types.add(functionType);
+
+        cr.node2Type.put(ctx, functionType);
+
+        functionType.returnType = (Type) cr.node2Type.get(ctx.typeTypeOrVoid());
+
+        // 参数的类型
+        if (ctx.typeList() != null) {
+            TypeListContext tcl = (TypeListContext) ctx.typeList();
+            for (TypeTypeContext ttc : tcl.typeType()) {
+                Type type = (Type) cr.node2Type.get(ttc);
+                functionType.paramTypes.add(type);
+            }
+        }
+    }
+
+    @Override
+    public void exitPrimitiveType(PrimitiveTypeContext ctx) {
+        Type type = null;
+        if (ctx.BOOLEAN() != null) {
+            type = PrimitiveType.Boolean;
+        } else if (ctx.INT() != null) {
+            type = PrimitiveType.Integer;
+        } else if (ctx.LONG() != null) {
+            type = PrimitiveType.Long;
+        } else if (ctx.FLOAT() != null) {
+            type = PrimitiveType.Float;
+        } else if (ctx.DOUBLE() != null) {
+            type = PrimitiveType.Double;
+        } else if (ctx.BYTE() != null) {
+            type = PrimitiveType.Byte;
+        } else if (ctx.SHORT() != null) {
+            type = PrimitiveType.Short;
+        } else if (ctx.CHAR() != null) {
+            type = PrimitiveType.Char;
+        }
+
+        cr.node2Type.put(ctx, type);
+    }
+
+    @Override
+    public void exitTypeTypeOrVoid(TypeTypeOrVoidContext ctx) {
+        if (ctx.VOID() != null) {
+            cr.node2Type.put(ctx, VoidType.voidType);
+        } else if (ctx.typeType() != null) {
+            cr.node2Type.put(ctx, (Type) cr.node2Type.get(ctx.typeType()));
+        }
+    }
+
+    @Override
+    public void exitFloatLiteral(FloatLiteralContext ctx) {
+        cr.node2Type.put(ctx, PrimitiveType.Float);
+    }
+
+    @Override
+    public void exitIntegerLiteral(IntegerLiteralContext ctx) {
+        cr.node2Type.put(ctx, PrimitiveType.Integer);
+    }
+
+    @Override
+    public void exitLiteral(LiteralContext ctx) {
+        if (ctx.BOOL_LITERAL() != null) {
+            cr.node2Type.put(ctx, PrimitiveType.Boolean);
+        } else if (ctx.CHAR_LITERAL() != null) {
+            cr.node2Type.put(ctx, PrimitiveType.Char);
+        } else if (ctx.NULL_LITERAL() != null) {
+            cr.node2Type.put(ctx, PrimitiveType.Null);
+        } else if (ctx.STRING_LITERAL() != null) {
+            cr.node2Type.put(ctx, PrimitiveType.String);
+        } else if (ctx.integerLiteral() != null) {
+            cr.node2Type.put(ctx, PrimitiveType.Integer);
+        } else if (ctx.floatLiteral() != null) {
+            cr.node2Type.put(ctx, PrimitiveType.Float);
+        }
+
     }
 
 }

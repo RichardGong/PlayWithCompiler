@@ -6,7 +6,7 @@ import java.util.Stack;
  * 保存程序执行时的临时变量
  */
 public class VMStack {
-    //所有的栈桢
+    // 所有的栈桢
     private Stack<StackFrame> frames = new Stack<StackFrame>();
 
     public StackFrame peek() {
@@ -20,16 +20,18 @@ public class VMStack {
     }
 
     public void push(StackFrame frame) {
-        frames.push(frame);
+        // 如果新加入的frame是当前frame的下一级，则入栈
+        if (frames.size() > 0) {
+            if (frame.scope.enclosingScope == frames.peek().scope) {
+                frame.parentFrame = frames.peek();
+            }
+            // 否则，跟栈顶元素的parentFrame相同
+            else {
+                frame.parentFrame = frames.peek().parentFrame;
+            }
+        }
 
-        //如果新加入的frame是当前frame的下一级，则入栈
-        if (frame.scope.enclosingScope == frames.peek().scope){
-            frame.parentFrame = frames.peek();
-        }
-        //否则，跟栈顶元素的parentFrame相同
-        else{
-            frame.parentFrame = frames.peek().parentFrame;
-        }
+        frames.push(frame);
     }
 
     /**
@@ -86,7 +88,7 @@ public class VMStack {
 
         @Override
         public String toString() {
-            return "LValue of " + variable.name +" : " + getValue();
+            return "LValue of " + variable.name + " : " + getValue();
         }
     }
 
