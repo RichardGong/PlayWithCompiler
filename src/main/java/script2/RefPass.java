@@ -188,7 +188,7 @@ public class RefPass extends PlayScriptBaseListener {
         String idName = ctx.IDENTIFIER().getText();
         Function function = new Function(idName, currentScope, ctx);
 
-        cr.types.add(function);
+        //cr.types.add(function);
         //cr.type2Node.put(function, ctx);
 
         // TODO 需要查重

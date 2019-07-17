@@ -271,6 +271,12 @@ public interface PlayScriptVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitTypeType(PlayScriptParser.TypeTypeContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link PlayScriptParser#functionType}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFunctionType(PlayScriptParser.FunctionTypeContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link PlayScriptParser#primitiveType}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

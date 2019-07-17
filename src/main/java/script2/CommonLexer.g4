@@ -53,6 +53,8 @@ VOID:               'void';
 VOLATILE:           'volatile';
 WHILE:              'while';
 
+FUNCTION:           'function';
+
 // Literals
 
 DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;

@@ -8,10 +8,13 @@ import java.util.Map;
  */
 public class PlayObject {
     //类型
-    protected Type type = null;
+    //protected Type type = null;
 
     //成员变量
     protected Map<Variable, Object> fields = new HashMap<Variable, Object>();
+
+    //父类的实例
+    //protected PlayObject parentObject = null;
 
     //引用次数
     // protected int refCount = 0;

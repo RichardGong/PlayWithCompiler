@@ -14,4 +14,12 @@ public abstract class Symbol {
 
     //Symbol关联的AST节点
     ParserRuleContext ctx = null;
+
+    public String getName(){
+        return name;
+    }
+
+    public Scope getEnclosingScope(){
+        return enclosingScope;
+    }
 }

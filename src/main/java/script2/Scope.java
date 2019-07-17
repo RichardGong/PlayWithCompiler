@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
-public class Scope extends Symbol{
+public abstract class Scope extends Symbol{
     // 该Scope中的成员，包括变量、方法、类等。
     protected List<Symbol> symbols = new LinkedList<Symbol>();
 

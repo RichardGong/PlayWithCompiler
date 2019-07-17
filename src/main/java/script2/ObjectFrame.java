@@ -5,7 +5,11 @@ public class ObjectFrame extends StackFrame {
 
     public ObjectFrame(PlayObject object){
         this.object = object;
-        this.scope = object.type;
+        if (object instanceof ClassObject){
+            this.scope = ((ClassObject)object).type;
+        } else if (object instanceof FunctionObject){
+            this.scope = ((FunctionObject)object).function;
+        }
     }
 
     @Override

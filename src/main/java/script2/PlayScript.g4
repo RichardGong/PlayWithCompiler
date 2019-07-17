@@ -289,7 +289,11 @@ typeList
     ;
 
 typeType
-    : (classOrInterfaceType | primitiveType) ('[' ']')*
+    : (classOrInterfaceType| functionType | primitiveType) ('[' ']')*
+    ;
+
+functionType
+    : FUNCTION typeTypeOrVoid '(' typeList? ')'
     ;
 
 primitiveType

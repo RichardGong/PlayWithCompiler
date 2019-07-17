@@ -440,6 +440,16 @@ public interface PlayScriptListener extends ParseTreeListener {
 	 */
 	void exitTypeType(PlayScriptParser.TypeTypeContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link PlayScriptParser#functionType}.
+	 * @param ctx the parse tree
+	 */
+	void enterFunctionType(PlayScriptParser.FunctionTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link PlayScriptParser#functionType}.
+	 * @param ctx the parse tree
+	 */
+	void exitFunctionType(PlayScriptParser.FunctionTypeContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link PlayScriptParser#primitiveType}.
 	 * @param ctx the parse tree
 	 */

@@ -1,5 +1,9 @@
 package script2;
 
-public abstract class Type extends Scope {
-    // protected String namespace = null;
+public interface Type {
+    public String getName();
+
+    //public String getPackage();
+
+    public Scope getEnclosingScope();
 }
