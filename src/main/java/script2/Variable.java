@@ -11,9 +11,9 @@ public class Variable extends Symbol {
     //是否允许多次重复，这是一个创新的参数机制
     protected Integer multiplicity = 1;
 
-    protected Variable(String name, Scope scope, ParserRuleContext ctx) {
+    protected Variable(String name, Scope enclosingScope, ParserRuleContext ctx) {
         this.name = name;
-        this.scope = scope;
+        this.enclosingScope = enclosingScope;
         this.ctx = ctx;
     }
 }

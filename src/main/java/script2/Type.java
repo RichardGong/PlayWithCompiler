@@ -1,5 +1,5 @@
 package script2;
 
-public abstract class Type extends Symbol{
-    protected String namespace = null;
+public abstract class Type extends Scope {
+    // protected String namespace = null;
 }

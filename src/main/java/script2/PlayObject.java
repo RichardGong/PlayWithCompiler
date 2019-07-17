@@ -15,4 +15,14 @@ public class PlayObject {
 
     //引用次数
     // protected int refCount = 0;
+
+    public Object getValue(Variable variable){
+        Object rtn = fields.get(variable);
+        //TODO 父类的属性如何返回？还是说都在这里了？
+        return rtn;
+    }
+
+    public void setValue(Variable variable, Object value){
+        fields.put(variable, value);
+    }
 }

@@ -1,10 +1,7 @@
 package script2;
 
-import java.util.HashMap;
-import java.util.Map;
-
-public class StackFrame {
-    Map<Variable, Object> variables = null;
+public abstract class StackFrame {
+    //Map<Variable, Object> variables = null;
 
     //该frame所对应的scope
     Scope scope = null;
@@ -16,15 +13,19 @@ public class StackFrame {
      * 如果是一个闭包（如何判断？），那么要带一个存放在堆里的环境。
      */
     StackFrame parentFrame = null;
-    
-    public StackFrame(Scope scope){
-        this.scope = scope;
-        variables = new HashMap<Variable, Object>();
-    }    
 
-    //用于通过PlayObject来初始化一个frame
-    public StackFrame(Scope scope, Map<Variable, Object> variables){
-        this.scope = scope;
-        this.variables = variables;
-    }    
+    protected abstract Object getValue(Variable variable);
+
+    protected abstract void setValue(Variable variable, Object value);
+    
+    // public StackFrame(Scope scope){
+    //     this.scope = scope;
+    //     variables = new HashMap<Variable, Object>();
+    // }    
+
+    // //用于通过PlayObject来初始化一个frame
+    // public StackFrame(Scope scope, Map<Variable, Object> variables){
+    //     this.scope = scope;
+    //     this.variables = variables;
+    // }    
 }

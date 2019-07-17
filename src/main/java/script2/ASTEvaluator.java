@@ -178,9 +178,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                     PlayObject valueObject = (PlayObject)value;
                     
                     //添加StackFrame
-                    Scope classScope = cr.node2Scope.get(valueObject.type.ctx);
-                    StackFrame frame = new StackFrame(classScope,valueObject.fields);
-                    frame.parentFrame = stack.peek(); //TODO 这里是不准确的
+                    //Scope classScope = cr.node2Scope.get(valueObject.type.ctx);
+                    StackFrame frame = new ObjectFrame(valueObject);
+                    // frame.parentFrame = stack.peek(); //TODO 这里是不准确的
                     stack.push(frame);
 
                     //获得field或调用方法
@@ -317,9 +317,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         } else if (ctx.FOR() != null) {
             // 添加StackFrame
-            Scope scope = cr.node2Scope.get(ctx);
-            StackFrame frame = new StackFrame(scope);
-            frame.parentFrame = stack.peek();
+            BlockScope scope = (BlockScope)cr.node2Scope.get(ctx);
+            StackFrame frame = new BlockFrame(scope);
+            // frame.parentFrame = stack.peek();
             stack.push(frame);
 
             ForControlContext forControl = ctx.forControl();
@@ -434,7 +434,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitProg(ProgContext ctx) {
         Object rtn = null;
-        stack.push(new StackFrame(cr.scopeTree));
+        stack.push(new BlockFrame((BlockScope)cr.scopeTree));
 
         rtn = visitBlockStatements(ctx.blockStatements());
 
@@ -462,11 +462,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     public Object visitFunctionCall(FunctionCallContext ctx) {
         Object rtn = null;
         Function function = (Function) cr.node2Symbol.get(ctx);
-        FunctionDeclarationContext functionCode = (FunctionDeclarationContext) cr.type2Node.get(function);
+        FunctionDeclarationContext functionCode = (FunctionDeclarationContext)function.ctx;
 
         // 添加StackFrame
+        PlayObject functionObject = heap.alloc(function);
         Scope functionScope = cr.node2Scope.get(functionCode);
-        StackFrame functionFrame = new StackFrame(functionScope);
+        StackFrame functionFrame = new ObjectFrame(functionObject);
         StackFrame classFrame = null;
 
         // 看看是不是类的构建函数。如果是的话，
@@ -475,19 +476,18 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             Class theClass = (Class) cr.node2Symbol.get(functionScope.enclosingScope.ctx);
             if (theClass.name.equals(function.name)) {
                 newObject = heap.alloc(theClass);
-                Scope classScope = cr.node2Scope.get(functionScope.enclosingScope.ctx);
-                classFrame = new StackFrame(classScope, newObject.fields);
-                classFrame.parentFrame = stack.peek();
+                classFrame = new ObjectFrame(newObject);
+                // classFrame.parentFrame = stack.peek();
                 stack.push(classFrame);
             }
         }
 
-        if (classFrame != null) {
-            functionFrame.parentFrame = classFrame;
-        } else {
-            // TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
-            functionFrame.parentFrame = stack.peek();
-        }
+        // if (classFrame != null) {
+        //     functionFrame.parentFrame = classFrame;
+        // } else {
+        //     // TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
+        //     functionFrame.parentFrame = stack.peek();
+        // }
         stack.push(functionFrame);
 
         // 往活动记录绑定形参和实参，它们要能够一一对应

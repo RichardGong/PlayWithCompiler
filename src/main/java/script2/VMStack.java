@@ -6,20 +6,30 @@ import java.util.Stack;
  * 保存程序执行时的临时变量
  */
 public class VMStack {
-    private Stack<StackFrame> data = new Stack<StackFrame>();
+    //所有的栈桢
+    private Stack<StackFrame> frames = new Stack<StackFrame>();
 
     public StackFrame peek() {
-        return data.peek();
+        return frames.peek();
     }
 
     public StackFrame pop() {
         // TODO:把reference中的计数器减少
 
-        return data.pop();
+        return frames.pop();
     }
 
     public void push(StackFrame frame) {
-        data.push(frame);
+        frames.push(frame);
+
+        //如果新加入的frame是当前frame的下一级，则入栈
+        if (frame.scope.enclosingScope == frames.peek().scope){
+            frame.parentFrame = frames.peek();
+        }
+        //否则，跟栈顶元素的parentFrame相同
+        else{
+            frame.parentFrame = frames.peek().parentFrame;
+        }
     }
 
     /**
@@ -30,9 +40,9 @@ public class VMStack {
 
         MyLValue lvalue = new MyLValue();
         lvalue.variable = variable;
-        StackFrame f = data.peek();
+        StackFrame f = frames.peek();
         while (f != null) {
-            if (f.scope == variable.scope) {
+            if (f.scope == variable.enclosingScope) {
                 lvalue.frame = f;
                 break;
             }
@@ -56,12 +66,12 @@ public class VMStack {
 
         @Override
         public Object getValue() {
-            return frame.variables.get(variable);
+            return frame.getValue(variable);
         }
 
         @Override
         public void setValue(Object value) {
-            frame.variables.put(variable, value);
+            frame.setValue(variable, value);
         }
 
         @Override

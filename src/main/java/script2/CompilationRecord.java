@@ -21,11 +21,14 @@ public class CompilationRecord {
     // AST节点对应的Scope，如for、函数调用会启动新的Scope
     protected Map<ParserRuleContext, Scope> node2Scope = new HashMap<ParserRuleContext, Scope>();
 
+    // 用于做类型推断，每个节点推断出来的类型
+    protected Map<ParserRuleContext, Type> node2Type = new HashMap<ParserRuleContext, Type>();
+
     // 编译后形成的scope树
     protected Scope scopeTree = null;
 
     // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
-    protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
+    //protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
 
     protected CompilationRecord() {
         // 初始化一些基本类型
@@ -99,23 +102,23 @@ public class CompilationRecord {
      * @param params
      * @return
      */
-    protected Function findFunction(Scope scope, String idName, List<Variable> params) {
+    protected Function findFunction(Scope scope, String idName, List<Type> paramTypes) {
         Function rtn = null;
         for (Symbol s : scope.symbols) {
             // typeType是可选的参数
             if (s instanceof Function && s.name.equals(idName)) {
                 Function function = (Function) s;
 
-                if (params != null) {
+                if (paramTypes != null) {
                     // 比较每个参数
-                    if (function.parameters.size() != params.size()) {
+                    if (function.parameters.size() != paramTypes.size()) {
                         break;
                     }
 
-                    for (int i = 0; i < params.size(); i++) {
-                        Variable v1 = params.get(i);
-                        Variable v2 = params.get(i);
-                        if (v1.type == v2.type) {
+                    for (int i = 0; i < paramTypes.size(); i++) {
+                        Variable var = function.parameters.get(i);
+                        Type type = paramTypes.get(i);
+                        if (var.type == type) {  //TODO 这里应该做类型兼容性测试，只要类型能够转换，或者是其子类都可以。
                             rtn = function;
                             break;
                         }
@@ -132,7 +135,7 @@ public class CompilationRecord {
         }
 
         if (rtn == null && scope.enclosingScope != null) {
-            rtn = findFunction(scope.enclosingScope, idName, params);
+            rtn = findFunction(scope.enclosingScope, idName, paramTypes);
         }
         return rtn;
     }

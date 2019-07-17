@@ -11,9 +11,9 @@ public class Function extends Type {
     //返回值
     protected Type returnType = null;
 
-    protected Function(String name, Scope scope, ParserRuleContext ctx) {
+    protected Function(String name, Scope enclosingScope, ParserRuleContext ctx) {
         this.name = name;
-        this.scope = scope;
+        this.enclosingScope = enclosingScope;
         this.ctx = ctx;
     }
 }

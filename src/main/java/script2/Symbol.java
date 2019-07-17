@@ -7,7 +7,7 @@ public abstract class Symbol {
     protected String name = null;
 
     //所属作用域
-    protected Scope scope = null;
+    protected Scope enclosingScope = null;
 
     //可见性，比如public还是private
     protected int visibility = 0;

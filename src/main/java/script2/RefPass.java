@@ -1,5 +1,8 @@
 package script2;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.antlr.v4.runtime.ParserRuleContext;
 
 import script2.PlayScriptParser.BlockContext;
@@ -7,12 +10,14 @@ import script2.PlayScriptParser.ClassDeclarationContext;
 import script2.PlayScriptParser.ClassOrInterfaceTypeContext;
 import script2.PlayScriptParser.EnhancedForControlContext;
 import script2.PlayScriptParser.ExpressionContext;
+import script2.PlayScriptParser.FormalParameterContext;
 import script2.PlayScriptParser.FunctionCallContext;
 import script2.PlayScriptParser.FunctionDeclarationContext;
 import script2.PlayScriptParser.PrimaryContext;
 import script2.PlayScriptParser.PrimitiveTypeContext;
 import script2.PlayScriptParser.ProgContext;
 import script2.PlayScriptParser.StatementContext;
+import script2.PlayScriptParser.TypeTypeContext;
 import script2.PlayScriptParser.VariableDeclaratorContext;
 import script2.PlayScriptParser.VariableDeclaratorIdContext;
 import script2.PlayScriptParser.VariableDeclaratorsContext;
@@ -31,8 +36,8 @@ public class RefPass extends PlayScriptBaseListener {
         this.cr = cr;
     }
 
-    private Scope createAndPushScope(ParserRuleContext ctx) {
-        Scope scope = new Scope(currentScope);
+    private Scope pushScope(Scope scope, ParserRuleContext ctx) {
+        // Scope scope = new Scope(currentScope);
         cr.node2Scope.put(ctx, scope);
         scope.ctx = ctx;
         currentScope = scope;
@@ -60,7 +65,8 @@ public class RefPass extends PlayScriptBaseListener {
 
     @Override
     public void enterEnhancedForControl(EnhancedForControlContext ctx) {
-        createAndPushScope(ctx);
+        BlockScope scope = new BlockScope(currentScope, ctx);
+        pushScope(scope, ctx);
     }
 
     @Override
@@ -78,13 +84,15 @@ public class RefPass extends PlayScriptBaseListener {
 
     @Override
     public void enterProg(ProgContext ctx) {
-        cr.scopeTree = createAndPushScope(ctx);
+        BlockScope scope = new BlockScope(currentScope, ctx);
+        cr.scopeTree = pushScope(scope, ctx);
     }
 
     @Override
     public void enterStatement(StatementContext ctx) {
         if (ctx.FOR() != null || ctx.WHILE() != null) {
-            createAndPushScope(ctx);
+            BlockScope scope = new BlockScope(currentScope, ctx);
+            pushScope(scope, ctx);
         }
     }
 
@@ -101,19 +109,19 @@ public class RefPass extends PlayScriptBaseListener {
         cr.node2Symbol.put(ctx, variable);
 
         // TODO 这里的类型推断先用比较简单的方法，后面要兼顾各种用到variableDeclaratorId的情况
-        if (ctx.parent instanceof VariableDeclaratorContext
-                && ctx.parent.parent instanceof VariableDeclaratorsContext) {
-            VariableDeclaratorsContext vdc = (VariableDeclaratorsContext) ctx.parent.parent;
-            if (vdc.typeType().classOrInterfaceType() != null) {
-                variable.type = (Type) cr.node2Symbol.get(vdc.typeType().classOrInterfaceType());
-            }
-        }
+        // if (ctx.parent instanceof VariableDeclaratorContext
+        //         && ctx.parent.parent instanceof VariableDeclaratorsContext) {
+        //     VariableDeclaratorsContext vdc = (VariableDeclaratorsContext) ctx.parent.parent;
+        //     if (vdc.typeType().classOrInterfaceType() != null) {
+        //         variable.type = (Type) cr.node2Symbol.get(vdc.typeType().classOrInterfaceType());
+        //     }
+        // }
 
         // 如果是在Class的定义中，则要添加field
-        if (currentScope.ctx instanceof ClassDeclarationContext) {
-            Class theClass = (Class) cr.node2Symbol.get(currentScope.ctx);
-            theClass.fields.add(variable);
-        }
+        // if (currentScope.ctx instanceof ClassDeclarationContext) {
+        // Class theClass = (Class) cr.node2Symbol.get(currentScope.ctx);
+        // theClass.fields.add(variable);
+        // }
     }
 
     @Override
@@ -141,16 +149,25 @@ public class RefPass extends PlayScriptBaseListener {
     }
 
     @Override
-    public void enterFunctionCall(FunctionCallContext ctx) {
+    public void exitFunctionCall(FunctionCallContext ctx) {
+        //获得类型
+        List<Type> paramTypes = new LinkedList<Type>();
+        if (ctx.expressionList() != null){
+            for (ExpressionContext exp: ctx.expressionList().expression()){
+                Type type = cr.node2Type.get(exp);
+                paramTypes.add(type);
+            }
+        }
+
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
-            Function function = cr.findFunction(currentScope, idName, null); // TODO 要更精确的查找方法
+            Function function = cr.findFunction(currentScope, idName, paramTypes); // TODO 要更精确的查找方法
             if (function == null) {
                 // 看看是不是类的构建函数
                 Class theClass = cr.findClass(currentScope, idName);
                 if (theClass != null) {
                     Scope classScope = cr.node2Scope.get(theClass.ctx);
-                    function = cr.findFunction(classScope, idName, null); // TODO 可能没有显式的构建函数
+                    function = cr.findFunction(classScope, idName, paramTypes); // TODO 可能没有显式的构建函数
                     if (function != null) {
                         cr.node2Symbol.put(ctx, function);
                     } else {
@@ -172,25 +189,21 @@ public class RefPass extends PlayScriptBaseListener {
         Function function = new Function(idName, currentScope, ctx);
 
         cr.types.add(function);
-        cr.type2Node.put(function, ctx);
+        //cr.type2Node.put(function, ctx);
 
         // TODO 需要查重
         currentScope.symbols.add(function);
 
         // 如果是在Class的定义中，则要添加成员
-        if (currentScope.ctx instanceof ClassDeclarationContext) {
-            Class theClass = (Class) cr.node2Symbol.get(currentScope.ctx);
-            theClass.functions.add(function);
-        }
+        // if (currentScope.ctx instanceof ClassDeclarationContext) {
+        // Class theClass = (Class) cr.node2Symbol.get(currentScope.ctx);
+        // theClass.functions.add(function);
+        // }
 
         // 创建一个新的scope
-        createAndPushScope(ctx);
+        pushScope(function, ctx);
     }
 
-    @Override
-    public void exitFunctionCall(FunctionCallContext ctx) {
-
-    }
 
     @Override
     public void exitFunctionDeclaration(FunctionDeclarationContext ctx) {
@@ -213,7 +226,7 @@ public class RefPass extends PlayScriptBaseListener {
         currentScope.symbols.add(theClass);
 
         // 创建一个新的scope
-        createAndPushScope(ctx);
+        pushScope(theClass, ctx);
 
     }
 
@@ -221,7 +234,6 @@ public class RefPass extends PlayScriptBaseListener {
     public void exitClassDeclaration(ClassDeclarationContext ctx) {
         popScope();
     }
-
 
     @Override
     public void enterExpression(ExpressionContext ctx) {
@@ -251,14 +263,14 @@ public class RefPass extends PlayScriptBaseListener {
                         cr.log("unable to find field " + idName + " in Class " + theClass.name, ctx);
                     }
                 }
-                
+
             } else {
                 cr.log("unable to resolve a class", ctx);
             }
         }
 
-        //往上冒泡传递
-        else if (ctx.primary() != null && ctx.primary().IDENTIFIER() !=null){
+        // 往上冒泡传递
+        else if (ctx.primary() != null && ctx.primary().IDENTIFIER() != null) {
             Variable variable = (Variable) cr.node2Symbol.get(ctx.primary());
             cr.node2Symbol.put(ctx, variable);
         }
@@ -270,7 +282,7 @@ public class RefPass extends PlayScriptBaseListener {
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.getText();
             Class theClass = cr.findClass(currentScope, idName);
-            cr.node2Symbol.put(ctx, theClass);
+            cr.node2Type.put(ctx, theClass);
         }
     }
 
@@ -278,6 +290,40 @@ public class RefPass extends PlayScriptBaseListener {
     public void enterPrimitiveType(PrimitiveTypeContext ctx) {
         if (ctx.BOOLEAN() != null) {
 
+        }
+    }
+
+    @Override
+    public void exitFormalParameter(FormalParameterContext ctx) {
+        // 设置参数类型
+        Type type = cr.node2Type.get(ctx.typeType());
+        Variable variable = (Variable) cr.node2Symbol.get(ctx.variableDeclaratorId());
+        variable.type = (Type) type;
+
+        // 添加到函数的参数列表里
+        if (currentScope instanceof Function){
+           ((Function)currentScope).parameters.add(variable);
+        }
+    }
+
+    @Override
+    public void exitTypeType(TypeTypeContext ctx) {
+        // 冒泡
+        if (ctx.classOrInterfaceType() != null) {
+            Type type = (Type) cr.node2Type.get(ctx.classOrInterfaceType());
+            cr.node2Type.put(ctx, type);
+        }
+
+    }
+
+    @Override
+    public void exitVariableDeclarators(VariableDeclaratorsContext ctx) {
+        //设置变量类型
+        Type type = (Type) cr.node2Type.get(ctx.typeType());
+
+        for (VariableDeclaratorContext child: ctx.variableDeclarator()){
+            Variable variable = (Variable) cr.node2Symbol.get(child.variableDeclaratorId());
+            variable.type = type;
         }
     }
 
