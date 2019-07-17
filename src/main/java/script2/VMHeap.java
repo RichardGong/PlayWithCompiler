@@ -1,22 +1,24 @@
 package script2;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.LinkedList;
+import java.util.List;
 
 public class VMHeap{
-    protected Map<Reference, Object> variables = new HashMap<Reference, Object>();
+    //保存在堆中的数据
+    protected List<PlayObject> objects = new LinkedList<PlayObject>();
 
-    protected Reference alloc(Type type){
+    //模拟在堆中申请空间，来保存对象
+    protected PlayObject alloc(Type type){
         PlayObject obj = new PlayObject();
         obj.type = type;
 
-        Reference ref = new Reference();
-        ref.object = obj;
+        objects.add(obj);
 
-        return ref;
+        return obj;
     }
 
-    protected void release(Reference ref){
-        variables.remove(ref);
+    //模拟释放一个对象所占的空间
+    protected void release(PlayObject obj){
+        objects.remove(obj);
     }
 }

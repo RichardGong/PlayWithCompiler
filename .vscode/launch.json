@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "CodeLens (Launch) - MemberOverload",
+            "request": "launch",
+            "mainClass": "MemberOverload",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - PlayScript",
             "request": "launch",
             "mainClass": "script2.PlayScript",

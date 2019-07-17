@@ -6,11 +6,16 @@ import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 
 public class Scope {
-    protected Scope enclosingScope;
+    //上一级的Scope
+    protected Scope enclosingScope; 
+
+    //下一级的Scope 
     protected List<Scope> children = new LinkedList<Scope>();
+
+    //该Scope中的成员，包括变量、方法、类等。
     protected List<Symbol> symbols = new LinkedList<Symbol>();
 
-    //关联的那个节点
+    //产生Scope那个AST节点
     protected ParserRuleContext ctx = null;
 
     public Scope() {

@@ -29,7 +29,7 @@ public class CompilationRecord {
 
     protected CompilationRecord() {
         // 初始化一些基本类型
-        types.add(new Class("Integer", null));
+        types.add(new Class("Integer", null, null));
     }
 
     protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
@@ -62,8 +62,8 @@ public class CompilationRecord {
             }
         }
 
-        if (rtn == null && scope.parent != null) {
-            rtn = findVariable(scope.parent, idName);
+        if (rtn == null && scope.enclosingScope != null) {
+            rtn = findVariable(scope.enclosingScope, idName);
         }
         return rtn;
     }
@@ -85,8 +85,8 @@ public class CompilationRecord {
             }
         }
 
-        if (rtn == null && scope.parent != null) {
-            rtn = findClass(scope.parent, idName);
+        if (rtn == null && scope.enclosingScope != null) {
+            rtn = findClass(scope.enclosingScope, idName);
         }
         return rtn;
     }
@@ -131,8 +131,8 @@ public class CompilationRecord {
             }
         }
 
-        if (rtn == null && scope.parent != null) {
-            rtn = findFunction(scope.parent, idName, params);
+        if (rtn == null && scope.enclosingScope != null) {
+            rtn = findFunction(scope.enclosingScope, idName, params);
         }
         return rtn;
     }

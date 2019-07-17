@@ -51,12 +51,14 @@ import script2.PlayScriptParser.VariableModifierContext;
 
 public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
-    //之前的编译结果
+    // 之前的编译结果
     private CompilationRecord cr = null;
-    
-    //局部变量的栈
+
+    // 局部变量的栈
     private VMStack stack = new VMStack();
-    
+
+    // 堆，用于保存对象
+    private VMHeap heap = new VMHeap();
 
     public ASTEvaluator(CompilationRecord cr) {
         this.cr = cr;
@@ -109,24 +111,21 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitExpression(ExpressionContext ctx) {
         Object rtn = null;
-        if (ctx.bop != null) {
+        if (ctx.bop != null && ctx.expression().size() >= 2) {
             Object leftObject = visitExpression(ctx.expression(0));
-            Object rightObject = null;
+            Object rightObject = visitExpression(ctx.expression(1));;
             Integer left = 0;
             Integer right = 0;
-            if (ctx.expression().size() >= 2) {
-                rightObject = visitExpression(ctx.expression(1));
-            }
 
-            if (leftObject instanceof LValue) {
+            if (leftObject instanceof LValue ) {
                 left = (Integer) ((LValue) leftObject).getValue();
-            } else if (leftObject instanceof Integer){
+            } else if (leftObject instanceof Integer) {
                 left = (Integer) leftObject;
             }
-            
+
             if (rightObject instanceof LValue) {
                 right = (Integer) ((LValue) rightObject).getValue();
-            }else if (rightObject instanceof Integer){
+            } else if (rightObject instanceof Integer) {
                 right = (Integer) rightObject;
             }
 
@@ -166,23 +165,42 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                     System.out.println("Unsupported feature during assignment");
                 }
                 break;
-            case PlayScriptParser.DOT:
-                if (leftObject instanceof LValue) {
-                    Variable variable = (Variable)cr.node2Symbol.get(ctx);
-                    if (variable.type instanceof Class){
-                        //找到类的成员
-                    }
-                } else {
-                    System.out.println("Expecting an Object Reference");
-                }
-                break;
+                
             default:
                 break;
             }
+        } else if(ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT){
+            //此语法是左递归的，算法体现这一点
+            Object leftObject = visitExpression(ctx.expression(0));
+            if (leftObject instanceof LValue) {
+                Object value = ((LValue)leftObject).getValue();
+                if (value instanceof PlayObject){
+                    PlayObject valueObject = (PlayObject)value;
+                    
+                    //添加StackFrame
+                    Scope classScope = cr.node2Scope.get(valueObject.type.ctx);
+                    StackFrame frame = new StackFrame(classScope,valueObject.fields);
+                    frame.parentFrame = stack.peek(); //TODO 这里是不准确的
+                    stack.push(frame);
+
+                    //获得field或调用方法
+                    if (ctx.IDENTIFIER() !=null){
+                        Variable variable = (Variable)cr.node2Symbol.get(ctx);
+                        LValue lValue = stack.getLValue(variable);
+                        rtn = lValue;
+                    }
+                    else if (ctx.functionCall() != null){
+                        visitFunctionCall(ctx.functionCall());
+                    }
+                }
+            } else {
+                System.out.println("Expecting an Object Reference");
+            }
+            
         } else if (ctx.primary() != null) {
             rtn = visitPrimary(ctx.primary());
         } else if (ctx.postfix != null) { // i++ 或 i-- 类型的语法
-            LValue lValue = (LValue)visitExpression(ctx.expression(0));
+            LValue lValue = (LValue) visitExpression(ctx.expression(0));
             Integer value = (Integer) lValue.getValue();
             switch (ctx.postfix.getType()) {
             case PlayScriptParser.INC:
@@ -257,7 +275,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
             Symbol symbol = cr.node2Symbol.get(ctx);
-            rtn = stack.getLValue((Variable)symbol);
+            rtn = stack.getLValue((Variable) symbol);
         }
         return rtn;
     }
@@ -369,7 +387,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitVariableDeclarator(VariableDeclaratorContext ctx) {
         Object rtn = null;
-        LValue lValue = (LValue)visitVariableDeclaratorId(ctx.variableDeclaratorId());
+        LValue lValue = (LValue) visitVariableDeclaratorId(ctx.variableDeclaratorId());
         if (ctx.variableInitializer() != null) {
             rtn = visitVariableInitializer(ctx.variableInitializer());
             lValue.setValue(rtn);
@@ -381,7 +399,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         Object rtn = null;
         Symbol symbol = cr.node2Symbol.get(ctx);
-        rtn = stack.getLValue((Variable)symbol);
+        rtn = stack.getLValue((Variable) symbol);
         return rtn;
     }
 
@@ -443,25 +461,42 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitFunctionCall(FunctionCallContext ctx) {
         Object rtn = null;
-        Function function= (Function)cr.node2Symbol.get(ctx);
+        Function function = (Function) cr.node2Symbol.get(ctx);
         FunctionDeclarationContext functionCode = (FunctionDeclarationContext) cr.type2Node.get(function);
 
         // 添加StackFrame
-        Scope scope = cr.node2Scope.get(functionCode);
-        StackFrame frame = new StackFrame(scope);
+        Scope functionScope = cr.node2Scope.get(functionCode);
+        StackFrame functionFrame = new StackFrame(functionScope);
+        StackFrame classFrame = null;
 
-        //TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
-        frame.parentFrame = stack.peek();   
+        // 看看是不是类的构建函数。如果是的话，
+        PlayObject newObject = null;
+        if (functionScope.enclosingScope.ctx instanceof ClassDeclarationContext) {
+            Class theClass = (Class) cr.node2Symbol.get(functionScope.enclosingScope.ctx);
+            if (theClass.name.equals(function.name)) {
+                newObject = heap.alloc(theClass);
+                Scope classScope = cr.node2Scope.get(functionScope.enclosingScope.ctx);
+                classFrame = new StackFrame(classScope, newObject.fields);
+                classFrame.parentFrame = stack.peek();
+                stack.push(classFrame);
+            }
+        }
 
-        stack.push(frame);
+        if (classFrame != null) {
+            functionFrame.parentFrame = classFrame;
+        } else {
+            // TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
+            functionFrame.parentFrame = stack.peek();
+        }
+        stack.push(functionFrame);
 
         // 往活动记录绑定形参和实参，它们要能够一一对应
         List<Object> realParams = new LinkedList<Object>();
         if (ctx.expressionList() != null) {
             for (ExpressionContext exp : ctx.expressionList().expression()) {
                 Object value = visitExpression(exp);
-                if (value instanceof LValue){
-                    value = ((LValue)value).getValue();
+                if (value instanceof LValue) {
+                    value = ((LValue) value).getValue();
                 }
                 realParams.add(value);
             }
@@ -470,7 +505,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         if (functionCode.formalParameters().formalParameterList() != null) {
             for (int i = 0; i < functionCode.formalParameters().formalParameterList().formalParameter().size(); i++) {
                 FormalParameterContext param = functionCode.formalParameters().formalParameterList().formalParameter(i);
-                LValue lValue= (LValue)visitVariableDeclaratorId(param.variableDeclaratorId());
+                LValue lValue = (LValue) visitVariableDeclaratorId(param.variableDeclaratorId());
                 lValue.setValue(realParams.get(i));
             }
         }
@@ -478,7 +513,14 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         // 调用方法体
         rtn = visitFunctionDeclaration(functionCode);
 
+        if (newObject != null) {
+            rtn = newObject;
+        }
+
         // 弹出StackFrame
+        if (classFrame!=null){
+            stack.pop();
+        }
         stack.pop();
         return rtn;
     }

@@ -4,7 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StackFrame {
-    Map<Symbol, Object> variables = new HashMap<Symbol, Object>();
+    Map<Variable, Object> variables = null;
 
     //该frame所对应的scope
     Scope scope = null;
@@ -19,5 +19,12 @@ public class StackFrame {
     
     public StackFrame(Scope scope){
         this.scope = scope;
+        variables = new HashMap<Variable, Object>();
+    }    
+
+    //用于通过PlayObject来初始化一个frame
+    public StackFrame(Scope scope, Map<Variable, Object> variables){
+        this.scope = scope;
+        this.variables = variables;
     }    
 }

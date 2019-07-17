@@ -121,8 +121,8 @@ arrayInitializer
     ;
 
 classOrInterfaceType
-    // : IDENTIFIER ('.' IDENTIFIER)*
-    : IDENTIFIER
+    : IDENTIFIER ('.' IDENTIFIER)*
+    //: IDENTIFIER
     ;
 
 typeArgument
