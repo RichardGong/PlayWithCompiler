@@ -30,6 +30,9 @@ public class CompilationRecord {
     // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
     //protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
 
+    //函数、类等引用的外部变量
+    protected Map<Scope, List<Variable>> outerReference = new HashMap<Scope, List<Variable>>();
+
     protected CompilationRecord() {
         // 初始化一些基本类型
         types.add(new Class("Integer", null, null));

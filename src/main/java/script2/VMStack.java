@@ -42,13 +42,19 @@ public class VMStack {
 
         MyLValue lvalue = new MyLValue();
         lvalue.variable = variable;
+
         StackFrame f = frames.peek();
-        while (f != null) {
-            if (f.scope == variable.enclosingScope) {
-                lvalue.frame = f;
-                break;
+
+        if (f.contains(variable)) {
+            lvalue.frame = f;   //TODO 注意，这个地方是为闭包打的补丁。本来，frame里面不能包含其他scope的变量
+        } else {
+            while (f != null) {
+                if (f.scope == variable.enclosingScope) {
+                    lvalue.frame = f;
+                    break;
+                }
+                f = f.parentFrame;
             }
-            f = f.parentFrame;
         }
         return lvalue;
     }

@@ -21,4 +21,12 @@ public class ObjectFrame extends StackFrame {
     protected void setValue(Variable variable, Object value) {
         object.setValue(variable, value);
     }
+
+    @Override
+    protected boolean contains(Variable variable) {
+        if(object != null && object.fields != null){
+            return object.fields.containsKey(variable);
+        }
+        return false;
+    }
 }

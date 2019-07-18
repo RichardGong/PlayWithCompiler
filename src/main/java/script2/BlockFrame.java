@@ -26,4 +26,12 @@ public class BlockFrame extends StackFrame {
         }
         objects.put(variable, value);
     }
+
+    @Override
+    protected boolean contains(Variable variable) {
+        if(objects != null){
+            return objects.containsKey(variable);
+        }
+        return false;
+    }
 }

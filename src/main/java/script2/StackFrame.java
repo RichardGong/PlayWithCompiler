@@ -14,6 +14,9 @@ public abstract class StackFrame {
      */
     StackFrame parentFrame = null;
 
+    //是否包含某个变量
+    protected abstract boolean contains(Variable variable);
+
     protected abstract Object getValue(Variable variable);
 
     protected abstract void setValue(Variable variable, Object value);

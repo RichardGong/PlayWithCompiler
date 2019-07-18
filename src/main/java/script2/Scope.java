@@ -12,16 +12,13 @@ public abstract class Scope extends Symbol{
     // 产生Scope那个AST节点
     protected ParserRuleContext ctx = null;
 
-    
-    // public ParserRuleContext getASTNode() {
-    //     return ctx;
-    // }
-
-    // public Scope getEnclosingScope() {
-    //     return enclosingScope;
-    // }
-
-    // public List<Symbol> symbols() {
-    //     return symbols;
-    // }
+    // 是否能在该Scope中访问这个symbol，包括层层的enclosingScope
+    protected boolean accessible(Symbol symbol){
+        boolean rtn = false;
+        rtn = symbols.contains(symbol);
+        if (!rtn && enclosingScope!=null){
+            rtn = enclosingScope.accessible(symbol);
+        }
+        return rtn;
+    }
 }

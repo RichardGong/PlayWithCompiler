@@ -78,15 +78,36 @@ public class RefPass extends PlayScriptBaseListener {
     @Override
     public void exitPrimary(PrimaryContext ctx) {
         if (ctx.IDENTIFIER() != null) {
+            // TODO其实可能需要通过上级节点的要求，选择合适的成员。有时候会有变量和函数同名的情况。
             String idName = ctx.IDENTIFIER().getText();
             Variable variable = cr.findVariable(currentScope, idName);
             if (variable == null) {
-                cr.log("unknown variable: " + idName, ctx);
+                // 看看是不是函数
+                Function function = cr.findFunction(currentScope, idName, null); // TODO 应该由上面传递下类型属性下来，然后精确比对
+                if (function != null) {
+                    cr.node2Symbol.put(ctx, function);
+                    cr.node2Type.put(ctx, function);
+                } else {
+                    cr.log("unknown variable or function: " + idName, ctx);
+                }
+
             } else {
                 cr.node2Symbol.put(ctx, variable);
 
                 // 记录类型
                 cr.node2Type.put(ctx, variable.type);
+
+                //记录所引用的外部变量
+                if (currentScope instanceof Function && variable.enclosingScope != currentScope){
+                    List<Variable> referedVariables = cr.outerReference.get(currentScope);
+                    if (referedVariables == null){
+                        referedVariables = new LinkedList<Variable>();
+                        cr.outerReference.put(currentScope,referedVariables);
+                    }
+                    if(!referedVariables.contains(variable)){
+                        referedVariables.add(variable);
+                    }
+                }
             }
         } else if (ctx.literal() != null) {
             cr.node2Type.put(ctx, cr.node2Type.get(ctx.literal()));
@@ -165,6 +186,11 @@ public class RefPass extends PlayScriptBaseListener {
 
     @Override
     public void exitFunctionCall(FunctionCallContext ctx) {
+        //TODO 临时代码，支持println
+        if(ctx.IDENTIFIER().getText().equals("println")){
+            return;
+        }
+
         // 获得参数类型
         List<Type> paramTypes = new LinkedList<Type>();
         if (ctx.expressionList() != null) {
@@ -177,7 +203,7 @@ public class RefPass extends PlayScriptBaseListener {
         Function function = null;
         // 看看是不是在被作为类的方法调用，从而确定正确的查找范围
         if (ctx.parent instanceof ExpressionContext) {
-            ExpressionContext exp = (ExpressionContext)ctx.parent;
+            ExpressionContext exp = (ExpressionContext) ctx.parent;
             if (exp.bop != null && exp.bop.getType() == PlayScriptParser.DOT) {
                 // 这是个左递归，要不断的把左边的节点的计算结果存到node2Symbol，所以要在exitExpression里操作
                 Symbol symbol = cr.node2Symbol.get(exp.expression(0));
@@ -187,11 +213,11 @@ public class RefPass extends PlayScriptBaseListener {
 
                     if (ctx.IDENTIFIER() != null) {
                         String idName = ctx.IDENTIFIER().getText();
-                        function = cr.findFunction(classScope, idName,paramTypes);
+                        function = cr.findFunction(classScope, idName, paramTypes);
                         if (function != null) {
                             cr.node2Symbol.put(exp, function);
                             cr.node2Type.put(exp, function.returnType);
-                            cr.node2Symbol.put(ctx, function);    //父节点也加上
+                            cr.node2Symbol.put(ctx, function); // 父节点也加上
                             cr.node2Type.put(ctx, function.returnType);
                         } else {
                             cr.log("unable to find field " + idName + " in Class " + theClass.name, exp);
@@ -219,9 +245,20 @@ public class RefPass extends PlayScriptBaseListener {
                         cr.node2Symbol.put(ctx, theClass); // TODO 直接赋予class
                     }
                     cr.node2Type.put(ctx, theClass); // 这次函数调用是返回一个对象
-                } else {
-                    cr.log("unknown function or class: " + idName, ctx);
+                } 
+
+                //看看是不是一个函数型的变量
+                if (function == null){
+                    Variable variable = cr.findVariable(currentScope, idName);
+                    if (variable.type instanceof FunctionType){
+                        cr.node2Symbol.put(ctx, variable);
+                        cr.node2Type.put(ctx, variable.type);
+                    }
+                    else{
+                        cr.log("unknown function or class constructor or function variable: " + idName, ctx);
+                    }
                 }
+                
             } else {
                 cr.node2Symbol.put(ctx, function);
                 cr.node2Type.put(ctx, function.returnType);
@@ -339,8 +376,8 @@ public class RefPass extends PlayScriptBaseListener {
 
         // 往上冒泡传递
         else if (ctx.primary() != null && ctx.primary().IDENTIFIER() != null) {
-            Variable variable = (Variable) cr.node2Symbol.get(ctx.primary());
-            cr.node2Symbol.put(ctx, variable);
+            Symbol symbol = cr.node2Symbol.get(ctx.primary());
+            cr.node2Symbol.put(ctx, symbol);
         }
 
         // 设置类型
