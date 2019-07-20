@@ -1,0 +1,52 @@
+/**
+ * ClassTest.play 测试面向对象的特性
+ */
+
+class MyClass1{
+  int a=2; 
+  int b; 
+
+  function MyClass1(){              //构造方法，与类名称相同
+    b = 3;
+  } 
+  
+  function void myMethod(int c){    //一个普通方法
+    b = c;                          //访问类的成员变量
+  }
+}  
+
+class MyClass2 extends MyClass1{
+  function void myMethod(int c){    //重载父类的方法
+    b = c*3;                         
+  }
+}
+
+class MyClass3 extends MyClass1{
+  int a=10;                         //重载父类的一个成员变量     
+
+  function void myMethod(int c){    //重载父类的方法
+    b = c*2;                         
+  }
+
+  function void myMethod(){         //方法的多态
+    b = a;                      
+  }
+}
+
+
+  
+MyClass1 obj1 = MyClass1(); 
+MyClass1 obj2 = MyClass2();
+MyClass3 obj3 = MyClass3();
+MyClass1 obj4 = obj3；
+
+obj1.a;
+
+//重载
+obj4.a;
+obj1.myMethod(5);
+obj2.myMethod(5);
+obj4.myMethod(5);
+
+//多态
+obj3.myMethod()

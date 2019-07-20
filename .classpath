@@ -32,6 +32,18 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="/usr/local/Cellar/antlr/4.7.2/antlr-4.7.2-complete.jar"/>
+	<classpathentry kind="src" output="target/classes" path="src/PlayScript">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="src" output="target/classes" path="src/lab">
+		<attributes>
+			<attribute name="optional" value="true"/>
+			<attribute name="maven.pomderived" value="true"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
 		<attributes>
 			<attribute name="optional" value="true"/>

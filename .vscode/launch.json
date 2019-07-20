@@ -2,16 +2,23 @@
     "configurations": [
         {
             "type": "java",
-            "name": "CodeLens (Launch) - MemberOverload",
+            "name": "CodeLens (Launch) - Extent",
             "request": "launch",
-            "mainClass": "MemberOverload",
+            "mainClass": "scope.Extent",
             "projectName": "compiler"
         },
         {
             "type": "java",
             "name": "CodeLens (Launch) - PlayScript",
             "request": "launch",
-            "mainClass": "script2.PlayScript",
+            "mainClass": "antlr.PlayScript",
+            "projectName": "compiler"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - PlayScript",
+            "request": "launch",
+            "mainClass": "play.PlayScript",
             "projectName": "compiler"
         }
     ]
