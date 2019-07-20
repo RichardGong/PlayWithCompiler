@@ -7,11 +7,16 @@ public class Class extends Scope implements Type{
     //protected List<Variable> fields = new LinkedList<Variable>();
     //protected List<Function> functions = new LinkedList<Function>();
 
-    protected Class parentClass = null;
-
-    protected Class(String name, Scope enclosingScope, ParserRuleContext ctx) {
+    protected Class(String name, ParserRuleContext ctx) {
         this.name = name;
-        this.enclosingScope = enclosingScope;
         this.ctx = ctx;
+    }
+
+    protected Class getParentClass(){
+        return (Class)enclosingScope;
+    }
+
+    protected void setParentClass(Class theClass){
+        enclosingScope = theClass;
     }
 }

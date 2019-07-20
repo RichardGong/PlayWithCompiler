@@ -25,7 +25,7 @@ public class CompilationRecord {
     protected Map<ParserRuleContext, Type> node2Type = new HashMap<ParserRuleContext, Type>();
 
     // 编译后形成的scope树
-    protected Scope scopeTree = null;
+    //protected Scope scopeTree = null;
 
     // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
     //protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
@@ -34,8 +34,7 @@ public class CompilationRecord {
     protected Map<Scope, List<Variable>> outerReference = new HashMap<Scope, List<Variable>>();
 
     protected CompilationRecord() {
-        // 初始化一些基本类型
-        types.add(new Class("Integer", null, null));
+       
     }
 
     protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
@@ -58,7 +57,7 @@ public class CompilationRecord {
      * @param idName
      * @return
      */
-    protected Variable findVariable(Scope scope, String idName) {
+    protected Variable lookupVariable(Scope scope, String idName) {
         Variable rtn = null;
         for (Symbol s : scope.symbols) {
             // typeType是可选的参数
@@ -69,7 +68,24 @@ public class CompilationRecord {
         }
 
         if (rtn == null && scope.enclosingScope != null) {
-            rtn = findVariable(scope.enclosingScope, idName);
+            rtn = lookupVariable(scope.enclosingScope, idName);
+        }
+        return rtn;
+    }
+
+    protected Boolean checkDuplicateVariable(Scope scope, String idName) {
+        Boolean rtn = Boolean.FALSE;
+        for (Symbol s : scope.symbols) {
+            // typeType是可选的参数
+            if (s instanceof Variable && s.name.equals(idName)) {
+                rtn = true;
+                break;
+            }
+        }
+
+        //对于BlockScope，要继续往上查找
+        if (!rtn && scope instanceof BlockScope && scope.enclosingScope != null) {
+            rtn = checkDuplicateVariable(scope.enclosingScope, idName);
         }
         return rtn;
     }
@@ -81,7 +97,7 @@ public class CompilationRecord {
      * @param idName
      * @return
      */
-    protected Class findClass(Scope scope, String idName) {
+    protected Class lookupClass(Scope scope, String idName) {
         Class rtn = null;
         for (Symbol s : scope.symbols) {
             // typeType是可选的参数
@@ -92,7 +108,19 @@ public class CompilationRecord {
         }
 
         if (rtn == null && scope.enclosingScope != null) {
-            rtn = findClass(scope.enclosingScope, idName);
+            rtn = lookupClass(scope.enclosingScope, idName);
+        }
+        return rtn;
+    }
+
+    protected Type lookupType(String idName) {   //TODO 单纯根据名称并不严密
+        Type rtn = null;
+        for (Type type : types) {
+            // typeType是可选的参数
+            if (type.getName().equals(idName)) {
+                rtn = type;
+                break;
+            }
         }
         return rtn;
     }
@@ -105,7 +133,7 @@ public class CompilationRecord {
      * @param params
      * @return
      */
-    protected Function findFunction(Scope scope, String idName, List<Type> paramTypes) {
+    protected Function lookupFunction(Scope scope, String idName, List<Type> paramTypes) {
         Function rtn = null;
         for (Symbol s : scope.symbols) {
             // typeType是可选的参数
@@ -143,7 +171,7 @@ public class CompilationRecord {
         }
 
         if (rtn == null && scope.enclosingScope != null) {
-            rtn = findFunction(scope.enclosingScope, idName, paramTypes);
+            rtn = lookupFunction(scope.enclosingScope, idName, paramTypes);
         }
         return rtn;
     }

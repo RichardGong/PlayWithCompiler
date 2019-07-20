@@ -2,9 +2,8 @@ package play;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
-import play.PlayScriptParser.ArgumentsContext;
-import play.PlayScriptParser.ArrayInitializerContext;
 import play.PlayScriptParser.BlockContext;
 import play.PlayScriptParser.BlockStatementContext;
 import play.PlayScriptParser.BlockStatementsContext;
@@ -55,23 +54,126 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     private CompilationRecord cr = null;
 
     // 局部变量的栈
-    private VMStack stack = new VMStack();
+    // private VMStack stack = new VMStack();
 
     // 堆，用于保存对象
-    private VMHeap heap = new VMHeap();
-
     public ASTEvaluator(CompilationRecord cr) {
         this.cr = cr;
     }
 
-    @Override
-    public Object visitArguments(ArgumentsContext ctx) {
-        return super.visitArguments(ctx);
+    ///////////////////////////////////////////////////////////
+    /// 栈桢的管理
+    private Stack<StackFrame> stack = new Stack<StackFrame>();
+
+    public void pushStack(StackFrame frame) {
+        // 如果新加入的frame是当前frame的下一级，则入栈
+        if (stack.size() > 0) {
+            if (frame.scope.enclosingScope == stack.peek().scope) {
+                frame.parentFrame = stack.peek();
+            }
+            // 否则，跟栈顶元素的parentFrame相同
+            else {
+                frame.parentFrame = stack.peek().parentFrame;
+            }
+        }
+
+        stack.push(frame);
     }
 
-    @Override
-    public Object visitArrayInitializer(ArrayInitializerContext ctx) {
-        return super.visitArrayInitializer(ctx);
+    public LValue getLValue(Variable variable) {
+        // todo 增加reference中的计数器
+        StackFrame f = stack.peek();
+
+        PlayObject valueContainer = null;
+        while (f != null) {
+            if (f.contains(variable) || f.scope.symbols.contains(variable)) {
+                valueContainer = f.object;
+                break;
+            }
+            f = f.parentFrame;
+        }
+
+        MyLValue lvalue = new MyLValue(valueContainer, variable);
+
+        return lvalue;
+    }
+
+    private final class MyLValue implements LValue {
+        private Variable variable;
+        private PlayObject valueContainer;
+
+        public MyLValue(PlayObject valueContainer, Variable variable) {
+            this.valueContainer = valueContainer;
+            this.variable = variable;
+        }
+
+        @Override
+        public Object getValue() {
+            return valueContainer.getValue(variable);
+        }
+
+        @Override
+        public void setValue(Object value) {
+            valueContainer.setValue(variable, value);
+        }
+
+        @Override
+        public Variable getVariable() {
+            return variable;
+        }
+
+        @Override
+        public String toString() {
+            return "LValue of " + variable.name + " : " + getValue();
+        }
+
+        @Override
+        public PlayObject getValueContainer() {
+            return valueContainer;
+        }
+    }
+
+    ///////////////////////////////////////////////////////////
+    /// 对象初始化
+
+    // 模拟在堆中申请空间，来保存对象
+    protected ClassObject createAndInitClassObject(Class theClass) {
+        ClassObject obj = new ClassObject();
+        obj.type = theClass;
+
+        Stack<Class> ancestorChain = new Stack<Class>();
+
+        // 从上到下执行缺省的初始化方法
+        ancestorChain.push(theClass);
+        while (theClass.getParentClass() != null) {
+            ancestorChain.push(theClass.getParentClass());
+            theClass = theClass.getParentClass();
+        }
+
+        // 执行缺省的初始化方法
+        StackFrame frame = new StackFrame(obj);
+        pushStack(frame);
+        while (ancestorChain.size() > 0) {
+            Class c = ancestorChain.pop();
+            defaultObjectInit(c, obj);
+        }
+        stack.pop();
+
+        return obj;
+    }
+
+    // 类的缺省初始化方法
+    protected void defaultObjectInit(Class theClass, ClassObject obj) {
+        for (Symbol symbol : theClass.symbols) {
+            // 把变量加到obj里，缺省先都初始化成null，不允许有未初始化的
+            if (symbol instanceof Variable) {
+                obj.fields.put((Variable) symbol, null);
+            }
+        }
+
+        // 执行缺省初始化
+        ClassBodyContext ctx = ((ClassDeclarationContext) theClass.ctx).classBody();
+        visitClassBody(ctx);
     }
 
     ///////////////////////////////////////////////////////////
@@ -83,13 +185,149 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         } else if (targetType == PrimitiveType.Integer) {
             rtn = ((Number) obj1).intValue() + ((Number) obj2).intValue();
         } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() + ((Number) obj2).floatValue(); 
+            rtn = ((Number) obj1).floatValue() + ((Number) obj2).floatValue();
         } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() + ((Number) obj2).longValue(); 
+            rtn = ((Number) obj1).longValue() + ((Number) obj2).longValue();
         } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() + ((Number) obj2).doubleValue(); 
+            rtn = ((Number) obj1).doubleValue() + ((Number) obj2).doubleValue();
         } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() + ((Number) obj2).shortValue(); 
+            rtn = ((Number) obj1).shortValue() + ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object minus(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() - ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() - ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() - ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() - ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() - ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object mul(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() * ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() * ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() * ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() * ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() * ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object div(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() / ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() / ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() / ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() / ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() / ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object EQ(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() == ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() == ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() == ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() == ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() == ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object GE(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() >= ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() >= ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() >= ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() >= ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() >= ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object GT(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() > ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() > ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() > ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() > ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() > ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object LE(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() <= ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() <= ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() <= ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() <= ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() <= ((Number) obj2).shortValue();
+        }
+
+        return rtn;
+    }
+
+    private Object LT(Object obj1, Object obj2, Type targetType) {
+        Object rtn = null;
+        if (targetType == PrimitiveType.Integer) {
+            rtn = ((Number) obj1).intValue() < ((Number) obj2).intValue();
+        } else if (targetType == PrimitiveType.Float) {
+            rtn = ((Number) obj1).floatValue() < ((Number) obj2).floatValue();
+        } else if (targetType == PrimitiveType.Long) {
+            rtn = ((Number) obj1).longValue() < ((Number) obj2).longValue();
+        } else if (targetType == PrimitiveType.Double) {
+            rtn = ((Number) obj1).doubleValue() < ((Number) obj2).doubleValue();
+        } else if (targetType == PrimitiveType.Short) {
+            rtn = ((Number) obj1).shortValue() < ((Number) obj2).shortValue();
         }
 
         return rtn;
@@ -136,66 +374,52 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     public Object visitExpression(ExpressionContext ctx) {
         Object rtn = null;
         if (ctx.bop != null && ctx.expression().size() >= 2) {
-            Object leftObject = visitExpression(ctx.expression(0));
-            Object rightObject = visitExpression(ctx.expression(1));
+            Object left = visitExpression(ctx.expression(0));
+            Object right = visitExpression(ctx.expression(1));
+            Object leftObject = null;
+            Object rightObject = null;
 
-            Integer left = 0;
-            Integer right = 0;
-
-            if (leftObject instanceof LValue) {
-                leftObject = ((LValue) leftObject).getValue();
+            if (left instanceof LValue) {
+                leftObject = ((LValue) left).getValue();
             }
 
-            if (rightObject instanceof LValue) {
-                rightObject = ((LValue) rightObject).getValue();
+            if (right instanceof LValue) {
+                rightObject = ((LValue) right).getValue();
             }
 
             Type type = cr.node2Type.get(ctx);
 
-            if (leftObject instanceof LValue) {
-                left = (Integer) ((LValue) leftObject).getValue();
-            } else if (leftObject instanceof Integer) {
-                left = (Integer) leftObject;
-            }
-
-            if (rightObject instanceof LValue) {
-                right = (Integer) ((LValue) rightObject).getValue();
-            } else if (rightObject instanceof Integer) {
-                right = (Integer) rightObject;
-            }
-
             switch (ctx.bop.getType()) {
             case PlayScriptParser.ADD:
-                // rtn = left + right;
                 rtn = add(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.SUB:
-                rtn = left - right;
+                rtn = minus(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.MUL:
-                rtn = left * right;
+                rtn = mul(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.DIV:
-                rtn = left / right;
+                rtn = div(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.EQUAL:
-                rtn = left == right;
+                rtn = EQ(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.LE:
-                rtn = left <= right;
+                rtn = LE(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.LT:
-                rtn = left < right;
+                rtn = LT(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.GE:
-                rtn = left >= right;
+                rtn = GE(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.GT:
-                rtn = left > right;
+                rtn = GT(leftObject, rightObject, type);
                 break;
             case PlayScriptParser.ASSIGN:
-                if (leftObject instanceof LValue) {
-                    ((LValue) leftObject).setValue(right);
+                if (left instanceof LValue) {
+                    ((LValue) left).setValue(right);
                     rtn = right;
                 } else {
                     System.out.println("Unsupported feature during assignment");
@@ -210,22 +434,19 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             Object leftObject = visitExpression(ctx.expression(0));
             if (leftObject instanceof LValue) {
                 Object value = ((LValue) leftObject).getValue();
-                if (value instanceof PlayObject) {
-                    PlayObject valueObject = (PlayObject) value;
-
-                    // 添加StackFrame
-                    // Scope classScope = cr.node2Scope.get(valueObject.type.ctx);
-                    StackFrame frame = new ObjectFrame(valueObject);
-                    // frame.parentFrame = stack.peek(); //TODO 这里是不准确的
-                    stack.push(frame);
-
+                if (value instanceof ClassObject) {
+                    ClassObject valueContainer = (ClassObject) value;
                     // 获得field或调用方法
                     if (ctx.IDENTIFIER() != null) {
                         Variable variable = (Variable) cr.node2Symbol.get(ctx);
-                        LValue lValue = stack.getLValue(variable);
+                        //类的成员可能需要重载
+                        Variable overloaded = cr.lookupVariable(valueContainer.type, variable.getName());
+                        LValue lValue = new MyLValue(valueContainer, overloaded);
                         rtn = lValue;
                     } else if (ctx.functionCall() != null) {
+                        pushStack(new StackFrame(valueContainer));
                         rtn = visitFunctionCall(ctx.functionCall());
+                        stack.pop();
                     }
                 }
             } else {
@@ -290,11 +511,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         } else if (ctx.STRING_LITERAL() != null) {
             String withQuotationMark = ctx.STRING_LITERAL().getText();
-            rtn = withQuotationMark.substring(1, withQuotationMark.length() -1);
-        } else if (ctx.CHAR_LITERAL() != null){
+            rtn = withQuotationMark.substring(1, withQuotationMark.length() - 1);
+        } else if (ctx.CHAR_LITERAL() != null) {
             rtn = ctx.CHAR_LITERAL().getText().charAt(0);
-        } else if (ctx.NULL_LITERAL() != null){
-            //TODO 需要设计自己的null类型的对象
+        } else if (ctx.NULL_LITERAL() != null) {
+            // TODO 需要设计自己的null类型的对象
         }
 
         return rtn;
@@ -311,7 +532,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     @Override
     public Object visitFloatLiteral(FloatLiteralContext ctx) {
-        return Float.valueOf(ctx.getText());  
+        return Float.valueOf(ctx.getText());
     }
 
     @Override
@@ -327,10 +548,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         } else if (ctx.IDENTIFIER() != null) {
             Symbol symbol = cr.node2Symbol.get(ctx);
             if (symbol instanceof Variable) {
-                rtn = stack.getLValue((Variable) symbol);
+                rtn = getLValue((Variable) symbol);
             } else if (symbol instanceof Function) {
-                FunctionObject obj = new FunctionObject();
-                obj.function = (Function) symbol;
+                FunctionObject obj = new FunctionObject((Function) symbol);
                 rtn = obj;
             }
         }
@@ -375,9 +595,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         } else if (ctx.FOR() != null) {
             // 添加StackFrame
             BlockScope scope = (BlockScope) cr.node2Scope.get(ctx);
-            StackFrame frame = new BlockFrame(scope);
+            StackFrame frame = new StackFrame(scope);
             // frame.parentFrame = stack.peek();
-            stack.push(frame);
+            pushStack(frame);
 
             ForControlContext forControl = ctx.forControl();
             if (forControl.enhancedForControl() != null) {
@@ -423,7 +643,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                     List<Variable> variables = cr.outerReference.get(functionObject.function);
                     if (variables != null) {
                         for (Variable var : variables) {
-                            LValue lValue = stack.getLValue(var); // 现在还可以从栈里取，退出函数以后就不行了
+                            LValue lValue = getLValue(var); // 现在还可以从栈里取，退出函数以后就不行了
                             Object value = lValue.getValue();
                             if (value != null) {
                                 functionObject.fields.put(var, value);
@@ -473,7 +693,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         Object rtn = null;
         Symbol symbol = cr.node2Symbol.get(ctx);
-        rtn = stack.getLValue((Variable) symbol);
+        rtn = getLValue((Variable) symbol);
         return rtn;
     }
 
@@ -508,7 +728,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitProg(ProgContext ctx) {
         Object rtn = null;
-        stack.push(new BlockFrame((BlockScope) cr.scopeTree));
+        pushStack(new StackFrame((BlockScope) cr.node2Scope.get(ctx)));
 
         rtn = visitBlockStatements(ctx.blockStatements());
 
@@ -542,7 +762,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         Symbol symbol = cr.node2Symbol.get(ctx);
         if (symbol instanceof Variable) {
             Variable variable = (Variable) symbol;
-            LValue lValue = stack.getLValue(variable);
+            LValue lValue = getLValue(variable);
             Object value = lValue.getValue();
             if (value instanceof FunctionObject) {
                 functionObject = (FunctionObject) value;
@@ -550,45 +770,58 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         } else if (symbol instanceof Function) {
             function = (Function) symbol;
-        } else {
+        } else  if (symbol instanceof Class){
+            //类的缺省构造函数。不
+            //cr.log("default construction method: " + ctx.IDENTIFIER().getText(), ctx);
+            rtn = createAndInitClassObject((Class)symbol);
+            return rtn;
+        }
+        else{
             // TODO 临时代码，用于打印输出
             if (ctx.IDENTIFIER().getText().equals("println")) {
                 System.out.println(visitExpressionList(ctx.expressionList()));
                 return rtn;
+            } else {
+                cr.log("unnable to find an function " + ctx.IDENTIFIER().getText(), ctx);
             }
-
-            cr.log("unnable to find an function " + ctx.IDENTIFIER().getText(), ctx);
         }
 
         FunctionDeclarationContext functionCode = (FunctionDeclarationContext) function.ctx;
-
-        // 添加StackFrame
-        if (functionObject == null) {
-            functionObject = heap.alloc(function);
-        }
         Scope functionScope = cr.node2Scope.get(functionCode);
-        StackFrame functionFrame = new ObjectFrame(functionObject);
+        
         StackFrame classFrame = null;
 
-        // 看看是不是类的构建函数。如果是的话，
-        PlayObject newObject = null;
+        //看看是不是类的方法
+        ClassObject newObject = null;
         if (functionScope.enclosingScope.ctx instanceof ClassDeclarationContext) {
             Class theClass = (Class) cr.node2Symbol.get(functionScope.enclosingScope.ctx);
+            // 看看是不是类的构建函数。
             if (theClass.name.equals(function.name)) {
-                newObject = heap.alloc(theClass);
-                classFrame = new ObjectFrame(newObject);
+                newObject = createAndInitClassObject(theClass);
+                classFrame = new StackFrame(newObject);
                 // classFrame.parentFrame = stack.peek();
-                stack.push(classFrame);
+                pushStack(classFrame);
+            }
+            //对普通的类函数，需要在运行时动态绑定
+            else{
+                ClassObject classObject = (ClassObject)stack.peek().object;
+                theClass = classObject.type;
+                Function overloaded = cr.lookupFunction(theClass, function.name, function.getParamTypes());
+                if (overloaded  != function){
+                    function = overloaded;
+                    functionCode = (FunctionDeclarationContext) function.ctx;
+                    functionScope = cr.node2Scope.get(functionCode);
+                }
             }
         }
 
-        // if (classFrame != null) {
-        // functionFrame.parentFrame = classFrame;
-        // } else {
-        // // TODO 假设函数调用者跟函数处于同一层级，高于或低于都要调整
-        // functionFrame.parentFrame = stack.peek();
-        // }
-        stack.push(functionFrame);
+        // 添加StackFrame
+        if (functionObject == null) {
+            functionObject = new FunctionObject(function);
+        }
+        StackFrame functionFrame = new StackFrame(functionObject);
+
+        pushStack(functionFrame);
 
         // 往活动记录绑定形参和实参，它们要能够一一对应
         List<Object> realParams = new LinkedList<Object>();
@@ -658,12 +891,38 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     @Override
     public Object visitClassBody(ClassBodyContext ctx) {
-        return super.visitClassBody(ctx);
+        Object rtn = null;
+        for (ClassBodyDeclarationContext child : ctx.classBodyDeclaration()) {
+            rtn = visitClassBodyDeclaration(child);
+        }
+        return rtn;
     }
 
     @Override
     public Object visitClassBodyDeclaration(ClassBodyDeclarationContext ctx) {
-        return super.visitClassBodyDeclaration(ctx);
+        Object rtn = null;
+        if (ctx.memberDeclaration() != null) {
+            rtn = visitMemberDeclaration(ctx.memberDeclaration());
+        }
+        return rtn;
+    }
+
+    @Override
+    public Object visitMemberDeclaration(MemberDeclarationContext ctx) {
+        Object rtn = null;
+        if (ctx.fieldDeclaration() != null) {
+            rtn = visitFieldDeclaration(ctx.fieldDeclaration());
+        }
+        return rtn;
+    }
+
+    @Override
+    public Object visitFieldDeclaration(FieldDeclarationContext ctx) {
+        Object rtn = null;
+        if (ctx.variableDeclarators() != null) {
+            rtn = visitVariableDeclarators(ctx.variableDeclarators());
+        }
+        return rtn;
     }
 
     @Override
@@ -679,16 +938,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitCreator(CreatorContext ctx) {
         return super.visitCreator(ctx);
-    }
-
-    @Override
-    public Object visitFieldDeclaration(FieldDeclarationContext ctx) {
-        return super.visitFieldDeclaration(ctx);
-    }
-
-    @Override
-    public Object visitMemberDeclaration(MemberDeclarationContext ctx) {
-        return super.visitMemberDeclaration(ctx);
     }
 
     @Override

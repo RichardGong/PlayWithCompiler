@@ -11,5 +11,6 @@ public interface LValue {
 
     public Variable getVariable();
 
-    public StackFrame getFrame();
+    public PlayObject getValueContainer();
+    //public StackFrame getFrame();
 }

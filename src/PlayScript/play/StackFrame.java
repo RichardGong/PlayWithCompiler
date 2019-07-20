@@ -1,6 +1,6 @@
 package play;
 
-public abstract class StackFrame {
+public class StackFrame {
     //Map<Variable, Object> variables = null;
 
     //该frame所对应的scope
@@ -14,21 +14,29 @@ public abstract class StackFrame {
      */
     StackFrame parentFrame = null;
 
-    //是否包含某个变量
-    protected abstract boolean contains(Variable variable);
+    PlayObject object = null;
 
-    protected abstract Object getValue(Variable variable);
+    protected boolean contains(Variable variable) {
+        if(object != null && object.fields != null){
+            return object.fields.containsKey(variable);
+        }
+        return false;
+    }
 
-    protected abstract void setValue(Variable variable, Object value);
-    
-    // public StackFrame(Scope scope){
-    //     this.scope = scope;
-    //     variables = new HashMap<Variable, Object>();
-    // }    
+    public StackFrame(BlockScope scope){
+        this.scope = scope;
+        this.object = new PlayObject();
+    }
 
-    // //用于通过PlayObject来初始化一个frame
-    // public StackFrame(Scope scope, Map<Variable, Object> variables){
-    //     this.scope = scope;
-    //     this.variables = variables;
-    // }    
+    public StackFrame(ClassObject object){
+        this.scope = object.type;
+        this.object = object;
+    }
+
+    public StackFrame(FunctionObject object){
+        this.scope = object.function;
+        this.object = object;
+    }
+
+
 }

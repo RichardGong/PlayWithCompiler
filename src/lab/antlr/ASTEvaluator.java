@@ -20,7 +20,7 @@ import antlr.PlayScriptParser.PrimaryExpressionContext;
 import antlr.PlayScriptParser.PrimitiveTypeContext;
 import antlr.PlayScriptParser.StatementContext;
 
-public class IntegerVisitor extends PlayScriptBaseVisitor<Integer> {
+public class ASTEvaluator extends PlayScriptBaseVisitor<Integer> {
     Map<String, Integer> memory = new HashMap<String, Integer>();
 
     @Override

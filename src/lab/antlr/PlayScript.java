@@ -11,7 +11,7 @@ public class PlayScript {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         PlayScriptParser parser = new PlayScriptParser(tokens);
         ParseTree tree = parser.additiveExpression();
-        IntegerVisitor visitor = new IntegerVisitor();
+        ASTEvaluator visitor = new ASTEvaluator();
         Integer result = visitor.visit(tree);
         System.out.println(result);
     }
