@@ -1,0 +1,26 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "PlayScript cpp version",
+            "type": "shell",
+            "command": "clang++",
+            "args": [
+                "-std=c++14",
+                "-stdlib=libc++",
+                "src/PlayScript.cpp",
+                "-Llib",
+                "-llibantlr4-runtime.a",
+                "-Isrc/grammar",
+                "-Iantlr4.7.2-runtime",
+                "-o",
+                "play.out",
+                "--debug"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        }
+    ]
+}

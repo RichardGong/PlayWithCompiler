@@ -1,0 +1,22 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - PlayScript",
+            "request": "launch",
+            "mainClass": "PlayScript"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - SimpleLexer",
+            "request": "launch",
+            "mainClass": "craft.SimpleLexer"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - MemberOverload",
+            "request": "launch",
+            "mainClass": "oop.MemberOverload"
+        }
+    ]
+}
