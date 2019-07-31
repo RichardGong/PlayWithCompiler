@@ -284,6 +284,7 @@ public class RefPass extends PlayScriptBaseListener {
         Function function = new Function(idName, currentScope(), ctx);
 
         cr.types.add(function);
+        cr.node2Type.put(ctx, function);
         // cr.type2Node.put(function, ctx);
 
         // TODO 需要查重

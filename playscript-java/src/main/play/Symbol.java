@@ -13,7 +13,7 @@ public abstract class Symbol {
     protected int visibility = 0;
 
     //Symbol关联的AST节点
-    ParserRuleContext ctx = null;
+    protected ParserRuleContext ctx = null;
 
     public String getName(){
         return name;

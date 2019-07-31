@@ -1,8 +1,6 @@
 package play;
 
 public class StackFrame {
-    //Map<Variable, Object> variables = null;
-
     //该frame所对应的scope
     Scope scope = null;
 
@@ -14,6 +12,7 @@ public class StackFrame {
      */
     StackFrame parentFrame = null;
 
+    //实际存放变量的地方
     PlayObject object = null;
 
     protected boolean contains(Variable variable) {

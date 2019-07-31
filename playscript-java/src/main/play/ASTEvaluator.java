@@ -81,12 +81,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     }
 
     public LValue getLValue(Variable variable) {
-        // todo 增加reference中的计数器
         StackFrame f = stack.peek();
 
         PlayObject valueContainer = null;
         while (f != null) {
-            if (f.contains(variable) || f.scope.symbols.contains(variable)) {
+            //if (f.contains(variable) || f.scope.symbols.contains(variable)) {
+            if (f.scope.symbols.contains(variable)) {
                 valueContainer = f.object;
                 break;
             }
@@ -823,15 +823,15 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         pushStack(functionFrame);
 
-        // 往活动记录绑定形参和实参，它们要能够一一对应
-        List<Object> realParams = new LinkedList<Object>();
+        // 往栈桢绑定形参和实参，它们要能够一一对应
+        List<Object> paramValues = new LinkedList<Object>();
         if (ctx.expressionList() != null) {
             for (ExpressionContext exp : ctx.expressionList().expression()) {
                 Object value = visitExpression(exp);
                 if (value instanceof LValue) {
                     value = ((LValue) value).getValue();
                 }
-                realParams.add(value);
+                paramValues.add(value);
             }
         }
 
@@ -839,7 +839,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             for (int i = 0; i < functionCode.formalParameters().formalParameterList().formalParameter().size(); i++) {
                 FormalParameterContext param = functionCode.formalParameters().formalParameterList().formalParameter(i);
                 LValue lValue = (LValue) visitVariableDeclaratorId(param.variableDeclaratorId());
-                lValue.setValue(realParams.get(i));
+                lValue.setValue(paramValues.get(i));
             }
         }
 
