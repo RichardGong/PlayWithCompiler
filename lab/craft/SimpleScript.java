@@ -17,10 +17,10 @@ public class SimpleScript {
             verbose = true;
             System.out.println("verbose mode");
         }
-        System.out.println("Simple antlr language!");
+        System.out.println("Simple script language!");
 
         SimpleParser parser = new SimpleParser();
-        SimpleScript antlr = new SimpleScript();
+        SimpleScript script = new SimpleScript();
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         String scriptText = "";
@@ -40,7 +40,7 @@ public class SimpleScript {
                         parser.dumpAST(tree, "");
                     }
 
-                    antlr.evaluate(tree, "");
+                    script.evaluate(tree, "");
 
                     System.out.print("\n>");   //提示符
 
