@@ -29,7 +29,8 @@ set(SRC_LIST src/PlayScript.cpp
             src/grammar/PlayScriptListener.cpp  
             src/grammar/PlayScriptParser.cpp 
             src/grammar/PlayScriptVisitor.cpp
-            )
+            src/grammar/RefPass.cpp
+        src/grammar/Scope.cpp src/grammar/Symbol.cpp src/grammar/Variable.cpp src/grammar/Variable.h src/grammar/Type.cpp src/grammar/Type.h src/grammar/Function.cpp src/grammar/Function.h)
 
 MESSAGE(STATUS "SRC_LIST: " ${SRC_LIST})
 
