@@ -156,8 +156,7 @@ public:
     void exitArguments(PlayScriptParser::ArgumentsContext * /*ctx*/) override {}
 
 private:
-    Scope& pushScope(Scope& scope, antlr4::ParserRuleContext& ctx) {
-    }
+    Scope& pushScope(Scope& scope, antlr4::ParserRuleContext& ctx);
 };
 
 } // namespace play

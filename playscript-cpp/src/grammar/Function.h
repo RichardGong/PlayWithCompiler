@@ -6,10 +6,11 @@
 #include "Scope.h"
 #include "Type.h"
 #include "Variable.h"
+#include "FunctionType.h"
 
 namespace play{
 
-    class Function : Scope{
+    class Function : public Scope, public FunctionType{
 
     public:
 
