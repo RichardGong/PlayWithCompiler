@@ -3,7 +3,6 @@
 //
 
 #include "IRGen.h"
-#include "PlayScriptJIT.h"
 
 #include "llvm/ADT/APFloat.h"
 #include "llvm/ADT/APInt.h"
@@ -30,12 +29,12 @@ using namespace antlr4;
 using namespace llvm;
 using namespace llvm::orc;
 
-static LLVMContext TheContext;
-static IRBuilder<> Builder(TheContext);
-static std::unique_ptr<Module> TheModule;
-static std::map<std::string, Value *> NamedValues;
-static std::unique_ptr<legacy::FunctionPassManager> TheFPM;
-static std::unique_ptr<PlayScriptJIT> TheJIT;
+//static LLVMContext TheContext;
+//static IRBuilder<> Builder(TheContext);
+//static std::unique_ptr<Module> TheModule;
+//static std::map<std::string, Value *> NamedValues;
+//static std::unique_ptr<legacy::FunctionPassManager> TheFPM;
+//static std::unique_ptr<PlayScriptJIT> TheJIT;
 //static std::map<std::string, std::unique_ptr<PrototypeAST>> FunctionProtos;
 
 void IRGen::InitializeModuleAndPassManager() {
@@ -44,7 +43,11 @@ void IRGen::InitializeModuleAndPassManager() {
     // Open a new module.
     TheModule = llvm::make_unique<Module>("playscript", TheContext);
 
-    TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
+    DataLayout dl = TheJIT->getTargetMachine().createDataLayout();
+    TheModule->setDataLayout(dl);
+
+
+//    TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
     // Create a new pass manager attached to it.
     TheFPM = llvm::make_unique<legacy::FunctionPassManager>(TheModule.get());
@@ -59,6 +62,20 @@ void IRGen::InitializeModuleAndPassManager() {
     TheFPM->add(createCFGSimplificationPass());
 
     TheFPM->doInitialization();
+}
+
+void IRGen::ExecuteJIT(){
+    TheJIT->addModule(std::move(TheModule));
+
+
+    // Search the JIT for the __anon_expr symbol.
+    auto ExprSymbol = TheJIT->findSymbol("__prog");
+    assert(ExprSymbol && "__prog not found");
+
+    // Get the symbol's address and cast it to the right type (takes no
+    // arguments, returns a double) so we can call it as a native function.
+    double (*FP)() = (double (*)())(intptr_t)cantFail(ExprSymbol.getAddress());
+    fprintf(stdout, "Evaluated to %f\n", FP());
 }
 
 void IRGen::PrintIR() {
@@ -98,10 +115,10 @@ antlrcpp::Any IRGen::visitProg(PlayScriptParser::ProgContext *ctx) {
     // Validate the generated code, checking for consistency.
     verifyFunction(*TheFunction);
 
-    fprintf(stdout, "prog:\n");
-
-    TheFunction->print(outs());
-    fprintf(stdout, "\n");
+//    fprintf(stdout, "prog:\n");
+//
+//    TheFunction->print(outs());
+//    fprintf(stdout, "\n");
 
     return TheFunction;
 }
@@ -182,8 +199,8 @@ antlrcpp::Any IRGen::visitExpression(PlayScriptParser::ExpressionContext *ctx) {
             }
 
             //std::cout<<"result:"<< result <<std::endl;
-            result->print(outs());
-            std::cout << std::endl;
+//            result->print(outs());
+//            std::cout << std::endl;
 
         } else if (ctx->primary()) {
             result = visitPrimary(ctx->primary());
@@ -209,6 +226,8 @@ antlrcpp::Any IRGen::visitPrimary(PlayScriptParser::PrimaryContext *ctx) {
         result = NamedValues[name];
         if (!result)
             result = LogErrorV("Unknown variable name");
+    }else if (ctx->expression()){
+        result = visitExpression(ctx->expression());
     }
     return result;
 }
@@ -283,9 +302,9 @@ antlrcpp::Any IRGen::visitFunctionDeclaration(PlayScriptParser::FunctionDeclarat
     for (auto &Arg : F->args())
         NamedValues[Arg.getName()] = &Arg;
 
-    for (auto iter = NamedValues.begin(); iter != NamedValues.end(); iter++) {
-        std::cout << iter->first << " : " << iter->second << std::endl;
-    }
+//    for (auto iter = NamedValues.begin(); iter != NamedValues.end(); iter++) {
+//        std::cout << iter->first << " : " << iter->second << std::endl;
+//    }
 
     if (Value *RetVal = visitFunctionBody(ctx->functionBody())) {
         // Finish off the function.
@@ -304,9 +323,9 @@ antlrcpp::Any IRGen::visitFunctionDeclaration(PlayScriptParser::FunctionDeclarat
         F->eraseFromParent();
     }
 
-    fprintf(stdout, "Function definition:");
-    F->print(outs());
-    fprintf(stdout, "\n");
+//    fprintf(stdout, "Function definition:");
+//    F->print(outs());
+//    fprintf(stdout, "\n");
 
     //恢复原来的代码插入点
     Builder.SetInsertPoint(oldBB);
