@@ -8,7 +8,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-public class CompilationRecord {
+public class AnnotatedTree {
     // AST
     protected ParseTree ast = null;
 
@@ -33,7 +33,7 @@ public class CompilationRecord {
     //函数、类等引用的外部变量
     protected Map<Scope, List<Variable>> outerReference = new HashMap<Scope, List<Variable>>();
 
-    protected CompilationRecord() {
+    protected AnnotatedTree() {
        
     }
 

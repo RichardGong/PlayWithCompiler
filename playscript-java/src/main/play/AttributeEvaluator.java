@@ -30,15 +30,15 @@ import play.PlayScriptParser.VariableDeclaratorIdContext;
 import play.PlayScriptParser.VariableDeclaratorsContext;
 
 /**
- * 解析符号之间的引用关系。
+ * 进行语义分析，包括类型推断、引用消解等。
  */
-public class RefPass extends PlayScriptBaseListener {
+public class AttributeEvaluator extends PlayScriptBaseListener {
 
-    private CompilationRecord cr = null;
+    private AnnotatedTree cr = null;
 
     private Stack<Scope> scopeStack = new Stack<Scope>();
 
-    public RefPass(CompilationRecord cr) {
+    public AttributeEvaluator(AnnotatedTree cr) {
         this.cr = cr;
     }
 
