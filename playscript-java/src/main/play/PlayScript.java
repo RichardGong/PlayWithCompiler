@@ -25,13 +25,13 @@ public class PlayScript {
         //String script = "println(2+3.5); println(\"Hello \" + 45); ";
 
         //test asm generation
-        //String script = "int a = 1; int b =2; int c;  c=a+b;";
+        String script = "int a = 1; int b =2; int c;  c=a+b;";
         //String script = "int fun1(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8){int c = 10; return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + c;} println(\"fun1: %d\", fun1(1,2,3,4,5,6,7,8));".replaceAll("\\\\", "");
-        
+
         //源代码文件
         String scriptFile = null;
 
-        String script = null;
+        //String script = null;
 
         //输出文件
         String outputFile = null;
@@ -39,54 +39,58 @@ public class PlayScript {
         // 是否生成汇编代码
         boolean genAsm = false;
 
+        if (script == null){
+
         //解析参数
-        for (int i = 0; i< args.length; i++){
-            if (args[i].equals("-S")){
-                genAsm = true;
-            }
-            else if (args[i].equals("-o")){
-                if (i+1 <args.length){
-                    outputFile = args[++i];  //让i的序号增加一个
+            for (int i = 0; i< args.length; i++){
+                if (args[i].equals("-S")){
+                    genAsm = true;
+                }
+                else if (args[i].equals("-o")){
+                    if (i+1 <args.length){
+                        outputFile = args[++i];  //让i的序号增加一个
+                    }
+                    else{
+                        System.out.println("Expecting a filename after -o");
+                        return;
+                    }
                 }
                 else{
-                    System.out.println("Expecting a filename after -o");
-                    return;
+                    scriptFile = args[i];
                 }
             }
-            else{
-                scriptFile = args[i];
-            }
-        }
 
-        if (scriptFile != null){
-            try {
-                script = readTextFile(scriptFile);
-            } catch (IOException e) {
-                System.out.println("unable to read from : "+scriptFile);
-                return;
-            }
-        }
-
-        if (scriptFile == null){
-            //进入REPL
-            REPL();
-        }else if (genAsm){
-            //生成汇编代码
-            PlayScriptCompiler compiler = new PlayScriptCompiler();
-            AnnotatedTree cr = compiler.Compile(script);
-            AsmGen asmGen = new AsmGen(cr);
-            String asm = asmGen.generate();
-            if (outputFile != null){
+            if (scriptFile != null){
                 try {
-                    writeTextFile(outputFile, asm);
+                    script = readTextFile(scriptFile);
                 } catch (IOException e) {
-                    System.out.println("unable to write to : "+scriptFile);
+                    System.out.println("unable to read from : "+scriptFile);
                     return;
                 }
-            } else{
-                System.out.println(asm);
+            }
+
+            if (scriptFile == null){
+                //进入REPL
+                REPL();
+            }else if (genAsm){
+                //生成汇编代码
+                PlayScriptCompiler compiler = new PlayScriptCompiler();
+                AnnotatedTree cr = compiler.Compile(script);
+                AsmGen asmGen = new AsmGen(cr);
+                String asm = asmGen.generate();
+                if (outputFile != null){
+                    try {
+                        writeTextFile(outputFile, asm);
+                    } catch (IOException e) {
+                        System.out.println("unable to write to : "+scriptFile);
+                        return;
+                    }
+                } else{
+                    System.out.println(asm);
+                }
             }
         }
+    
         else{
             //执行脚本文件
             PlayScriptCompiler compiler = new PlayScriptCompiler();
@@ -94,7 +98,6 @@ public class PlayScript {
             Object result = compiler.Execute(cr);
             System.out.println(result);
         }
-            
     }
 
     private static String readTextFile(String pathName) throws IOException {

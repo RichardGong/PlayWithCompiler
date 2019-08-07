@@ -1,5 +1,18 @@
 {
     "configurations": [
-      
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - DistributedDataLayer",
+            "request": "launch",
+            "mainClass": "dsql.DistributedDataLayer",
+            "projectName": "dsql"
+        },
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - DistributedDataLayer",
+            "request": "launch",
+            "mainClass": "sql.DistributedDataLayer",
+            "projectName": "dsql"
+        }
     ]
 }

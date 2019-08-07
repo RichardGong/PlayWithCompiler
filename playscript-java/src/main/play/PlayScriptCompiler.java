@@ -14,6 +14,8 @@ public class PlayScriptCompiler {
         PlayScriptParser parser = new PlayScriptParser(tokens);
         cr.ast = parser.prog();
 
+        System.out.println(cr.ast.toStringTree(parser));
+
         ParseTreeWalker walker = new ParseTreeWalker();
         AttributeEvaluator refPass = new AttributeEvaluator(cr);
         walker.walk(refPass, cr.ast);
