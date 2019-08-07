@@ -4,35 +4,65 @@
 
 package dsql;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 import dsql.parser.*;
 
 public class DistributedDataLayer {
-    public int getDBIndex(String sql) {
+    Map<String, String> region2DB = new HashMap<String, String>();
+
+    public DistributedDataLayer() {
+        region2DB.put("SDYT", "db1");
+        region2DB.put("BJHD", "db2");
+        region2DB.put("FJXM", "db3");
+        region2DB.put("SZLG", "db4");
+    }
+
+    public String getDBName(String sql) {
+        // 词法解析
         SQLiteLexer lexer = new SQLiteLexer(CharStreams.fromString(sql));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        SQLiteParser parser = new SQLiteParser(tokens);
 
+        // 语法解析
+        SQLiteParser parser = new SQLiteParser(tokens);
         ParseTree tree = parser.sql_stmt();
 
+        // 以lisp格式打印AST
         System.out.println(tree.toStringTree(parser));
-        // cr.ast = parser.prog();
 
-        // ParseTreeWalker walker = new ParseTreeWalker();
-        // AttributeEvaluator refPass = new AttributeEvaluator(cr);
-        // walker.walk(refPass, cr.ast);
+        // 获得select语句的要素
+        SQLVisitor visitor = new SQLVisitor();
+        SelectStmt select = (SelectStmt) visitor.visit(tree);
 
-        return 0;
+        String dbName = null;
+        if (select.tableName.equals("orders")) {
+            if (select.whereExprs != null) {
+                for (WhereExpr expr : select.whereExprs) {
+                    // 根据cust_id或order_id来确定库的名称
+                    if (expr.columnName.equals("cust_id") || expr.columnName.equals("order_id")) {
+                        // 取编号的前4位，即区域编码
+                        String region = expr.value.substring(1, 5);
+                        // 根据区域编码，获取库名称
+                        dbName = region2DB.get(region);
+                        break;
+                    }
+                }
+            }
+        }
+        return dbName;
     }
 
     public static void main(String args[]) {
-        String sql = "select * from order where cust_id = \"SDYT987645\"".replaceAll("\\\\", "");
+        String sql = "select order_id from orders where cust_id = 'SDYT987645' and price > 200";
         DistributedDataLayer dl = new DistributedDataLayer();
-        dl.getDBIndex(sql);
+        String dbName = dl.getDBName(sql);
+        System.out.println("sql:" + sql);
+        System.out.println("db:" + dbName);
     }
 
 }

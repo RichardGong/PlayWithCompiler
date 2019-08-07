@@ -8264,6 +8264,7 @@ public class SQLiteParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
+		
 		public TerminalNode K_GROUP() { return getToken(SQLiteParser.K_GROUP, 0); }
 		public TerminalNode K_BY() { return getToken(SQLiteParser.K_BY, 0); }
 		public TerminalNode K_DISTINCT() { return getToken(SQLiteParser.K_DISTINCT, 0); }
