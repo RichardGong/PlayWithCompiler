@@ -51,13 +51,13 @@ import play.PlayScriptParser.VariableModifierContext;
 public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     // 之前的编译结果
-    private CompilationRecord cr = null;
+    private AnnotatedTree cr = null;
 
     // 局部变量的栈
     // private VMStack stack = new VMStack();
 
     // 堆，用于保存对象
-    public ASTEvaluator(CompilationRecord cr) {
+    public ASTEvaluator(AnnotatedTree cr) {
         this.cr = cr;
     }
 

@@ -36,9 +36,9 @@ import play.PlayScriptParser.VariableInitializerContext;
 public class AsmGen extends PlayScriptBaseVisitor<String> {
 
     // 之前的编译结果
-    private CompilationRecord cr = null;
+    private AnnotatedTree cr = null;
 
-    public AsmGen(CompilationRecord cr) {
+    public AsmGen(AnnotatedTree cr) {
         this.cr = cr;
     }
 

@@ -73,7 +73,7 @@ public class PlayScript {
         }else if (genAsm){
             //生成汇编代码
             PlayScriptCompiler compiler = new PlayScriptCompiler();
-            CompilationRecord cr = compiler.Compile(script);
+            AnnotatedTree cr = compiler.Compile(script);
             AsmGen asmGen = new AsmGen(cr);
             String asm = asmGen.generate();
             if (outputFile != null){
@@ -90,7 +90,7 @@ public class PlayScript {
         else{
             //执行脚本文件
             PlayScriptCompiler compiler = new PlayScriptCompiler();
-            CompilationRecord cr = compiler.Compile(script);
+            AnnotatedTree cr = compiler.Compile(script);
             Object result = compiler.Execute(cr);
             System.out.println(result);
         }
@@ -144,7 +144,7 @@ public class PlayScript {
              
                     // 执行脚本文件
                     PlayScriptCompiler compiler = new PlayScriptCompiler();
-                    CompilationRecord cr = compiler.Compile(scriptText);
+                    AnnotatedTree cr = compiler.Compile(scriptText);
                     Object result = compiler.Execute(cr);
                     System.out.println(result);
 
