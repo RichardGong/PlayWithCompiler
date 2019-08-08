@@ -1,5 +1,5 @@
 // Generated from SQLite.g4 by ANTLR 4.7.2
-package dsql.parser;
+package playdb.parser;
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
 /**

@@ -1,4 +1,4 @@
-package dsql;
+package playdb;
 
 import java.util.List;
 

@@ -1,0 +1,11 @@
+{
+    "configurations": [
+        {
+            "type": "java",
+            "name": "CodeLens (Launch) - PlayReport",
+            "request": "launch",
+            "mainClass": "report.PlayReport",
+            "projectName": "dsql"
+        }
+    ]
+}

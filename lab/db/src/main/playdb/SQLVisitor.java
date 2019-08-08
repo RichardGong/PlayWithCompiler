@@ -1,20 +1,19 @@
-package dsql;
+package playdb;
 
 import java.util.LinkedList;
 import java.util.List;
 
-import dsql.parser.*;
-import dsql.parser.SQLiteParser.Any_nameContext;
-import dsql.parser.SQLiteParser.Column_nameContext;
-import dsql.parser.SQLiteParser.ExprContext;
-import dsql.parser.SQLiteParser.Factored_select_stmtContext;
-import dsql.parser.SQLiteParser.KeywordContext;
-import dsql.parser.SQLiteParser.Literal_valueContext;
-import dsql.parser.SQLiteParser.Result_columnContext;
-import dsql.parser.SQLiteParser.Select_coreContext;
-import dsql.parser.SQLiteParser.Sql_stmtContext;
-import dsql.parser.SQLiteParser.Table_nameContext;
-import dsql.parser.SQLiteParser.Table_or_subqueryContext;
+import playdb.parser.*;
+import playdb.parser.SQLiteParser.Any_nameContext;
+import playdb.parser.SQLiteParser.Column_nameContext;
+import playdb.parser.SQLiteParser.ExprContext;
+import playdb.parser.SQLiteParser.Factored_select_stmtContext;
+import playdb.parser.SQLiteParser.Literal_valueContext;
+import playdb.parser.SQLiteParser.Result_columnContext;
+import playdb.parser.SQLiteParser.Select_coreContext;
+import playdb.parser.SQLiteParser.Sql_stmtContext;
+import playdb.parser.SQLiteParser.Table_nameContext;
+import playdb.parser.SQLiteParser.Table_or_subqueryContext;
 
 public class SQLVisitor extends SQLiteBaseVisitor<Object> {
 

@@ -2,7 +2,7 @@
  * 分布式数据访问层。能根据传来的SQL，确定所需要连接的数据库，并执行SQL。
  */
 
-package dsql;
+package playdb;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,12 +11,12 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import dsql.parser.*;
+import playdb.parser.*;
 
-public class DistributedDataLayer {
+public class PlayDB {
     Map<String, String> region2DB = new HashMap<String, String>();
 
-    public DistributedDataLayer() {
+    public PlayDB() {
         region2DB.put("SDYT", "db1");
         region2DB.put("BJHD", "db2");
         region2DB.put("FJXM", "db3");
@@ -59,7 +59,7 @@ public class DistributedDataLayer {
 
     public static void main(String args[]) {
         String sql = "select order_id from orders where cust_id = 'SDYT987645' and price > 200";
-        DistributedDataLayer dl = new DistributedDataLayer();
+        PlayDB dl = new PlayDB();
         String dbName = dl.getDBName(sql);
         System.out.println("sql:" + sql);
         System.out.println("db:" + dbName);

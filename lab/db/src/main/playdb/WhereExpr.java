@@ -1,4 +1,4 @@
-package dsql;
+package playdb;
 
 /**
  * 保存where条件的概要信息
