@@ -1,0 +1,24 @@
+<playreport title="Report 1">
+    <section>
+        <column>
+            <title>部门</title>
+            <field>=dept</field>
+        </column>
+        <column>
+            <title>人数</title>
+            <field>=num_person</field>
+        </column>
+        <column>
+            <title>销售额</title>
+            <field>=sales_amount</field>
+        </column>
+        <column>
+            <title>人均销售额</title>
+            <field>=sales_amount/num_person</field>
+        </column>
+    </section>
+    <datasource>
+        <connection>数据库连接信息</connection>
+        <sql>select dept, num_person, sales_amount from sales</sql>
+    </datasource>
+</playreport>

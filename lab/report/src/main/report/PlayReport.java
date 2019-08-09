@@ -20,27 +20,30 @@ public class PlayReport {
       
     }
 
-    // public String getDBName(String sql) {
-    //     // 词法解析
-    //     SQLiteLexer lexer = new SQLiteLexer(CharStreams.fromString(sql));
-    //     CommonTokenStream tokens = new CommonTokenStream(lexer);
+    public void parse(String exp) {
+        // 词法解析
+        PlayReportLexer lexer = new PlayReportLexer(CharStreams.fromString(exp));
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
 
-    //     // 语法解析
-    //     SQLiteParser parser = new SQLiteParser(tokens);
-    //     ParseTree tree = parser.sql_stmt();
+        // 语法解析
+        PlayReportParser parser = new PlayReportParser(tokens);
+        ParseTree tree = parser.bracedExpression();
 
-    //     // 以lisp格式打印AST
-    //     System.out.println(tree.toStringTree(parser));
+        // 以lisp格式打印AST
+        System.out.println(tree.toStringTree(parser));
 
-    //     // 获得select语句的要素
-    //     SQLVisitor visitor = new SQLVisitor();
-    //     SelectStmt select = (SelectStmt) visitor.visit(tree);
+        // 获得select语句的要素
+        // SQLVisitor visitor = new SQLVisitor();
+        // SelectStmt select = (SelectStmt) visitor.visit(tree);
 
-    //     return dbName;
-    // }
+    }
+
 
     public static void main(String args[]) {
         System.out.println("Play Report!");
+
+        PlayReport report = new PlayReport();
+        report.parse("{=sales_amount/num_person}");
     }
 
 }
