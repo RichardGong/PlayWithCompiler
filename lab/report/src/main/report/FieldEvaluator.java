@@ -1,6 +1,7 @@
 package report;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -16,24 +17,24 @@ import report.parser.PlayReportParser.IntegerLiteralContext;
 import report.parser.PlayReportParser.LiteralContext;
 import report.parser.PlayReportParser.PrimaryContext;
 
+@SuppressWarnings({ "all", "warnings", "unchecked", "unused", "cast" })
 public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
 
     // 报表数据
     private TabularData data = null;
 
-    // 当前行
-    private int rowIndex = 0;
+    private Add add = new Add();
+    private Minus minus = new Minus();
+    private Mul mul = new Mul();
+    private Div div = new Div();
+    private EQ eq = new EQ();
+    private GE ge = new GE();
+    private GT gt = new GT();
+    private LE le = new LE();
+    private LT lt = new LT();
 
     public FieldEvaluator(TabularData data) {
         this.data = data;
-    }
-
-    public int getRowIndex() {
-        return rowIndex;
-    }
-
-    public void setRowIndex(int rowIndex) {
-        this.rowIndex = rowIndex;
     }
 
     @Override
@@ -52,31 +53,31 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
 
             switch (ctx.bop.getType()) {
             case PlayReportParser.ADD:
-                rtn = add(left, right, type);
+                rtn = add.vectorOp(left, right, type);
                 break;
             case PlayReportParser.SUB:
-                rtn = minus(left, right, type);
+                rtn = minus.vectorOp(left, right, type);
                 break;
             case PlayReportParser.MUL:
-                rtn = mul(left, right, type);
+                rtn = mul.vectorOp(left, right, type);
                 break;
             case PlayReportParser.DIV:
-                rtn = div(left, right, type);
+                rtn = div.vectorOp(left, right, type);
                 break;
             case PlayReportParser.EQUAL:
-                rtn = EQ(left, right, type);
+                rtn = eq.vectorOp(left, right, type);
                 break;
             case PlayReportParser.LE:
-                rtn = LE(left, right, type);
+                rtn = le.vectorOp(left, right, type);
                 break;
             case PlayReportParser.LT:
-                rtn = LT(left, right, type);
+                rtn = lt.vectorOp(left, right, type);
                 break;
             case PlayReportParser.GE:
-                rtn = GE(left, right, type);
+                rtn = ge.vectorOp(left, right, type);
                 break;
             case PlayReportParser.GT:
-                rtn = GT(left, right, type);
+                rtn = gt.vectorOp(left, right, type);
                 break;
             default:
                 break;
@@ -98,8 +99,7 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
             String fieldName = ctx.IDENTIFIER().getText();
-            int colIndex = data.fieldNames.indexOf(fieldName);
-            rtn = data.cols.get(colIndex).get(rowIndex);
+            rtn = data.getField(fieldName);
         }
         return rtn;
     }
@@ -144,34 +144,73 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
     public Object visitFunctionCall(FunctionCallContext ctx) {
         Object rtn = null;
         String functionName = ctx.IDENTIFIER().getText().toLowerCase();
+        String functionFieldName = ctx.getText();
         if (functionName.equals("rank")) {
-            String functionFieldName = ctx.getText();
-            if (!data.fieldNames.contains(functionFieldName)) {
-                //计算参数列
+            if (!data.hasField(functionFieldName)) {
+                // 计算参数列
                 String fieldName = ctx.expressionList().expression(0).getText();
-                if (!data.fieldNames.contains(fieldName)) {
+                if (!data.hasField(fieldName)) {
                     addCalculatedField(ctx.expressionList().expression(0));
                 }
-                //计算rank
-                List<Object> paramCol = data.cols.get(data.fieldNames.indexOf(fieldName));
-                List<Object> sorted = paramCol.stream().sorted().collect(Collectors.toList());
-                
-                List<Object> rank = new ArrayList<>(paramCol.size());
-                int numRows = data.getNumRows();
-                for (Object obj: paramCol){
-                    int index = sorted.indexOf(obj);
-                    rank.add(numRows-index);
+
+                Object rank = null;
+                // 计算rank
+                if (data.getField(fieldName) instanceof List<?>) {
+                    List<Object> paramCol = (List<Object>) data.getField(fieldName);
+                    List<Object> sorted = paramCol.stream().sorted().collect(Collectors.toList());
+
+                    List<Object> rankList = new ArrayList<>(paramCol.size());
+                    rank = rankList;
+                    int numRows = data.getNumRows();
+                    for (Object obj : paramCol) {
+                        int index = sorted.indexOf(obj);
+                        rankList.add(numRows - index);
+                    }
+                } else { // 标量
+                    rank = 1;
                 }
 
-                //增加一列
-                data.addColumn(functionFieldName, rank);
+                // 增加一个字段
+                data.setField(functionFieldName, rank);
             }
 
-            int colIndex = data.fieldNames.indexOf(functionFieldName);
-            rtn = data.cols.get(colIndex).get(rowIndex);
+            rtn = data.getField(functionFieldName);
+
+        } else if (functionName.equals("max")) {
+            if (!data.hasField(functionFieldName)) {
+                // 计算参数列
+                String fieldName = ctx.expressionList().expression(0).getText();
+                if (!data.hasField(fieldName)) {
+                    addCalculatedField(ctx.expressionList().expression(0));
+                }
+
+                // 计算max
+                Object max = null;
+                Object field = data.getField(fieldName);
+                if (field instanceof List<?>) {
+                    List<Object> paramCol = (List<Object>) field;
+                    if (paramCol.size() > 0) {
+                        if (paramCol.get(0) instanceof Integer) {
+                            max = paramCol.stream().mapToInt(x -> (Integer) x).max().getAsInt();
+                        } else if (paramCol.get(0) instanceof Long) {
+                            max = paramCol.stream().mapToLong(x -> (Long) x).max().getAsLong();
+                        } else if (paramCol.get(0) instanceof Double) {
+                            max = paramCol.stream().mapToDouble(x -> (Double) x).max().getAsDouble();
+                        }
+                    }
+                } else { // 标量
+                    max = field;
+                }
+
+                //增加一个field
+                data.setField(functionFieldName, max);
+            }
+
+            rtn = data.getField(functionFieldName);
         }
 
         return rtn;
+
     }
 
     @Override
@@ -188,17 +227,20 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
 
     // 根据公式，往数据源里添加一个计算字段
     private void addCalculatedField(ExpressionContext ctx) {
-        int oldRowIndex = rowIndex;
-        List<Object> calcedColumn = new ArrayList<Object>();
-        int numRows = data.getNumRows();
-        for (int row = 0; row < numRows ; row++) {
-            rowIndex = row;
-            Object value = visitExpression(ctx);
-            calcedColumn.add(value);
-        }
+        Object value = visitExpression(ctx);
         String fieldName = ctx.getText();
-        data.addColumn(fieldName, calcedColumn);
-        rowIndex = oldRowIndex;
+        data.setField(fieldName, value);
+
+        // List<Object> calcedColumn = new ArrayList<Object>();
+
+        // int numRows = data.getNumRows();
+        // for (int row = 0; row < numRows; row++) {
+        // rowIndex = row;
+
+        // calcedColumn.add(value);
+        // }
+
+        // rowIndex = oldRowIndex;
     }
 
     ///////////////////////////////////////////////////////////
@@ -206,6 +248,15 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
 
     private PrimitiveType calcType(Object obj1, Object obj2) {
         PrimitiveType type = PrimitiveType.String;
+
+        // 处理向量的情况
+        if (obj1 instanceof List<?> && ((List<Object>) obj1).size() > 0) {
+            obj1 = ((List<Object>) obj1).get(0);
+        }
+
+        if (obj2 instanceof List<?> && ((List<Object>) obj2).size() > 0) {
+            obj2 = ((List<Object>) obj2).get(0);
+        }
 
         if (obj1 instanceof String || obj2 instanceof String) {
             type = PrimitiveType.String;
@@ -222,159 +273,213 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
         return type;
     }
 
-    private Object add(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.String) {
-            rtn = String.valueOf(obj1) + String.valueOf(obj2);
-        } else if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() + ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() + ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() + ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() + ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() + ((Number) obj2).shortValue();
+    private abstract class BinaryOp {
+        // 支持向量运算
+        public Object vectorOp(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+
+            List<Object> list1 = null;
+            Object data2 = null;
+            if (obj1 instanceof List<?>) {
+                list1 = (List<Object>) obj1;
+                data2 = obj2;
+            } else if (obj2 instanceof List<?>) {
+                list1 = (List<Object>) obj2;
+                data2 = obj1;
+            }
+
+            if (list1 != null) {
+                List<Object> vector = new ArrayList<Object>();
+                for (int i = 0; i < list1.size(); i++) {
+                    Object o1 = list1.get(i);
+                    Object o2 = data2;
+                    if (data2 instanceof List<?>) {
+                        o2 = ((List<Object>) data2).get(i);
+                    }
+                    Object value = op(o1, o2, targetType);
+                    vector.add(value);
+                }
+                rtn = vector;
+            } else {
+                rtn = op(obj1, obj2, targetType);
+            }
+
+            return rtn;
         }
 
-        return rtn;
+        protected abstract Object op(Object obj1, Object obj2, PrimitiveType targetType);
     }
 
-    private Object minus(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() - ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() - ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() - ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() - ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() - ((Number) obj2).shortValue();
+    private class Add extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.String) {
+                rtn = String.valueOf(obj1) + String.valueOf(obj2);
+            } else if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() + ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() + ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() + ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() + ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() + ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class Minus extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() - ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() - ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() - ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() - ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() - ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class Mul extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() * ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() * ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() * ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() * ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() * ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class Div extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() / ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() / ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() / ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() / ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() / ((Number) obj2).shortValue();
+            }
+            return rtn;
+        }
+    }
+
+    private class EQ extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() == ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() == ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() == ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() == ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() == ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class GE extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() >= ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() >= ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() >= ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() >= ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() >= ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class GT extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() > ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() > ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() > ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() > ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() > ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class LE extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() <= ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() <= ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() <= ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() <= ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() <= ((Number) obj2).shortValue();
+            }
+
+            return rtn;
+        }
+    }
+
+    private class LT extends BinaryOp {
+        protected Object op(Object obj1, Object obj2, PrimitiveType targetType) {
+            Object rtn = null;
+            if (targetType == PrimitiveType.Integer) {
+                rtn = ((Number) obj1).intValue() < ((Number) obj2).intValue();
+            } else if (targetType == PrimitiveType.Float) {
+                rtn = ((Number) obj1).floatValue() < ((Number) obj2).floatValue();
+            } else if (targetType == PrimitiveType.Long) {
+                rtn = ((Number) obj1).longValue() < ((Number) obj2).longValue();
+            } else if (targetType == PrimitiveType.Double) {
+                rtn = ((Number) obj1).doubleValue() < ((Number) obj2).doubleValue();
+            } else if (targetType == PrimitiveType.Short) {
+                rtn = ((Number) obj1).shortValue() < ((Number) obj2).shortValue();
+            }
+
+            return rtn;
         }
 
-        return rtn;
     }
-
-    private Object mul(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() * ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() * ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() * ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() * ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() * ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
-    private Object div(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() / ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() / ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() / ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() / ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() / ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
-    private Object EQ(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() == ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() == ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() == ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() == ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() == ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
-    private Object GE(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() >= ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() >= ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() >= ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() >= ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() >= ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
-    private Object GT(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() > ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() > ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() > ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() > ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() > ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
-    private Object LE(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() <= ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() <= ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() <= ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() <= ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() <= ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
-    private Object LT(Object obj1, Object obj2, PrimitiveType targetType) {
-        Object rtn = null;
-        if (targetType == PrimitiveType.Integer) {
-            rtn = ((Number) obj1).intValue() < ((Number) obj2).intValue();
-        } else if (targetType == PrimitiveType.Float) {
-            rtn = ((Number) obj1).floatValue() < ((Number) obj2).floatValue();
-        } else if (targetType == PrimitiveType.Long) {
-            rtn = ((Number) obj1).longValue() < ((Number) obj2).longValue();
-        } else if (targetType == PrimitiveType.Double) {
-            rtn = ((Number) obj1).doubleValue() < ((Number) obj2).doubleValue();
-        } else if (targetType == PrimitiveType.Short) {
-            rtn = ((Number) obj1).shortValue() < ((Number) obj2).shortValue();
-        }
-
-        return rtn;
-    }
-
 }

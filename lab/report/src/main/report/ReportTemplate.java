@@ -34,13 +34,17 @@ public class ReportTemplate {
         template.columnHeaders.add("部门      ");
         template.columnHeaders.add("人数");
         template.columnHeaders.add("销售额");
-        template.columnHeaders.add("销售额排序");
-        template.columnHeaders.add("人均销售额");
-        template.columnHeaders.add("人均销售额排序");
+        template.columnHeaders.add("最高额");
+        template.columnHeaders.add("差距");
+        template.columnHeaders.add("排序");
+        template.columnHeaders.add("人均");
+        template.columnHeaders.add("人均排序");
 
         template.fields.add("{=dept}");
         template.fields.add("{=num_person}");
         template.fields.add("{=sales_amount}");
+        template.fields.add("{=max(sales_amount)}");
+        template.fields.add("{=max(sales_amount)-sales_amount}");
         template.fields.add("{=rank(sales_amount)}");
         template.fields.add("{=sales_amount/num_person}");
         template.fields.add("{=rank(sales_amount/num_person)}");
