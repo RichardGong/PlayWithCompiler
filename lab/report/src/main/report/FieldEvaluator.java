@@ -1,5 +1,11 @@
 package report;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import report.parser.*;
 import report.parser.PlayReportParser.BracedExpressionContext;
 import report.parser.PlayReportParser.ExpressionContext;
@@ -93,7 +99,7 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
         } else if (ctx.IDENTIFIER() != null) {
             String fieldName = ctx.IDENTIFIER().getText();
             int colIndex = data.fieldNames.indexOf(fieldName);
-            rtn = data.rows.get(rowIndex).get(colIndex);
+            rtn = data.cols.get(colIndex).get(rowIndex);
         }
         return rtn;
     }
@@ -137,6 +143,33 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
     @Override
     public Object visitFunctionCall(FunctionCallContext ctx) {
         Object rtn = null;
+        String functionName = ctx.IDENTIFIER().getText().toLowerCase();
+        if (functionName.equals("rank")) {
+            String functionFieldName = ctx.getText();
+            if (!data.fieldNames.contains(functionFieldName)) {
+                //计算参数列
+                String fieldName = ctx.expressionList().expression(0).getText();
+                if (!data.fieldNames.contains(fieldName)) {
+                    addCalculatedField(ctx.expressionList().expression(0));
+                }
+                //计算rank
+                List<Object> paramCol = data.cols.get(data.fieldNames.indexOf(fieldName));
+                List<Object> sorted = paramCol.stream().sorted().collect(Collectors.toList());
+                
+                List<Object> rank = new ArrayList<>(paramCol.size());
+                int numRows = data.getNumRows();
+                for (Object obj: paramCol){
+                    int index = sorted.indexOf(obj);
+                    rank.add(numRows-index);
+                }
+
+                //增加一列
+                data.addColumn(functionFieldName, rank);
+            }
+
+            int colIndex = data.fieldNames.indexOf(functionFieldName);
+            rtn = data.cols.get(colIndex).get(rowIndex);
+        }
 
         return rtn;
     }
@@ -151,14 +184,22 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
     }
 
     //////////////////////////////////////////////////////////
-    //内置函数
-    private int rank(ExpressionContext field, int rowIndex){
-        //首先看有没有这个字段，如果是计算字段，则要生成一下
+    // 内置函数
 
-
-        return 0;
+    // 根据公式，往数据源里添加一个计算字段
+    private void addCalculatedField(ExpressionContext ctx) {
+        int oldRowIndex = rowIndex;
+        List<Object> calcedColumn = new ArrayList<Object>();
+        int numRows = data.getNumRows();
+        for (int row = 0; row < numRows ; row++) {
+            rowIndex = row;
+            Object value = visitExpression(ctx);
+            calcedColumn.add(value);
+        }
+        String fieldName = ctx.getText();
+        data.addColumn(fieldName, calcedColumn);
+        rowIndex = oldRowIndex;
     }
-
 
     ///////////////////////////////////////////////////////////
     /// 工具性的方法

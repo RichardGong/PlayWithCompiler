@@ -22,14 +22,8 @@ public class PlayReport {
       
     }
 
-    public String renderReport(){
+    public String renderReport(ReportTemplate template, TabularData data){
         StringBuffer sb = new StringBuffer();
-
-        //获取报表定义
-        ReportTemplate template = ReportTemplate.sampleReport();
-
-        //获取报表数据
-        TabularData data = TabularData.sampleData();
 
         //输出表格头
         for (String columnHeader: template.columnHeaders){
@@ -46,7 +40,7 @@ public class PlayReport {
 
         //为每一行做计算，并执行
         FieldEvaluator evaluator = new FieldEvaluator(data);
-        for (int row = 0; row< data.rows.size(); row++){
+        for (int row = 0; row< data.getNumRows(); row++){
             evaluator.setRowIndex(row);
             for (ParseTree tree: fieldASTs){
                 Object value = evaluator.visit(tree);
@@ -80,8 +74,12 @@ public class PlayReport {
         PlayReport report = new PlayReport();
         //report.parse("{=sales_amount/num_person}");
 
-        String reportString = report.renderReport();
+        //打印报表1
+        String reportString = report.renderReport(ReportTemplate.sampleReport1(), TabularData.sampleData());
+        System.out.println(reportString);
 
+        //打印报表2
+        reportString = report.renderReport(ReportTemplate.sampleReport2(), TabularData.sampleData());
         System.out.println(reportString);
     }
 

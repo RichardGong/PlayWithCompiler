@@ -12,7 +12,7 @@ public class ReportTemplate {
     public List<String> fields = new LinkedList<String>();
 
     //创建一个例子报表
-    public static ReportTemplate sampleReport(){
+    public static ReportTemplate sampleReport1(){
         ReportTemplate template = new ReportTemplate();
 
         template.columnHeaders.add("部门      ");
@@ -27,4 +27,26 @@ public class ReportTemplate {
 
         return template;
     }
+
+    public static ReportTemplate sampleReport2(){
+        ReportTemplate template = new ReportTemplate();
+
+        template.columnHeaders.add("部门      ");
+        template.columnHeaders.add("人数");
+        template.columnHeaders.add("销售额");
+        template.columnHeaders.add("销售额排序");
+        template.columnHeaders.add("人均销售额");
+        template.columnHeaders.add("人均销售额排序");
+
+        template.fields.add("{=dept}");
+        template.fields.add("{=num_person}");
+        template.fields.add("{=sales_amount}");
+        template.fields.add("{=rank(sales_amount)}");
+        template.fields.add("{=sales_amount/num_person}");
+        template.fields.add("{=rank(sales_amount/num_person)}");
+
+        return template;
+    }
+
+   
 }
