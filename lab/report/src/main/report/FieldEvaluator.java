@@ -1,11 +1,8 @@
 package report;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import report.parser.*;
 import report.parser.PlayReportParser.BracedExpressionContext;
@@ -144,69 +141,17 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
     public Object visitFunctionCall(FunctionCallContext ctx) {
         Object rtn = null;
         String functionName = ctx.IDENTIFIER().getText().toLowerCase();
-        String functionFieldName = ctx.getText();
         if (functionName.equals("rank")) {
-            if (!data.hasField(functionFieldName)) {
-                // 计算参数列
-                String fieldName = ctx.expressionList().expression(0).getText();
-                if (!data.hasField(fieldName)) {
-                    addCalculatedField(ctx.expressionList().expression(0));
-                }
-
-                Object rank = null;
-                // 计算rank
-                if (data.getField(fieldName) instanceof List<?>) {
-                    List<Object> paramCol = (List<Object>) data.getField(fieldName);
-                    List<Object> sorted = paramCol.stream().sorted().collect(Collectors.toList());
-
-                    List<Object> rankList = new ArrayList<>(paramCol.size());
-                    rank = rankList;
-                    int numRows = data.getNumRows();
-                    for (Object obj : paramCol) {
-                        int index = sorted.indexOf(obj);
-                        rankList.add(numRows - index);
-                    }
-                } else { // 标量
-                    rank = 1;
-                }
-
-                // 增加一个字段
-                data.setField(functionFieldName, rank);
-            }
-
-            rtn = data.getField(functionFieldName);
-
-        } else if (functionName.equals("max")) {
-            if (!data.hasField(functionFieldName)) {
-                // 计算参数列
-                String fieldName = ctx.expressionList().expression(0).getText();
-                if (!data.hasField(fieldName)) {
-                    addCalculatedField(ctx.expressionList().expression(0));
-                }
-
-                // 计算max
-                Object max = null;
-                Object field = data.getField(fieldName);
-                if (field instanceof List<?>) {
-                    List<Object> paramCol = (List<Object>) field;
-                    if (paramCol.size() > 0) {
-                        if (paramCol.get(0) instanceof Integer) {
-                            max = paramCol.stream().mapToInt(x -> (Integer) x).max().getAsInt();
-                        } else if (paramCol.get(0) instanceof Long) {
-                            max = paramCol.stream().mapToLong(x -> (Long) x).max().getAsLong();
-                        } else if (paramCol.get(0) instanceof Double) {
-                            max = paramCol.stream().mapToDouble(x -> (Double) x).max().getAsDouble();
-                        }
-                    }
-                } else { // 标量
-                    max = field;
-                }
-
-                //增加一个field
-                data.setField(functionFieldName, max);
-            }
-
-            rtn = data.getField(functionFieldName);
+            rtn = rank(ctx);
+        }
+        else if (functionName.equals("max")) {
+            rtn = max(ctx);
+        }
+        else if (functionName.equals("sum")) {
+            rtn = sum(ctx);
+        }
+        else if (functionName.equals("runningsum")) {
+            rtn = runningSum(ctx);
         }
 
         return rtn;
@@ -225,22 +170,182 @@ public class FieldEvaluator extends PlayReportBaseVisitor<Object> {
     //////////////////////////////////////////////////////////
     // 内置函数
 
+    // 求排序值（向量）
+    private Object rank(FunctionCallContext ctx) {
+        Object rtn = null;
+        String functionFieldName = ctx.getText();
+
+        if (!data.hasField(functionFieldName)) {
+            // 计算参数列
+            String fieldName = ctx.expressionList().expression(0).getText();
+            if (!data.hasField(fieldName)) {
+                addCalculatedField(ctx.expressionList().expression(0));
+            }
+
+            Object rank = null;
+            // 计算rank
+            if (data.getField(fieldName) instanceof List<?>) {
+                List<Object> paramCol = (List<Object>) data.getField(fieldName);
+                List<Object> sorted = paramCol.stream().sorted().collect(Collectors.toList());
+
+                List<Object> rankList = new ArrayList<>(paramCol.size());
+                rank = rankList;
+                int numRows = data.getNumRows();
+                for (Object obj : paramCol) {
+                    int index = sorted.indexOf(obj);
+                    rankList.add(numRows - index);
+                }
+            } else { // 标量
+                rank = 1;
+            }
+
+            // 增加一个字段
+            data.setField(functionFieldName, rank);
+        }
+
+        rtn = data.getField(functionFieldName);
+
+        return rtn;
+    }
+
+    // 求最大值（标量）
+    private Object max(FunctionCallContext ctx) {
+        Object rtn = null;
+        String functionFieldName = ctx.getText();
+
+        if (!data.hasField(functionFieldName)) {
+            // 计算参数列
+            String fieldName = ctx.expressionList().expression(0).getText();
+            if (!data.hasField(fieldName)) {
+                addCalculatedField(ctx.expressionList().expression(0));
+            }
+
+            // 计算max
+            Object max = null;
+            Object field = data.getField(fieldName);
+            if (field instanceof List<?>) {
+                List<Object> paramCol = (List<Object>) field;
+                if (paramCol.size() > 0) {
+                    if (paramCol.get(0) instanceof Integer) {
+                        max = paramCol.stream().mapToInt(x -> (Integer) x).max().getAsInt();
+                    } else if (paramCol.get(0) instanceof Long) {
+                        max = paramCol.stream().mapToLong(x -> (Long) x).max().getAsLong();
+                    } else if (paramCol.get(0) instanceof Double) {
+                        max = paramCol.stream().mapToDouble(x -> (Double) x).max().getAsDouble();
+                    }
+                }
+            } else { // 标量
+                max = field;
+            }
+
+            // 增加一个field
+            data.setField(functionFieldName, max);
+        }
+
+        rtn = data.getField(functionFieldName);
+
+        return rtn;
+    }
+
+    // 求汇总值（标量）
+    private Object sum(FunctionCallContext ctx) {
+        Object rtn = null;
+        String functionFieldName = ctx.getText();
+
+        if (!data.hasField(functionFieldName)) {
+            // 计算参数列
+            String fieldName = ctx.expressionList().expression(0).getText();
+            if (!data.hasField(fieldName)) {
+                addCalculatedField(ctx.expressionList().expression(0));
+            }
+
+            // 计算sum
+            Object sum = null;
+            Object field = data.getField(fieldName);
+            if (field instanceof List<?>) {
+                List<Object> paramCol = (List<Object>) field;
+                if (paramCol.size() > 0) {
+                    if (paramCol.get(0) instanceof Integer) {
+                        sum = paramCol.stream().mapToInt(x -> (Integer) x).sum();
+                    } else if (paramCol.get(0) instanceof Long) {
+                        sum = paramCol.stream().mapToLong(x -> (Long) x).sum();
+                    } else if (paramCol.get(0) instanceof Double) {
+                        sum = paramCol.stream().mapToDouble(x -> (Double) x).sum();
+                    }
+                }
+            } else { // 标量
+                sum = field;
+            }
+
+            // 增加一个field
+            data.setField(functionFieldName, sum);
+        }
+
+        rtn = data.getField(functionFieldName);
+
+        return rtn;
+    }
+
+    // 求累计汇总值（向量）
+    private Object runningSum(FunctionCallContext ctx) {
+        Object rtn = null;
+        String functionFieldName = ctx.getText();
+
+        if (!data.hasField(functionFieldName)) {
+            // 计算参数列
+            String fieldName = ctx.expressionList().expression(0).getText();
+            if (!data.hasField(fieldName)) {
+                addCalculatedField(ctx.expressionList().expression(0));
+            }
+
+            Object runningSum = null;
+
+            // 计算rank
+            if (data.getField(fieldName) instanceof List<?>) {
+                List<Object> paramCol = (List<Object>) data.getField(fieldName);
+                runningSum = new ArrayList<>(paramCol.size());
+                if (paramCol.size() > 0){
+                    if (paramCol.get(0) instanceof Integer){
+                        Integer iSum = 0;
+                        for (Object o: paramCol){
+                            iSum += (Integer)o;
+                            ((List<Object>)runningSum).add(iSum);
+                        }
+                    }
+                    else if (paramCol.get(0) instanceof Long){
+                        Long lSum = 0L;
+                        for (Object o: paramCol){
+                            lSum += (Long)o;
+                            ((List<Object>)runningSum).add(lSum);
+                        }
+                    }
+                    else if (paramCol.get(0) instanceof Double){
+                        Double dSum = 0.0;
+                        for (Object o: paramCol){
+                            dSum += (Double)o;
+                            ((List<Object>)runningSum).add(dSum);
+                        }
+                    }
+                }
+                
+            } else { // 标量
+                runningSum = data.getField(fieldName);
+            }
+
+            // 增加一个字段
+            data.setField(functionFieldName, runningSum);
+        }
+
+        rtn = data.getField(functionFieldName);
+
+        return rtn;
+    }
+
     // 根据公式，往数据源里添加一个计算字段
     private void addCalculatedField(ExpressionContext ctx) {
         Object value = visitExpression(ctx);
         String fieldName = ctx.getText();
         data.setField(fieldName, value);
-
-        // List<Object> calcedColumn = new ArrayList<Object>();
-
-        // int numRows = data.getNumRows();
-        // for (int row = 0; row < numRows; row++) {
-        // rowIndex = row;
-
-        // calcedColumn.add(value);
-        // }
-
-        // rowIndex = oldRowIndex;
     }
 
     ///////////////////////////////////////////////////////////

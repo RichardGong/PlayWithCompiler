@@ -39,6 +39,8 @@ public class ReportTemplate {
         template.columnHeaders.add("排序");
         template.columnHeaders.add("人均");
         template.columnHeaders.add("人均排序");
+        template.columnHeaders.add("累计汇总");
+        template.columnHeaders.add("占比%");
 
         template.fields.add("{=dept}");
         template.fields.add("{=num_person}");
@@ -48,6 +50,8 @@ public class ReportTemplate {
         template.fields.add("{=rank(sales_amount)}");
         template.fields.add("{=sales_amount/num_person}");
         template.fields.add("{=rank(sales_amount/num_person)}");
+        template.fields.add("{=runningsum(sales_amount)}");
+        template.fields.add("{=sales_amount/sum(sales_amount)*100}");
 
         return template;
     }
