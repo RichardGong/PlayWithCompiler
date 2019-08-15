@@ -7,12 +7,10 @@ public enum ASTNodeType{
     ExpressionStmt,
     AssignmentStmt,
 
-    PrimaryExp,
-    MulticativeExp,
-    AdditiveExp,
-
-    AssignmentExp,
+    Primary,
+    Multicative,
+    Additive,
 
     Identifier,
-    IntConstant
+    IntLiteral
 }

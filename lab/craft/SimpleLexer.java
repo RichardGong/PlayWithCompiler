@@ -1,38 +1,52 @@
 
-
 import java.io.CharArrayReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 一个简单的手写的词法分析器。
+ * 能够为后面的简单计算器、简单脚本语言产生Token。
+ */
 public class SimpleLexer {
 
     public static void main(String args[]) {
         SimpleLexer lexer = new SimpleLexer();
-        lexer.tokenize("inta age = 45");
+        SimpleTokenReader tokenReader = lexer.tokenize("int age = 45;");
+        dump(tokenReader);
     }
 
-    private StringBuffer tokenText = null;
-    private List<Token> tokens = null;
-    private SimpleToken token = null;
+    //下面几个变量是在解析过程中用到的临时变量,如果要优化的话，可以塞到方法里隐藏起来
+    private StringBuffer tokenText = null;   //临时保存token的文本
+    private List<Token> tokens = null;       //保存解析出来的Token
+    private SimpleToken token = null;        //当前正在解析的Token
 
+    //是否是字母
     private boolean isAlpha(int ch) {
         return ch >= 'a' && ch <= 'z' || ch >= 'A' && ch <= 'Z';
     }
 
+    //是否是数字
     private boolean isDigit(int ch) {
         return ch >= '0' && ch <= '9';
     }
 
+    //是否是空白字符
     private boolean isBlank(int ch) {
         return ch == ' ' || ch == '\t' || ch == '\n';
     }
 
+    /**
+     * 有限状态机进入初始状态。
+     * 这个初始状态其实并不做停留，它马上进入其他状态。
+     * 开始解析的时候，进入初始状态；某个Token解析完毕，也进入初始状态，在这里把Token记下来，然后建立一个新的Token。
+     * @param ch
+     * @return
+     */
     private DfaState initToken(char ch) {
         if (tokenText.length() > 0) {
             token.text = tokenText.toString();
             tokens.add(token);
-            // System.out.println(token.getType() + "\t" + token.getText());
 
             tokenText = new StringBuffer();
             token = new SimpleToken();
@@ -49,7 +63,7 @@ public class SimpleLexer {
             tokenText.append(ch);
         } else if (isDigit(ch)) {
             newState = DfaState.IntConstant;
-            token.type = TokenType.IntConstant;
+            token.type = TokenType.IntLiteral;
             tokenText.append(ch);
         } else if (ch == '>') {
             newState = DfaState.GT;
@@ -93,6 +107,12 @@ public class SimpleLexer {
         return newState;
     }
 
+    /**
+     * 解析字符串，形成Token。
+     * 这是一个有限状态自动机，在不同的状态中迁移。
+     * @param code
+     * @return
+     */
     public SimpleTokenReader tokenize(String code) {
         tokens = new ArrayList<Token>();
         CharArrayReader reader = new CharArrayReader(code.toCharArray());
@@ -176,16 +196,16 @@ public class SimpleLexer {
         return new SimpleTokenReader(tokens);
     }
 
+    /**
+     * Token的一个简单实现。只有类型和文本值两个属性。
+     */
     private final class SimpleToken implements Token {
+        //Token类型
         private TokenType type = null;
+
+        //文本值
         private String text = null;
 
-        // public SimpleToken(){ }
-
-        // public SimpleToken(TokenType type,String text){
-        // this.type = type;
-        // this.text = text;
-        // }
 
         @Override
         public TokenType getType() {
@@ -196,17 +216,23 @@ public class SimpleLexer {
         public String getText() {
             return text;
         }
-
-        // public void setType(TokenType type){
-        // this.type = type;
-        // }
-
-        // public void setText(String text){
-        // this.text = text;
-        // }
-
     }
 
+    /**
+     * 打印所有的Token
+     * @param tokenReader
+     */
+    public static void dump(SimpleTokenReader tokenReader){
+        System.out.println("text\ttype");
+        Token token = null;
+        while ((token= tokenReader.read())!=null){
+            System.out.println(token.getText()+"\t\t"+token.getType());
+        }
+    }
+
+    /**
+     * 有限状态机的各种状态。
+     */
     private enum DfaState {
         Initial,
 
@@ -223,6 +249,9 @@ public class SimpleLexer {
         IntConstant
     }
 
+    /**
+     * 一个简单的Token流。是把一个Token列表进行了封装。
+     */
     private class SimpleTokenReader implements TokenReader {
         List<Token> tokens = null;
         int pos = 0;
@@ -240,9 +269,6 @@ public class SimpleLexer {
         }
 
         @Override
-        /**
-         * 返回Token流中下一个Token，但不从流中取出。 如果流已经为空，返回null;
-         */
         public Token peek() {
             if (pos < tokens.size()) {
                 return tokens.get(pos);

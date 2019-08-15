@@ -25,6 +25,6 @@ public enum TokenType{
 
     Identifier,
 
-    IntConstant,
+    IntLiteral,
     StringConstant
 }
