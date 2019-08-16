@@ -259,7 +259,7 @@ public class SimpleCalculator {
                 }
             }
         }
-        return node;
+        return node;  //这个方法也做了AST的简化，就是不用构造一个primary节点，直接返回子节点。因为它只有一个子节点。
     }
 
     /**

@@ -17,7 +17,6 @@ import java.util.List;
  * primary -> IntLiteral | Id | (additive)
  */
 public class SimpleParser {
-    private TokenReader tokens = null;
 
     public static void main(String[] args) {
 
@@ -42,8 +41,8 @@ public class SimpleParser {
      */
     public ASTNode parse(String script) throws Exception {
         SimpleLexer lexer = new SimpleLexer();
-        tokens = lexer.tokenize(script);
-        ASTNode rootNode = prog();
+        TokenReader tokens = lexer.tokenize(script);
+        ASTNode rootNode = prog(tokens);
         return rootNode;
     }
 
@@ -52,18 +51,18 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode prog() throws Exception {
+    private SimpleASTNode prog(TokenReader tokens) throws Exception {
         SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "pwc");
 
         while (tokens.peek() != null) {
-            SimpleASTNode child = intDeclare();
+            SimpleASTNode child = intDeclare(tokens);
 
             if (child == null) {
-                child = expressionStatement();
+                child = expressionStatement(tokens);
             }
 
             if (child == null) {
-                child = assignmentStatement();
+                child = assignmentStatement(tokens);
             }
 
             if (child != null) {
@@ -81,9 +80,9 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode expressionStatement() throws Exception {
+    private SimpleASTNode expressionStatement(TokenReader tokens) throws Exception {
         int pos = tokens.getPosition();
-        SimpleASTNode node = additive();
+        SimpleASTNode node = additive(tokens);
         if (node != null) {
             Token token = tokens.peek();
             if (token != null && token.getType() == TokenType.SemiColon) {
@@ -101,7 +100,7 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode assignmentStatement() throws Exception {
+    private SimpleASTNode assignmentStatement(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.peek();
         if (token != null && token.getType() == TokenType.Identifier) {
@@ -110,7 +109,7 @@ public class SimpleParser {
             token = tokens.peek();
             if (token != null && token.getType() == TokenType.Assignment) {
                 tokens.read();  //取出等号
-                SimpleASTNode child = additive();
+                SimpleASTNode child = additive(tokens);
                 if (child == null) {
                     throw new Exception("invalide assignment statement, expecting an expression");
                 }
@@ -141,7 +140,7 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode intDeclare() throws Exception {
+    private SimpleASTNode intDeclare(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.peek();
         if (token != null && token.getType() == TokenType.Int) {
@@ -152,7 +151,7 @@ public class SimpleParser {
                 token = tokens.peek();
                 if (token != null && token.getType() == TokenType.Assignment) {
                     tokens.read();  //取出等号
-                    SimpleASTNode child = additive();
+                    SimpleASTNode child = additive(tokens);
                     if (child == null) {
                         throw new Exception("invalide variable initialization, expecting an expression");
                     }
@@ -181,15 +180,15 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode additive() throws Exception {
-        SimpleASTNode child1 = multiplicative();
+    private SimpleASTNode additive(TokenReader tokens) throws Exception {
+        SimpleASTNode child1 = multiplicative(tokens);
         SimpleASTNode node = child1;
         if (child1 != null) {
             while (true) {
                 Token token = tokens.peek();
                 if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
                     token = tokens.read();
-                    SimpleASTNode child2 = multiplicative();
+                    SimpleASTNode child2 = multiplicative(tokens);
                     node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
                     node.addChild(child1);
                     node.addChild(child2);
@@ -207,15 +206,15 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode multiplicative() throws Exception {
-        SimpleASTNode child1 = primary();
+    private SimpleASTNode multiplicative(TokenReader tokens) throws Exception {
+        SimpleASTNode child1 = primary(tokens);
         SimpleASTNode node = child1;
 
         while (true) {
             Token token = tokens.peek();
             if (token != null && (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)) {
                 token = tokens.read();
-                SimpleASTNode child2 = primary();
+                SimpleASTNode child2 = primary(tokens);
                 node = new SimpleASTNode(ASTNodeType.Multicative, token.getText());
                 node.addChild(child1);
                 node.addChild(child2);
@@ -233,7 +232,7 @@ public class SimpleParser {
      * @return
      * @throws Exception
      */
-    private SimpleASTNode primary() throws Exception {
+    private SimpleASTNode primary(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.peek();
         if (token != null) {
@@ -245,7 +244,7 @@ public class SimpleParser {
                 node = new SimpleASTNode(ASTNodeType.Identifier, token.getText());
             } else if (token.getType() == TokenType.LeftParen) {
                 tokens.read();
-                node = additive();
+                node = additive(tokens);
                 if (node != null) {
                     token = tokens.peek();
                     if (token != null && token.getType() == TokenType.RightParen) {
@@ -258,7 +257,7 @@ public class SimpleParser {
                 }
             }
         }
-        return node;
+        return node;  //这个方法也做了AST的简化，就是不用构造一个primary节点，直接返回子节点。因为它只有一个子节点。
     }
 
     /**
