@@ -12,7 +12,22 @@ public class SimpleLexer {
 
     public static void main(String args[]) {
         SimpleLexer lexer = new SimpleLexer();
-        SimpleTokenReader tokenReader = lexer.tokenize("int age = 45;");
+
+        String script = "int age = 45;";
+        System.out.println("parse :" + script);
+        SimpleTokenReader tokenReader = lexer.tokenize(script);
+        dump(tokenReader);
+
+        //测试inta的解析
+        script = "inta age = 45;";
+        System.out.println("\nparse :" + script);
+        tokenReader = lexer.tokenize(script);
+        dump(tokenReader);
+
+        //测试in的解析
+        script = "in age = 45;";
+        System.out.println("\nparse :" + script);
+        tokenReader = lexer.tokenize(script);
         dump(tokenReader);
     }
 
@@ -167,17 +182,35 @@ public class SimpleLexer {
                         state = DfaState.Id_int2;
                         tokenText.append(ch);
                     }
+                    else if (isDigit(ch) || isAlpha(ch)){
+                        state = DfaState.Id;
+                        tokenText.append(ch);
+                    }
+                    else {
+                        state = initToken(ch);
+                    }
                     break;
                 case Id_int2:
                     if (ch == 't') {
                         state = DfaState.Id_int3;
                         tokenText.append(ch);
                     }
+                    else if (isDigit(ch) || isAlpha(ch)){
+                        state = DfaState.Id;
+                        tokenText.append(ch);
+                    }
+                    else {
+                        state = initToken(ch);
+                    }
                     break;
                 case Id_int3:
                     if (isBlank(ch)) {
                         token.type = TokenType.Int;
                         state = initToken(ch);
+                    }
+                    else{
+                        state = DfaState.Id;
+                        tokenText.append(ch);
                     }
                     break;
                 default:

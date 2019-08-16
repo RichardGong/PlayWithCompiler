@@ -102,30 +102,30 @@ public class SimpleParser {
      */
     private SimpleASTNode assignmentStatement(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
-        Token token = tokens.peek();
+        Token token = tokens.peek();    //预读，看看下面是不是标识符
         if (token != null && token.getType() == TokenType.Identifier) {
-            token = tokens.read();              //读入标识符
+            token = tokens.read();      //读入标识符
             node = new SimpleASTNode(ASTNodeType.AssignmentStmt, token.getText());
-            token = tokens.peek();
+            token = tokens.peek();      //预读，看看下面是不是等号
             if (token != null && token.getType() == TokenType.Assignment) {
-                tokens.read();  //取出等号
+                tokens.read();          //取出等号
                 SimpleASTNode child = additive(tokens);
-                if (child == null) {
+                if (child == null) {    //出错，等号右面没有一个合法的表达式
                     throw new Exception("invalide assignment statement, expecting an expression");
                 }
                 else{
-                    node.addChild(child);
-                    token = tokens.peek();
+                    node.addChild(child);   //添加子节点
+                    token = tokens.peek();  //预读，看看后面是不是分号
                     if (token != null && token.getType() == TokenType.SemiColon) {
-                        tokens.read();
+                        tokens.read();      //消耗掉这个分号
 
-                    } else {
+                    } else {                //报错，缺少分号
                         throw new Exception("invalid statement, expecting semicolon");
                     }
                 }
             }
             else {
-                tokens.unread();              //回溯，吐出之前消化掉的标识符
+                tokens.unread();            //回溯，吐出之前消化掉的标识符
                 node = null;
             }
         }
