@@ -1,30 +1,31 @@
-
-
+/**
+ * Token的类型
+ */
 public enum TokenType{
-    Plus,
-    Minus,
-    Star,
-    Slash,
+    Plus,   // +
+    Minus,  // -
+    Star,   // *
+    Slash,  // /
 
-    GE,
-    GT,
-    EQ,
-    LE,
-    LT,
+    GE,     // >=
+    GT,     // >
+    EQ,     // ==
+    LE,     // <=
+    LT,     // <
 
-    SemiColon,
-    LeftParen,
-    RightParen,
+    SemiColon, // ;
+    LeftParen, // (
+    RightParen,// )
 
-    Assignment,
+    Assignment,// =
 
     If,
     Else,
     
     Int,
 
-    Identifier,
+    Identifier,     //标识符
 
-    IntLiteral,
-    StringConstant
+    IntLiteral,     //整型字面量
+    StringLiteral   //字符串字面量
 }

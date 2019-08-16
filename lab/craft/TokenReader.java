@@ -1,5 +1,5 @@
 /**
- * 一个Token流。Parser可以从中获取Token。
+ * 一个Token流。由Lexer生成。Parser可以从中获取Token。
  */
 public interface TokenReader{
     /**

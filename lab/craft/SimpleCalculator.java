@@ -7,25 +7,44 @@ import java.util.List;
 /**
  * 实现一个计算器，但计算的结合性是有问题的。因为它使用了下面的语法规则：
  *
+ * additive -> multiplicative | multiplicative + additive
+ * multiplicative -> primary | primary + multiplicative
  *
+ * 递归项在右边，会自然的对应右结合。我们真正需要的是左结合。
  */
 public class SimpleCalculator {
-    private TokenReader tokens = null;
 
     public static void main(String[] args) {
         SimpleCalculator calculator = new SimpleCalculator();
 
-        String script = "2+3*5";
-        System.out.println("计算: " + script + "，看上去一切正常。");
+        //测试变量声明语句的解析
+        String script = "int a = b+3;";
+        System.out.println("解析变量声明语句: " + script);
+        SimpleLexer lexer = new SimpleLexer();
+        TokenReader tokens = lexer.tokenize(script);
+        try {
+            SimpleASTNode node = calculator.intDeclare(tokens);
+            calculator.dumpAST(node,"");
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        //测试表达式
+        script = "2+3*5";
+        System.out.println("\n计算: " + script + "，看上去一切正常。");
         calculator.evaluate(script);
 
-        System.out.println();
 
         script = "2+3+4";
-        System.out.println("计算: " + script + "，结合性出现错误。");
+        System.out.println("\n计算: " + script + "，结合性出现错误。");
         calculator.evaluate(script);
     }
 
+    /**
+     * 执行脚本，并打印输出AST和求值过程。
+     * @param script
+     */
     public void evaluate(String script){
         try {
             ASTNode tree = parse(script);
@@ -34,19 +53,31 @@ public class SimpleCalculator {
             evaluate(tree, "");
 
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
+    /**
+     * 解析脚本，并返回根节点
+     * @param code
+     * @return
+     * @throws Exception
+     */
     public ASTNode parse(String code) throws Exception {
         SimpleLexer lexer = new SimpleLexer();
-        tokens = lexer.tokenize(code);
+        TokenReader tokens = lexer.tokenize(code);
 
-        ASTNode rootNode = prog();
+        ASTNode rootNode = prog(tokens);
 
         return rootNode;
     }
 
+    /**
+     * 对某个AST节点求值，并打印求值过程。
+     * @param node
+     * @param indent  打印输出时的缩进量，用tab控制
+     * @return
+     */
     private int evaluate(ASTNode node, String indent) {
         int result = 0;
         System.out.println(indent + "Calculating: " + node.getType());
@@ -87,11 +118,15 @@ public class SimpleCalculator {
         return result;
     }
 
-    // 根节点
-    private SimpleASTNode prog() throws Exception {
+    /**
+     * 语法解析：根节点
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode prog(TokenReader tokens) throws Exception {
         SimpleASTNode node = new SimpleASTNode(ASTNodeType.Programm, "Calculator");
 
-        SimpleASTNode child = additive();
+        SimpleASTNode child = additive(tokens);
 
         if (child != null) {
             node.addChild(child);
@@ -99,16 +134,63 @@ public class SimpleCalculator {
         return node;
     }
 
+    /**
+     * 整型变量声明，如：
+     * int a;
+     * int b = 2*3;
+     *
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode intDeclare(TokenReader tokens) throws Exception {
+        SimpleASTNode node = null;
+        Token token = tokens.peek();
+        if (token != null && token.getType() == TokenType.Int) {
+            token = tokens.read();
+            if (tokens.peek().getType() == TokenType.Identifier) {
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.Assignment) {
+                    tokens.read();  //取出等号
+                    SimpleASTNode child = additive(tokens);
+                    if (child == null) {
+                        throw new Exception("invalide variable initialization, expecting an expression");
+                    }
+                    else{
+                        node.addChild(child);
+                    }
+                }
+            } else {
+                throw new Exception("variable name expected");
+            }
 
-    private SimpleASTNode additive() throws Exception {
-        SimpleASTNode child1 = multiplicative();
+            if (node != null) {
+                token = tokens.peek();
+                if (token != null && token.getType() == TokenType.SemiColon) {
+                    tokens.read();
+                } else {
+                    throw new Exception("invalid statement, expecting semicolon");
+                }
+            }
+        }
+        return node;
+    }
+
+    /**
+     * 语法解析：加法表达式
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode additive(TokenReader tokens) throws Exception {
+        SimpleASTNode child1 = multiplicative(tokens);
         SimpleASTNode node = child1;
 
         Token token = tokens.peek();
         if (child1 != null && token != null) {
             if (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus) {
                 token = tokens.read();
-                SimpleASTNode child2 = additive();
+                SimpleASTNode child2 = additive(tokens);
                 if (child2 != null) {
                     node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
                     node.addChild(child1);
@@ -121,15 +203,20 @@ public class SimpleCalculator {
         return node;
     }
 
-    private SimpleASTNode multiplicative() throws Exception {
-        SimpleASTNode child1 = primary();
+    /**
+     * 语法解析：乘法表达式
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode multiplicative(TokenReader tokens) throws Exception {
+        SimpleASTNode child1 = primary(tokens);
         SimpleASTNode node = child1;
 
         Token token = tokens.peek();
         if (child1 != null && token != null) {
             if (token.getType() == TokenType.Star || token.getType() == TokenType.Slash) {
                 token = tokens.read();
-                SimpleASTNode child2 = primary();
+                SimpleASTNode child2 = primary(tokens);
                 if (child2 != null) {
                     node = new SimpleASTNode(ASTNodeType.Multicative, token.getText());
                     node.addChild(child1);
@@ -142,17 +229,43 @@ public class SimpleCalculator {
         return node;
     }
 
-    private SimpleASTNode primary() throws Exception {
+    /**
+     * 语法解析：基础表达式
+     * @return
+     * @throws Exception
+     */
+    private SimpleASTNode primary(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
         Token token = tokens.peek();
-        if (token != null && token.getType() == TokenType.IntLiteral) {
-            token = tokens.read();
-            node = new SimpleASTNode(ASTNodeType.Primary, token.getText());
+        if (token != null) {
+            if (token.getType() == TokenType.IntLiteral) {
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.IntLiteral, token.getText());
+            } else if (token.getType() == TokenType.Identifier) {
+                token = tokens.read();
+                node = new SimpleASTNode(ASTNodeType.Identifier, token.getText());
+            } else if (token.getType() == TokenType.LeftParen) {
+                tokens.read();
+                node = additive(tokens);
+                if (node != null) {
+                    token = tokens.peek();
+                    if (token != null && token.getType() == TokenType.RightParen) {
+                        tokens.read();
+                    } else {
+                        throw new Exception("expecting right parenthesis");
+                    }
+                } else {
+                    throw new Exception("expecting an additive expression inside parenthesis");
+                }
+            }
         }
         return node;
     }
 
-
+    /**
+     * 一个简单的AST节点的实现。
+     * 属性包括：类型、文本值、父节点、子节点。
+     */
     private class SimpleASTNode implements ASTNode {
         SimpleASTNode parent = null;
         List<ASTNode> children = new ArrayList<ASTNode>();
@@ -160,9 +273,6 @@ public class SimpleCalculator {
         ASTNodeType nodeType = null;
         String text = null;
 
-        // public SimpleASTNode() {
-
-        // }
 
         public SimpleASTNode(ASTNodeType nodeType, String text) {
             this.nodeType = nodeType;
@@ -196,6 +306,11 @@ public class SimpleCalculator {
 
     }
 
+    /**
+     * 打印输出AST的树状结构
+     * @param node
+     * @param indent 缩进字符，由tab组成，每一级多一个tab
+     */
     private void dumpAST(ASTNode node, String indent) {
         System.out.println(indent + node.getType() + " " + node.getText());
         for (ASTNode child : node.getChildren()) {
