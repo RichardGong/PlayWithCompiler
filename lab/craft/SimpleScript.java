@@ -105,7 +105,7 @@ public class SimpleScript {
                 result = value1 - value2;
             }
             break;
-        case Multicative:
+        case Multiplicative:
             child1 = node.getChildren().get(0);
             value1 = evaluate(child1, indent + "\t");
             child2 = node.getChildren().get(1);

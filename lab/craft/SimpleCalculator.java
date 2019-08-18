@@ -98,7 +98,7 @@ public class SimpleCalculator {
                 result = value1 - value2;
             }
             break;
-        case Multicative:
+        case Multiplicative:
             child1 = node.getChildren().get(0);
             value1 = evaluate(child1, indent + "\t");
             child2 = node.getChildren().get(1);
@@ -135,7 +135,7 @@ public class SimpleCalculator {
     }
 
     /**
-     * 整型变量声明，如：
+     * 整型变量声明语句，如：
      * int a;
      * int b = 2*3;
      *
@@ -144,16 +144,17 @@ public class SimpleCalculator {
      */
     private SimpleASTNode intDeclare(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
-        Token token = tokens.peek();
-        if (token != null && token.getType() == TokenType.Int) {
-            token = tokens.read();
-            if (tokens.peek().getType() == TokenType.Identifier) {
-                token = tokens.read();
+        Token token = tokens.peek();    //预读
+        if (token != null && token.getType() == TokenType.Int) {   //匹配Int
+            token = tokens.read();      //消耗掉int
+            if (tokens.peek().getType() == TokenType.Identifier) { //匹配标识符
+                token = tokens.read();  //消耗掉标识符
+                //创建当前节点，并把变量名记到AST节点的文本值中，这里新建一个变量子节点也是可以的
                 node = new SimpleASTNode(ASTNodeType.IntDeclaration, token.getText());
-                token = tokens.peek();
+                token = tokens.peek();  //预读
                 if (token != null && token.getType() == TokenType.Assignment) {
-                    tokens.read();  //取出等号
-                    SimpleASTNode child = additive(tokens);
+                    tokens.read();      //消耗掉等号
+                    SimpleASTNode child = additive(tokens);  //匹配一个表达式
                     if (child == null) {
                         throw new Exception("invalide variable initialization, expecting an expression");
                     }
@@ -218,7 +219,7 @@ public class SimpleCalculator {
                 token = tokens.read();
                 SimpleASTNode child2 = primary(tokens);
                 if (child2 != null) {
-                    node = new SimpleASTNode(ASTNodeType.Multicative, token.getText());
+                    node = new SimpleASTNode(ASTNodeType.Multiplicative, token.getText());
                     node.addChild(child1);
                     node.addChild(child2);
                 } else {
@@ -261,6 +262,8 @@ public class SimpleCalculator {
         }
         return node;  //这个方法也做了AST的简化，就是不用构造一个primary节点，直接返回子节点。因为它只有一个子节点。
     }
+
+
 
     /**
      * 一个简单的AST节点的实现。
