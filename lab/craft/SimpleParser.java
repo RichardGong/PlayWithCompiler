@@ -181,16 +181,16 @@ public class SimpleParser {
      * @throws Exception
      */
     private SimpleASTNode additive(TokenReader tokens) throws Exception {
-        SimpleASTNode child1 = multiplicative(tokens);
+        SimpleASTNode child1 = multiplicative(tokens);  //应用add规则
         SimpleASTNode node = child1;
         if (child1 != null) {
-            while (true) {
+            while (true) {                              //循环应用add'规则
                 Token token = tokens.peek();
                 if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
-                    token = tokens.read();
-                    SimpleASTNode child2 = multiplicative(tokens);
+                    token = tokens.read();              //读出加号
+                    SimpleASTNode child2 = multiplicative(tokens);  //计算下级节点
                     node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
-                    node.addChild(child1);
+                    node.addChild(child1);              //注意，新节点在顶层，保证正确的结合性
                     node.addChild(child2);
                     child1 = node;
                 } else {
