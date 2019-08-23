@@ -113,7 +113,7 @@ public class SimpleCalculator {
                 result = value1 / value2;
             }
             break;
-        case Primary:
+        case IntLiteral:
             result = Integer.valueOf(node.getText()).intValue();
             break;
         default:
