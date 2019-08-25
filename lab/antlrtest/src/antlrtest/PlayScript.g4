@@ -36,6 +36,10 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+/*
+用Antlr的语法重新实现了02~05讲的语法规则。
+Antlr可以支持左递归的语法规则，参见additiveExpression和multiplicativeExpression规则。
+*/
 grammar PlayScript;
 
 import CommonLexer;   //导入词法定义
@@ -107,12 +111,14 @@ assignmentOperator
 	|	'|='
 	;
 
+//加法表达式，Antlr能够支持左递归
 additiveExpression
     :   multiplicativeExpression
     |   additiveExpression '+' multiplicativeExpression
     |   additiveExpression '-' multiplicativeExpression
     ;
 
+//乘法表达式，Antlr能够支持左递归
 multiplicativeExpression
     :   primaryExpression
     |   multiplicativeExpression '*' primaryExpression
