@@ -17,6 +17,13 @@
      比如，输入： java SimpleScript  
      或：java SimpleScript -v  
      -v 参数会让解释器打印AST和求值过程。  
+* lab/antlrtest : 第6讲的示例代码。
+  + Hello.g4 一个简单的词法规则文件
+  + CommonLexer.g4 参考https://github.com/antlr/grammars-v4/blob/master/java/JavaLexer.g4 形成的一个词法文件。
+  + PlayScript.g4 参考https://github.com/antlr/grammars-v4/blob/master/java/JavaParser.g4 形成的一个语法文件。
+  + ASTEvaluator.java 实现了visitor模式的一个类，对AST遍历，实现表达式求值。
+  + PlayScript.java 一个简单的测试程序
+  + 其他文件：都是由Antlr解析规则文件后生成的  
 
 ### 注意
 随着课程进度，会不断更新资料内容和本文档的内容。   
