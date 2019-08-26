@@ -2,29 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="317944c3-db05-4ece-b3ed-923739047c88" name="默认更改列表" comment="">
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.classpath" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.project" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.settings/org.eclipse.core.resources.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.settings/org.eclipse.jdt.apt.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.settings/org.eclipse.m2e.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/src/antlrtest/ASTEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../antlrtest/src/antlrtest/ASTEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/src/antlrtest/CommonLexer.g4" beforeDir="false" afterPath="$PROJECT_DIR$/../antlrtest/src/antlrtest/CommonLexer.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/src/antlrtest/Hello.g4" beforeDir="false" afterPath="$PROJECT_DIR$/../antlrtest/src/antlrtest/Hello.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/src/antlrtest/PlayScript.g4" beforeDir="false" afterPath="$PROJECT_DIR$/../antlrtest/src/antlrtest/PlayScript.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/src/antlrtest/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/../antlrtest/src/antlrtest/PlayScript.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/CommonLexer.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/Hello.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/Hello.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/Hello.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/PlayScript.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/PlayScript.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/PlayScript.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/PlayScriptLexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/PlayScriptLexer.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../antlrtest/target/classes/antlrtest/hello.play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -105,20 +82,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/SimpleCalculator.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="313">
               <caret line="115" column="8" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="8" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/SimpleScript.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-1054">
-              <caret line="28" column="18" selection-start-line="28" selection-start-column="18" selection-end-line="28" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -246,12 +214,12 @@
       <updated>1565875583479</updated>
       <workItem from="1565875588519" duration="16699000" />
       <workItem from="1566109167020" duration="375000" />
-      <workItem from="1566112094978" duration="8153000" />
+      <workItem from="1566112094978" duration="8155000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25227000" />
+    <option name="totallyTimeSpent" value="25229000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -264,6 +232,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1251" height="777" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.25971878" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -274,7 +243,7 @@
       <window_info id="设计器" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32876712" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3459854" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.3459854" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -377,17 +346,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SimpleCalculator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="313">
-          <caret line="115" column="8" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/SimpleScript.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-1054">
           <caret line="28" column="18" selection-start-line="28" selection-start-column="18" selection-end-line="28" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/SimpleCalculator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="313">
+          <caret line="115" column="8" selection-start-line="115" selection-start-column="8" selection-end-line="115" selection-end-column="8" />
         </state>
       </provider>
     </entry>
