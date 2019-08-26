@@ -13,6 +13,11 @@ public class PlayObject {
     public Object getValue(Variable variable){
         Object rtn = fields.get(variable);
         //TODO 父类的属性如何返回？还是说都在这里了？
+
+        //替换成自己的NullObject
+        if (rtn == null){
+            rtn = NullObject.instance();
+        }
         return rtn;
     }
 

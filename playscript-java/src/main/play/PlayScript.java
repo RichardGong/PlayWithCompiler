@@ -16,7 +16,7 @@ public class PlayScript {
         //String script = "int age = 44; { int i = 10; age+i;}";
         //String script = "int age = 44; for(int i = 0;i<10;i++) { age = age + 2;} int i = 8;";
         //String script = "int b= 10; int myfunc(int a) {return a+b+3;} myfunc(2);";
-        //String script = "class myclass{int a=2; int b; myclass(){ b = 3;} }  myclass c = myclass(); c.b;";
+        String script = "class myclass{int a=2; int b; myclass(){ b = 3;} }  myclass c = myclass(); c.b;";
         //String script = "class class1{int a=2; int b; void method1(){println(\"in class1\");}} class class2 extends class1{int b = 5; void method1(){println(\"in class2\");} } class1 c = class2(); println(c.a); println(c.b); c.method1();";
         //String script = "class myclass{int a; int b; myclass(){a=1; b=2;} int calc(){return a + b;} } myclass c = myclass(); c.calc();";
         //String script = "println(2);";
@@ -25,7 +25,7 @@ public class PlayScript {
         //String script = "println(2+3.5); println(\"Hello \" + 45); ";
 
         //test asm generation
-        String script = "int a = 1; int b =2; int c;  c=a+b;";
+        //String script =  null; //"int a = 1; int b =2; int c;  c=a+b;";
         //String script = "int fun1(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8){int c = 10; return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + c;} println(\"fun1: %d\", fun1(1,2,3,4,5,6,7,8));".replaceAll("\\\\", "");
 
         //源代码文件
@@ -39,7 +39,7 @@ public class PlayScript {
         // 是否生成汇编代码
         boolean genAsm = false;
 
-        if (script == null){
+//        if (script == null){
 
         //解析参数
             for (int i = 0; i< args.length; i++){
@@ -69,34 +69,45 @@ public class PlayScript {
                 }
             }
 
-            if (scriptFile == null){
+            if (script == null){
                 //进入REPL
                 REPL();
             }else if (genAsm){
                 //生成汇编代码
+                generateAsm(script, outputFile);
+            }
+
+            else{
+                //执行脚本文件
                 PlayScriptCompiler compiler = new PlayScriptCompiler();
                 AnnotatedTree cr = compiler.Compile(script);
-                AsmGen asmGen = new AsmGen(cr);
-                String asm = asmGen.generate();
-                if (outputFile != null){
-                    try {
-                        writeTextFile(outputFile, asm);
-                    } catch (IOException e) {
-                        System.out.println("unable to write to : "+scriptFile);
-                        return;
-                    }
-                } else{
-                    System.out.println(asm);
-                }
+
+                Object result = compiler.Execute(cr);
+                System.out.println(result);
             }
-        }
+//        }
     
-        else{
-            //执行脚本文件
-            PlayScriptCompiler compiler = new PlayScriptCompiler();
-            AnnotatedTree cr = compiler.Compile(script);
-            Object result = compiler.Execute(cr);
-            System.out.println(result);
+    }
+
+    /**
+     * 生成ASM
+     * @param script 脚本
+     * @param outputFile 输出的文件名
+     */
+    private static void generateAsm(String script,String outputFile){
+        PlayScriptCompiler compiler = new PlayScriptCompiler();
+        AnnotatedTree cr = compiler.Compile(script);
+        AsmGen asmGen = new AsmGen(cr);
+        String asm = asmGen.generate();
+        if (outputFile != null){
+            try {
+                writeTextFile(outputFile, asm);
+            } catch (IOException e) {
+                System.out.println("unable to write to : "+outputFile);
+                return;
+            }
+        } else{
+            System.out.println(asm);
         }
     }
 
@@ -106,7 +117,7 @@ public class PlayScript {
             BufferedReader br = new BufferedReader(reader)) {
             String line;
             while ((line = br.readLine()) != null) {
-                buffer.append(line);
+                buffer.append(line).append('\n');
             }
         }
         return buffer.toString();

@@ -248,8 +248,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return rtn;
     }
 
-    private Object EQ(Object obj1, Object obj2, Type targetType) {
-        Object rtn = null;
+    private Boolean EQ(Object obj1, Object obj2, Type targetType) {
+        Boolean rtn = null;
         if (targetType == PrimitiveType.Integer) {
             rtn = ((Number) obj1).intValue() == ((Number) obj2).intValue();
         } else if (targetType == PrimitiveType.Float) {
@@ -260,6 +260,10 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             rtn = ((Number) obj1).doubleValue() == ((Number) obj2).doubleValue();
         } else if (targetType == PrimitiveType.Short) {
             rtn = ((Number) obj1).shortValue() == ((Number) obj2).shortValue();
+        }
+        //对于对象实例、函数，直接比较对象引用
+        else {
+            rtn = obj1 == obj2;
         }
 
         return rtn;
@@ -376,8 +380,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         if (ctx.bop != null && ctx.expression().size() >= 2) {
             Object left = visitExpression(ctx.expression(0));
             Object right = visitExpression(ctx.expression(1));
-            Object leftObject = null;
-            Object rightObject = null;
+            Object leftObject = left;
+            Object rightObject = right;
 
             if (left instanceof LValue) {
                 leftObject = ((LValue) left).getValue();
@@ -390,44 +394,48 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             Type type = cr.node2Type.get(ctx);
 
             switch (ctx.bop.getType()) {
-            case PlayScriptParser.ADD:
-                rtn = add(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.SUB:
-                rtn = minus(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.MUL:
-                rtn = mul(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.DIV:
-                rtn = div(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.EQUAL:
-                rtn = EQ(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.LE:
-                rtn = LE(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.LT:
-                rtn = LT(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.GE:
-                rtn = GE(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.GT:
-                rtn = GT(leftObject, rightObject, type);
-                break;
-            case PlayScriptParser.ASSIGN:
-                if (left instanceof LValue) {
-                    ((LValue) left).setValue(right);
-                    rtn = right;
-                } else {
-                    System.out.println("Unsupported feature during assignment");
-                }
-                break;
+                case PlayScriptParser.ADD:
+                    rtn = add(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.SUB:
+                    rtn = minus(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.MUL:
+                    rtn = mul(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.DIV:
+                    rtn = div(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.EQUAL:
+                    rtn = EQ(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.NOTEQUAL:
+                    rtn = !EQ(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.LE:
+                    rtn = LE(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.LT:
+                    rtn = LT(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.GE:
+                    rtn = GE(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.GT:
+                    rtn = GT(leftObject, rightObject, type);
+                    break;
+                case PlayScriptParser.ASSIGN:
+                    if (left instanceof LValue) {
+                        //((LValue) left).setValue(right);
+                        ((LValue) left).setValue(rightObject);
+                        rtn = right;
+                    } else {
+                        System.out.println("Unsupported feature during assignment");
+                    }
+                    break;
 
-            default:
-                break;
+                default:
+                    break;
             }
         } else if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
             // 此语法是左递归的，算法体现这一点
@@ -459,16 +467,16 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             LValue lValue = (LValue) visitExpression(ctx.expression(0));
             Integer value = (Integer) lValue.getValue();
             switch (ctx.postfix.getType()) {
-            case PlayScriptParser.INC:
-                lValue.setValue(value + 1);
-                rtn = value; // 返回值还是原值。如果++放在前面，返回值要加1。
-                break;
-            case PlayScriptParser.DEC:
-                lValue.setValue(value - 1);
-                rtn = value;
-                break;
-            default:
-                break;
+                case PlayScriptParser.INC:
+                    lValue.setValue(value + 1);
+                    rtn = value; // 返回值还是原值。如果++放在前面，返回值要加1。
+                    break;
+                case PlayScriptParser.DEC:
+                    lValue.setValue(value - 1);
+                    rtn = value;
+                    break;
+                default:
+                    break;
             }
         } else if (ctx.functionCall() != null) {// functionCall
             rtn = visitFunctionCall(ctx.functionCall());
@@ -499,23 +507,40 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitLiteral(LiteralContext ctx) {
         Object rtn = null;
+
+        //整数
         if (ctx.integerLiteral() != null) {
             rtn = visitIntegerLiteral(ctx.integerLiteral());
-        } else if (ctx.floatLiteral() != null) {
+        }
+
+        //浮点数
+        else if (ctx.floatLiteral() != null) {
             rtn = visitFloatLiteral(ctx.floatLiteral());
-        } else if (ctx.BOOL_LITERAL() != null) {
+        }
+
+        //布尔值
+        else if (ctx.BOOL_LITERAL() != null) {
             if (ctx.BOOL_LITERAL().getText().equals("true")) {
                 rtn = Boolean.TRUE;
             } else {
                 rtn = Boolean.FALSE;
             }
-        } else if (ctx.STRING_LITERAL() != null) {
+        }
+
+        //字符串
+        else if (ctx.STRING_LITERAL() != null) {
             String withQuotationMark = ctx.STRING_LITERAL().getText();
             rtn = withQuotationMark.substring(1, withQuotationMark.length() - 1);
-        } else if (ctx.CHAR_LITERAL() != null) {
+        }
+
+        //单个的字符
+        else if (ctx.CHAR_LITERAL() != null) {
             rtn = ctx.CHAR_LITERAL().getText().charAt(0);
-        } else if (ctx.NULL_LITERAL() != null) {
-            // TODO 需要设计自己的null类型的对象
+        }
+
+        //null字面量
+        else if (ctx.NULL_LITERAL() != null) {
+            rtn = NullObject.instance();
         }
 
         return rtn;
@@ -684,6 +709,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         LValue lValue = (LValue) visitVariableDeclaratorId(ctx.variableDeclaratorId());
         if (ctx.variableInitializer() != null) {
             rtn = visitVariableInitializer(ctx.variableInitializer());
+            if (rtn instanceof LValue){
+                rtn = ((LValue)rtn).getValue();
+            }
             lValue.setValue(rtn);
         }
         return rtn;
@@ -770,13 +798,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         } else if (symbol instanceof Function) {
             function = (Function) symbol;
-        } else  if (symbol instanceof Class){
+        } else if (symbol instanceof Class) {
             //类的缺省构造函数。不
             //cr.log("default construction method: " + ctx.IDENTIFIER().getText(), ctx);
-            rtn = createAndInitClassObject((Class)symbol);
+            rtn = createAndInitClassObject((Class) symbol);
             return rtn;
-        }
-        else{
+        } else {
             // TODO 临时代码，用于打印输出
             if (ctx.IDENTIFIER().getText().equals("println")) {
                 System.out.println(visitExpressionList(ctx.expressionList()));
@@ -788,7 +815,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         FunctionDeclarationContext functionCode = (FunctionDeclarationContext) function.ctx;
         Scope functionScope = cr.node2Scope.get(functionCode);
-        
+
         StackFrame classFrame = null;
 
         //看看是不是类的方法
@@ -803,14 +830,18 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 pushStack(classFrame);
             }
             //对普通的类函数，需要在运行时动态绑定
-            else{
-                ClassObject classObject = (ClassObject)stack.peek().object;
+            else {
+                //从栈中取出代表这个对象的栈桢
+                ClassObject classObject = (ClassObject) stack.peek().object;
+                //获取类的定义
                 theClass = classObject.type;
-                Function overloaded = cr.lookupFunction(theClass, function.name, function.getParamTypes());
-                if (overloaded  != function){
-                    function = overloaded;
+                //从当前类逐级向上查找，找到正确的方法定义
+                Function overrided = cr.lookupFunction(theClass, function.name, function.getParamTypes());
+                //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上
+                if (overrided != function) {
+                    function = overrided;
                     functionCode = (FunctionDeclarationContext) function.ctx;
-                    functionScope = cr.node2Scope.get(functionCode);
+                    //functionScope = cr.node2Scope.get(functionCode);
                 }
             }
         }

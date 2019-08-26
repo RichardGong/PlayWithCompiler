@@ -1,0 +1,27 @@
+//2+3*5;
+
+//null;
+
+/*
+class Mammal{
+    void speak(){
+        println("mammal speeking...");
+    }
+}
+
+Mammal a = Mammal();
+
+a.speak();
+
+*/
+
+class myclass{
+    int a=2;
+    int b;
+    myclass(){
+        b = 3;
+    }
+}
+myclass c = myclass();
+
+c.b;

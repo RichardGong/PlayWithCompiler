@@ -2,41 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52071378-2c11-4461-8688-ca9737da8a4c" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/.idea/libraries/antlr_4_7_2_complete.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/playscript-java.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/NullObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/mammal.play" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/test2.play" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../craft/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../craft/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.classpath" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/.name" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/compiler.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/encodings.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.project" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/playscript-java.code-workspace" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/MySQLLexer.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/MySQLLexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/MySQLLexer.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/MySQLParser.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/MySQLParser.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/MySQLParser.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/mysql/predefined.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/CommonLexer.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/CommonLexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/CommonLexer.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/PlayScript.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/PlayScript.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/PlayScript.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/PlayScriptLexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/play/PlayScriptLexer.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/sql/SQLite.g4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/sql/SQLite.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/sql/SQLite.tokens" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/sql/SQLiteLexer.interp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/target/classes/sql/SQLiteLexer.tokens" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.core.resources.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.jdt.apt.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.m2e.core.prefs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/ASTEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ASTEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayScript.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -101,8 +81,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/antlrtest/CommonLexer.g4">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="76" selection-start-line="3" selection-start-column="76" selection-end-line="3" selection-end-column="76" />
+            <state relative-caret-position="330">
+              <caret line="22" column="71" lean-forward="true" selection-start-line="22" selection-start-column="71" selection-end-line="22" selection-end-column="71" />
             </state>
           </provider>
         </entry>
@@ -130,9 +110,9 @@
     </treeState>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="10" />
+    <option name="x" value="9" />
     <option name="y" value="23" />
-    <option name="width" value="1238" />
+    <option name="width" value="1082" />
     <option name="height" value="777" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -219,15 +199,15 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1566733519590</updated>
-      <workItem from="1566733525995" duration="2572000" />
+      <workItem from="1566733525995" duration="3169000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="2572000" />
+    <option name="totallyTimeSpent" value="3169000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="10" y="23" width="1238" height="777" extended-state="0" />
+    <frame x="9" y="23" width="1082" height="777" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Image Layers" />
@@ -235,7 +215,7 @@
       <window_info id="UI Designer" />
       <window_info id="Favorites" side_tool="true" />
       <window_info id="设计器" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.25" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2875" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Terminal" />
       <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
@@ -308,8 +288,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/antlrtest/CommonLexer.g4">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="76" selection-start-line="3" selection-start-column="76" selection-end-line="3" selection-end-column="76" />
+        <state relative-caret-position="330">
+          <caret line="22" column="71" lean-forward="true" selection-start-line="22" selection-start-column="71" selection-end-line="22" selection-end-column="71" />
         </state>
       </provider>
     </entry>

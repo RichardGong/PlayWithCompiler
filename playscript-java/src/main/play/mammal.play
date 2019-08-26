@@ -1,0 +1,26 @@
+class Mammal{
+    void speak(){
+        println("mammal speeking...");
+    }
+}
+
+class Cow extends Mammal{
+    void speak(){
+        println("moo~~ moo~~");
+    }
+}
+
+class Sheep extends Mammal{
+    void speak(){
+        println("mee~~ mee~~");
+    }
+}
+
+
+Mammal a = Cow();
+Mammal b = Sheep();
+
+a.speak();
+b.speak();
+
+
