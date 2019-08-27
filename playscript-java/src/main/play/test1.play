@@ -1,23 +1,16 @@
-int foo(int a){
-    return a + a;
-}
+/**
+测试脚本功能的涂写板。你可以在这里写一些测试用的脚本，然后让脚本引擎解释执行。
+*/
 
-println("foo(10)=" + foo(10));
+println(2+3*5);
 
-//测试return语句从中间返回
-int bar(int a){
-    for (int i = 0; i< a; i++){
-        //println("i="+i);
-        if (i >= 5){
-            return i;
-        }
+int a = 0;
+
+for (int i = 0; i< 10; i++){
+    a = a + i;
+    println("a=" + a);
+
+    if (i >= 5){
+        break;
     }
-    return a;
 }
-
-println("bar(3)=" + bar(3));
-
-println("bar(10)=" + bar(10));
-
-
-

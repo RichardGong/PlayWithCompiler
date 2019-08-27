@@ -2,21 +2,19 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52071378-2c11-4461-8688-ca9737da8a4c" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/BlockScope.play" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/BreakObject.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ObjectAssign.play" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ReturnObject.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/loop.play" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/TypeAndScopeScanner.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/TypeResolver.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/out/production/playscript-java/play/test1.play" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/out/production/playscript-java/play/test1.play" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/ASTEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ASTEvaluator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/AnnotatedTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/AnnotatedTree.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/AsmGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/AsmGen.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/AttributeEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/AttributeEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/NullObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/NullObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PrimitiveType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PrimitiveType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayScriptCompiler.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayScriptCompiler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/test1.play" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/test1.play" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/test2.play" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -30,7 +28,7 @@
     <option name="delegatedBuild" value="true" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/antlrtest/ASTEvaluator.java">
           <provider selected="true" editor-type-id="text-editor">
@@ -60,7 +58,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/antlrtest/PlayScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="328">
+            <state relative-caret-position="435">
               <caret line="31" column="30" selection-start-line="31" selection-start-column="30" selection-end-line="31" selection-end-column="30" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -82,7 +80,7 @@
         <entry file="file://$PROJECT_DIR$/src/antlrtest/CommonLexer.g4">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="330">
-              <caret line="22" column="71" lean-forward="true" selection-start-line="22" selection-start-column="71" selection-end-line="22" selection-end-column="71" />
+              <caret line="22" column="71" selection-start-line="22" selection-start-column="71" selection-end-line="22" selection-end-column="71" />
             </state>
           </provider>
         </entry>
@@ -121,7 +119,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -147,7 +145,7 @@
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -200,62 +198,62 @@
       <option name="presentableId" value="Default" />
       <updated>1566733519590</updated>
       <workItem from="1566733525995" duration="3169000" />
+      <workItem from="1566884582595" duration="2267000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="3169000" />
+    <option name="totallyTimeSpent" value="5436000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="9" y="23" width="1082" height="777" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info id="Image Layers" />
-      <window_info id="Capture Tool" />
-      <window_info id="UI Designer" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info id="设计器" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2875" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.29326922" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info anchor="bottom" id="Database Changes" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Messages" weight="0.329927" />
-      <window_info anchor="bottom" id="调试" />
+      <window_info id="Image Layers" order="2" />
+      <window_info id="Capture Tool" order="3" />
+      <window_info id="UI Designer" order="4" />
+      <window_info id="Favorites" order="5" side_tool="true" />
+      <window_info id="设计器" order="6" />
+      <window_info anchor="bottom" id="Tool Output" />
+      <window_info anchor="bottom" id="ANTLR Preview" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.329927" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.329927" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Maven" weight="0.32943144" />
-      <window_info anchor="right" id="Capture Analysis" />
-      <window_info anchor="right" id="调色板" />
-      <window_info anchor="right" id="Database" />
-      <window_info anchor="right" id="Palette&#9;" />
-      <window_info anchor="right" id="Theme Preview" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.329927" />
+      <window_info anchor="bottom" id="Terminal" order="8" />
+      <window_info anchor="bottom" id="Docker" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
+      <window_info anchor="bottom" id="Database Changes" order="11" />
+      <window_info anchor="bottom" id="Version Control" order="12" />
+      <window_info anchor="bottom" id="调试" order="13" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Maven" order="3" weight="0.32943144" />
+      <window_info anchor="right" id="Capture Analysis" order="4" />
+      <window_info anchor="right" id="调色板" order="5" />
+      <window_info anchor="right" id="Database" order="6" />
+      <window_info anchor="right" id="Palette&#9;" order="7" />
+      <window_info anchor="right" id="Theme Preview" order="8" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/antlrtest/PlayScriptLexer.java">
+    <entry file="file://$PROJECT_DIR$/.project">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/antlrtest/ASTEvaluator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
-          <caret line="2" column="17" selection-start-line="2" selection-start-column="8" selection-end-line="2" selection-end-column="17" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/antlrtest/PlayScript.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="328">
-          <caret line="31" column="30" selection-start-line="31" selection-start-column="30" selection-end-line="31" selection-end-column="30" />
+          <caret line="2" selection-start-line="2" selection-end-line="2" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -265,10 +263,17 @@
     <entry file="file://$PROJECT_DIR$/antlrtest.iml">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/antlrtest/ASTEvaluator.java">
+    <entry file="file://$PROJECT_DIR$/src/antlrtest/PlayScriptLexer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="30">
-          <caret line="2" selection-start-line="2" selection-end-line="2" />
+          <caret line="2" column="17" selection-start-line="2" selection-start-column="8" selection-end-line="2" selection-end-column="17" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/antlrtest/PlayScript.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="435">
+          <caret line="31" column="30" selection-start-line="31" selection-start-column="30" selection-end-line="31" selection-end-column="30" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -282,13 +287,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/.project">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/antlrtest/CommonLexer.g4">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
-          <caret line="22" column="71" lean-forward="true" selection-start-line="22" selection-start-column="71" selection-end-line="22" selection-end-column="71" />
+          <caret line="22" column="71" selection-start-line="22" selection-start-column="71" selection-end-line="22" selection-end-column="71" />
         </state>
       </provider>
     </entry>

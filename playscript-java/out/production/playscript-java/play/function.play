@@ -1,0 +1,23 @@
+int foo(int a){
+    return a + a;
+}
+
+println("foo(10)=" + foo(10));
+
+//测试return语句从中间返回
+int bar(int a){
+    for (int i = 0; i< a; i++){
+        //println("i="+i);
+        if (i >= 5){
+            return i;
+        }
+    }
+    return a;
+}
+
+println("bar(3)=" + bar(3));
+
+println("bar(10)=" + bar(10));
+
+
+

@@ -1,0 +1,33 @@
+/*
+类型宣布可以
+*/
+
+
+C1 obj = C1(2);
+println(obj.a);
+
+
+class C1{
+    C1(int value){
+        foo();       //在声明之前就可以调用
+        a = value;
+    }
+
+    int a = 1;
+
+    void foo(){
+        println("a="+a);  //在a声明之前调用
+    }
+
+}
+
+//C1 obj = C1(2);
+//println(obj.a);
+
+
+/*
+class C2{
+    C2 b;
+}
+*/
+

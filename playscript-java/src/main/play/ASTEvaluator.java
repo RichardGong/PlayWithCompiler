@@ -176,6 +176,20 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         visitClassBody(ctx);
     }
 
+    //自己硬编码的println方法
+    private void println(FunctionCallContext ctx){
+        if (ctx.expressionList() != null) {
+            Object value = visitExpressionList(ctx.expressionList());
+            if (value instanceof LValue) {
+                value = ((LValue) value).getValue();
+            }
+            System.out.println(value);
+        }
+        else{
+            System.out.println();
+        }
+    }
+
     ///////////////////////////////////////////////////////////
     /// 工具性的方法
     private Object add(Object obj1, Object obj2, Type targetType) {
@@ -400,11 +414,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
 
             //本节点期待的数据类型
-            Type type = cr.node2Type.get(ctx);
+            Type type = cr.typeOfNode.get(ctx);
 
             //左右两个子节点的类型
-            Type type1 = cr.node2Type.get(ctx.expression(0));
-            Type type2 = cr.node2Type.get(ctx.expression(1));
+            Type type1 = cr.typeOfNode.get(ctx.expression(0));
+            Type type2 = cr.typeOfNode.get(ctx.expression(1));
 
             switch (ctx.bop.getType()) {
                 case PlayScriptParser.ADD:
@@ -466,7 +480,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                     ClassObject valueContainer = (ClassObject) value;
                     // 获得field或调用方法
                     if (ctx.IDENTIFIER() != null) {
-                        Variable variable = (Variable) cr.node2Symbol.get(ctx);
+                        Variable variable = (Variable) cr.symbolOfNode.get(ctx);
                         //类的成员可能需要重载
                         Variable overloaded = cr.lookupVariable(valueContainer.type, variable.getName());
                         LValue lValue = new MyLValue(valueContainer, overloaded);
@@ -489,7 +503,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         else if (ctx.postfix != null) {
             Object value = visitExpression(ctx.expression(0));
             LValue lValue = null;
-            Type type = cr.node2Type.get(ctx.expression(0));
+            Type type = cr.typeOfNode.get(ctx.expression(0));
             if (value instanceof LValue) {
                 lValue = (LValue) value;
                 value = lValue.getValue();
@@ -520,7 +534,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         else if (ctx.prefix != null) {
             Object value = visitExpression(ctx.expression(0));
             LValue lValue = null;
-            Type type = cr.node2Type.get(ctx.expression(0));
+            Type type = cr.typeOfNode.get(ctx.expression(0));
             if (value instanceof LValue) {
                 lValue = (LValue) value;
                 value = lValue.getValue();
@@ -642,7 +656,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal());
         } else if (ctx.IDENTIFIER() != null) {
-            Symbol symbol = cr.node2Symbol.get(ctx);
+            Symbol symbol = cr.symbolOfNode.get(ctx);
             if (symbol instanceof Variable) {
                 rtn = getLValue((Variable) symbol);
             } else if (symbol instanceof Function) {
@@ -860,7 +874,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         Object rtn = null;
-        Symbol symbol = cr.node2Symbol.get(ctx);
+        Symbol symbol = cr.symbolOfNode.get(ctx);
         rtn = getLValue((Variable) symbol);
         return rtn;
     }
@@ -938,7 +952,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         Function function = null;
         FunctionObject functionObject = null;
 
-        Symbol symbol = cr.node2Symbol.get(ctx);
+        Symbol symbol = cr.symbolOfNode.get(ctx);
         if (symbol instanceof Variable) {
             Variable variable = (Variable) symbol;
             LValue lValue = getLValue(variable);
@@ -957,16 +971,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         } else {
             // TODO 临时代码，用于打印输出
             if (ctx.IDENTIFIER().getText().equals("println")) {
-                if (ctx.expressionList() != null) {
-                    Object value = visitExpressionList(ctx.expressionList());
-                    if (value instanceof LValue) {
-                        value = ((LValue) value).getValue();
-                    }
-                    System.out.println(value);
-                }
-                else{
-                    System.out.println();
-                }
+                println(ctx);
                 return rtn;
             } else {
                 cr.log("unnable to find an function " + ctx.IDENTIFIER().getText(), ctx);
@@ -974,14 +979,15 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         }
 
         FunctionDeclarationContext functionCode = (FunctionDeclarationContext) function.ctx;
-        Scope functionScope = cr.node2Scope.get(functionCode);
+        //aa Scope functionScope = cr.node2Scope.get(functionCode);
 
         StackFrame classFrame = null;
 
         //看看是不是类的方法
         ClassObject newObject = null;
-        if (functionScope.enclosingScope.ctx instanceof ClassDeclarationContext) {
-            Class theClass = (Class) cr.node2Symbol.get(functionScope.enclosingScope.ctx);
+        if (function.enclosingScope instanceof Class) {
+            //Class theClass = (Class) cr.symbolOfNode.get(functionScope.enclosingScope.ctx);
+            Class theClass = (Class) function.enclosingScope;
             // 看看是不是类的构建函数。
             if (theClass.name.equals(function.name)) {
                 newObject = createAndInitClassObject(theClass);
@@ -991,10 +997,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
             //对普通的类函数，需要在运行时动态绑定
             else {
-                //从栈中取出代表这个对象的栈桢
-                ClassObject classObject = (ClassObject) stack.peek().object;
-                //获取类的定义
-                theClass = classObject.type;
+                //theClass = (Class)function.enclosingScope;
+
                 //从当前类逐级向上查找，找到正确的方法定义
                 Function overrided = cr.lookupFunction(theClass, function.name, function.getParamTypes());
                 //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上

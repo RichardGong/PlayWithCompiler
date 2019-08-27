@@ -16,30 +16,29 @@ public class AnnotatedTree {
     protected List<Type> types = new LinkedList<Type>();
 
     // AST节点对应的Symbol
-    protected Map<ParserRuleContext, Symbol> node2Symbol = new HashMap<ParserRuleContext, Symbol>();
+    protected Map<ParserRuleContext, Symbol> symbolOfNode = new HashMap<ParserRuleContext, Symbol>();
 
     // AST节点对应的Scope，如for、函数调用会启动新的Scope
     protected Map<ParserRuleContext, Scope> node2Scope = new HashMap<ParserRuleContext, Scope>();
 
     // 用于做类型推断，每个节点推断出来的类型
-    protected Map<ParserRuleContext, Type> node2Type = new HashMap<ParserRuleContext, Type>();
+    protected Map<ParserRuleContext, Type> typeOfNode = new HashMap<ParserRuleContext, Type>();
 
     // 编译后形成的scope树
-    //protected Scope scopeTree = null;
+    protected Scope scopeTree = null;
 
     // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
     //protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
 
     //函数、类等引用的外部变量
     protected Map<Scope, List<Variable>> outerReference = new HashMap<Scope, List<Variable>>();
-
-    protected AnnotatedTree() {
-       
-    }
-
     protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
 
-    protected void log(String message, ParserRuleContext ctx){
+    protected AnnotatedTree() {
+
+    }
+
+    protected void log(String message, ParserRuleContext ctx) {
         CompilationLog log = new CompilationLog();
         log.ctx = ctx;
         log.message = message;
@@ -52,7 +51,7 @@ public class AnnotatedTree {
 
     /**
      * 通过名称查找Variable
-     * 
+     *
      * @param scope
      * @param idName
      * @return
@@ -92,7 +91,7 @@ public class AnnotatedTree {
 
     /**
      * 通过名称查找Class
-     * 
+     *
      * @param scope
      * @param idName
      * @return
@@ -127,10 +126,10 @@ public class AnnotatedTree {
 
     /**
      * 通过方法的名称和方法签名查找Function
-     * 
+     *
      * @param scope
      * @param idName
-     * @param params
+     * @param paramTypes
      * @return
      */
     protected Function lookupFunction(Scope scope, String idName, List<Type> paramTypes) {
@@ -155,7 +154,7 @@ public class AnnotatedTree {
                             break;
                         }
                     }
-                    if (match){
+                    if (match) {
                         rtn = function;
                     }
 
@@ -175,5 +174,28 @@ public class AnnotatedTree {
         }
         return rtn;
     }
+
+
+    /**
+     * 查找某节点所在的Scope
+     * 算法：逐级查找父节点，找到一个对应着Scope的上级节点
+     *
+     * @param node
+     * @return
+     */
+    public Scope enclosingScopeOfNode(ParserRuleContext node) {
+        Scope rtn = null;
+        ParserRuleContext parent = node.getParent();
+        if (parent != null) {
+            rtn = node2Scope.get(parent);
+            if (rtn == null) {
+                rtn = enclosingScopeOfNode(parent);
+            }
+
+        }
+
+        return rtn;
+    }
+
 
 }

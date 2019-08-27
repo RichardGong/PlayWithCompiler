@@ -35,11 +35,12 @@ public class PrimitiveType implements Type {
 
     /**
      * 计算两个类型中比较“高”的一级，比如int和long相加，要取long
+     *
      * @param type1
      * @param type2
      * @return
      */
-    public static PrimitiveType getUpperType(Type type1, Type type2){
+    public static PrimitiveType getUpperType(Type type1, Type type2) {
         PrimitiveType type = null;
         if (type1 == PrimitiveType.String || type2 == PrimitiveType.String) {
             type = PrimitiveType.String;
@@ -57,6 +58,25 @@ public class PrimitiveType implements Type {
             type = PrimitiveType.Byte; // TODO 以上这些规则有没有漏洞？
         }
         return type;
+    }
+
+    /**
+     * 某个类型是不是数值型的（以便进行数值型运算）
+     *
+     * @param type
+     * @return
+     */
+    public static boolean isNumeric(Type type) {
+        if (type == PrimitiveType.Byte ||
+                type == PrimitiveType.Short ||
+                type == PrimitiveType.Integer ||
+                type == PrimitiveType.Long ||
+                type == PrimitiveType.Float ||
+                type == PrimitiveType.Double) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }

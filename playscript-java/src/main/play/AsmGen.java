@@ -266,7 +266,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         rspOffset += 4; // 本地整型变量占4字节
         String rtn = "-" + rspOffset + "(%rbp)";
 
-        Symbol symbol = cr.node2Symbol.get(ctx);
+        Symbol symbol = cr.symbolOfNode.get(ctx);
         localVars.put((Variable) symbol, rtn);
 
         return rtn;
@@ -320,7 +320,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal()); // 直接操作数
         } else if (ctx.IDENTIFIER() != null) {
-            Symbol symbol = cr.node2Symbol.get(ctx);
+            Symbol symbol = cr.symbolOfNode.get(ctx);
             if (symbol instanceof Variable) {
                 rtn = localVars.get((Variable) symbol); // TODO: 本地变量地址，暂时不支持上一级Scope的变量
             }
@@ -378,7 +378,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
 
         String functionName = null;
 
-        Symbol symbol = cr.node2Symbol.get(ctx);
+        Symbol symbol = cr.symbolOfNode.get(ctx);
 
         if (symbol instanceof Function) {
             Function function = (Function) symbol;
@@ -462,7 +462,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
     public String visitFunctionDeclaration(FunctionDeclarationContext ctx) {
         // 给所有参数确定地址
 
-        Function function = (Function) cr.node2Type.get(ctx);
+        Function function = (Function) cr.typeOfNode.get(ctx);
         for (int i = 0; i < function.parameters.size(); i++) {
             if (i < 6) {
                 // 少于6个参数，使用寄存器

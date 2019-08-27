@@ -9,7 +9,6 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import play.PlayScriptParser.BlockContext;
 import play.PlayScriptParser.ClassDeclarationContext;
 import play.PlayScriptParser.ClassOrInterfaceTypeContext;
-import play.PlayScriptParser.EnhancedForControlContext;
 import play.PlayScriptParser.ExpressionContext;
 import play.PlayScriptParser.FloatLiteralContext;
 import play.PlayScriptParser.FormalParameterContext;
@@ -90,17 +89,20 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
                 // 看看是不是函数
                 Function function = cr.lookupFunction(currentScope(), idName, null); // TODO 应该由上面传递下类型属性下来，然后精确比对
                 if (function != null) {
-                    cr.node2Symbol.put(ctx, function);
-                    cr.node2Type.put(ctx, function);
+                    cr.symbolOfNode.put(ctx, function);
+                    cr.typeOfNode.put(ctx, function);
                 } else {
-                    cr.log("unknown variable or function: " + idName, ctx);
+                    //暂时还不知道类型，有可能是类的成员，宣布在后，使用在前
+                    cr.symbolOfNode.put(ctx, null);
+                    cr.typeOfNode.put(ctx, null);
+                    //cr.log("unknown variable or function: " + idName, ctx);
                 }
 
             } else {
-                cr.node2Symbol.put(ctx, variable);
+                cr.symbolOfNode.put(ctx, variable);
 
                 // 记录类型
-                cr.node2Type.put(ctx, variable.type);
+                cr.typeOfNode.put(ctx, variable.type);
 
                 //记录所引用的外部变量
                 if (currentScope() instanceof Function && variable.enclosingScope != currentScope()){
@@ -115,15 +117,16 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
                 }
             }
         } else if (ctx.literal() != null) {
-            cr.node2Type.put(ctx, cr.node2Type.get(ctx.literal()));
+            cr.typeOfNode.put(ctx, cr.typeOfNode.get(ctx.literal()));
         } else if (ctx.expression() != null) {
-            cr.node2Type.put(ctx, cr.node2Type.get(ctx.expression()));
+            cr.typeOfNode.put(ctx, cr.typeOfNode.get(ctx.expression()));
         }
     }
 
     @Override
     public void enterProg(ProgContext ctx) {
         BlockScope scope = new BlockScope(currentScope(), ctx);
+        cr.scopeTree = scope; //scope的根
         pushScope(scope, ctx);
     }
 
@@ -153,7 +156,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
     @Override
     public void enterVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         String idName = ctx.IDENTIFIER().getText();
-        Variable variable = new Variable(idName, currentScope(), ctx); // TODO 根据上下文确定正确的类型       
+        Variable variable = new Variable(idName, currentScope(), ctx);
 
         if (currentScope() instanceof BlockScope){
             if (cr.checkDuplicateVariable(currentScope(), idName)) {
@@ -162,7 +165,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         }
 
         currentScope().symbols.add(variable);
-        cr.node2Symbol.put(ctx, variable);
+        cr.symbolOfNode.put(ctx, variable);
 
         // TODO 这里的类型推断先用比较简单的方法，后面要兼顾各种用到variableDeclaratorId的情况
         // if (ctx.parent instanceof VariableDeclaratorContext
@@ -171,13 +174,13 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         // ctx.parent.parent;
         // if (vdc.typeType().classOrInterfaceType() != null) {
         // variable.type = (Type)
-        // cr.node2Symbol.get(vdc.typeType().classOrInterfaceType());
+        // cr.symbolOfNode.get(vdc.typeType().classOrInterfaceType());
         // }
         // }
 
         // 如果是在Class的定义中，则要添加field
         // if (currentScope().ctx instanceof ClassDeclarationContext) {
-        // Class theClass = (Class) cr.node2Symbol.get(currentScope().ctx);
+        // Class theClass = (Class) cr.symbolOfNode.get(currentScope().ctx);
         // theClass.fields.add(variable);
         // }
     }
@@ -193,7 +196,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         List<Type> paramTypes = new LinkedList<Type>();
         if (ctx.expressionList() != null) {
             for (ExpressionContext exp : ctx.expressionList().expression()) {
-                Type type = cr.node2Type.get(exp);
+                Type type = cr.typeOfNode.get(exp);
                 paramTypes.add(type);
             }
         }
@@ -203,7 +206,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         if (ctx.parent instanceof ExpressionContext) {
             ExpressionContext exp = (ExpressionContext) ctx.parent;
             if (exp.bop != null && exp.bop.getType() == PlayScriptParser.DOT) {
-                Symbol symbol = cr.node2Symbol.get(exp.expression(0));
+                Symbol symbol = cr.symbolOfNode.get(exp.expression(0));
                 if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                     Class theClass = (Class) ((Variable) symbol).type;
                     Scope classScope = cr.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
@@ -212,10 +215,10 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
                         String idName = ctx.IDENTIFIER().getText();
                         function = cr.lookupFunction(classScope, idName, paramTypes);
                         if (function != null) {
-                            cr.node2Symbol.put(exp, function);
-                            cr.node2Type.put(exp, function.returnType);
-                            cr.node2Symbol.put(ctx, function); // 父节点也加上
-                            cr.node2Type.put(ctx, function.returnType);
+                            cr.symbolOfNode.put(exp, function);
+                            cr.typeOfNode.put(exp, function.returnType);
+                            cr.symbolOfNode.put(ctx, function); // 父节点也加上
+                            cr.typeOfNode.put(ctx, function.returnType);
                         } else {
                             cr.log("unable to find field " + idName + " in Class " + theClass.name, exp);
                         }
@@ -238,29 +241,32 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
                     Scope classScope = cr.node2Scope.get(theClass.ctx);
                     function = cr.lookupFunction(classScope, idName, paramTypes); // TODO 可能没有显式的构建函数
                     if (function != null) {
-                        cr.node2Symbol.put(ctx, function);
+                        cr.symbolOfNode.put(ctx, function);
                     } else {
-                        cr.node2Symbol.put(ctx, theClass); // TODO 直接赋予class
+                        cr.symbolOfNode.put(ctx, theClass); // TODO 直接赋予class
                         defaultConstructor = true;
                     }
-                    cr.node2Type.put(ctx, theClass); // 这次函数调用是返回一个对象
+                    cr.typeOfNode.put(ctx, theClass); // 这次函数调用是返回一个对象
                 } 
 
                 //看看是不是一个函数型的变量
                 if (function == null){
                     Variable variable = cr.lookupVariable(currentScope(), idName);
                     if (variable != null && variable.type instanceof FunctionType){
-                        cr.node2Symbol.put(ctx, variable);
-                        cr.node2Type.put(ctx, variable.type);
+                        cr.symbolOfNode.put(ctx, variable);
+                        cr.typeOfNode.put(ctx, variable.type);
                     }
                     else if (!defaultConstructor){
+                        //可能是类的方法，在声明前使用。
+                        cr.symbolOfNode.put(ctx, null);
+                        cr.typeOfNode.put(ctx, null);
                         cr.log("unknown function or class constructor or function variable: " + idName, ctx);
                     }
                 }
                 
             } else {
-                cr.node2Symbol.put(ctx, function);
-                cr.node2Type.put(ctx, function.returnType);
+                cr.symbolOfNode.put(ctx, function);
+                cr.typeOfNode.put(ctx, function.returnType);
             }
         }
     }
@@ -272,7 +278,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         Function function = new Function(idName, currentScope(), ctx);
 
         cr.types.add(function);
-        cr.node2Type.put(ctx, function);
+        cr.typeOfNode.put(ctx, function);
         // cr.type2Node.put(function, ctx);
 
         // TODO 需要查重
@@ -280,7 +286,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
 
         // 如果是在Class的定义中，则要添加成员
         // if (currentScope().ctx instanceof ClassDeclarationContext) {
-        // Class theClass = (Class) cr.node2Symbol.get(currentScope().ctx);
+        // Class theClass = (Class) cr.symbolOfNode.get(currentScope().ctx);
         // theClass.functions.add(function);
         // }
 
@@ -292,7 +298,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
     public void exitFunctionDeclaration(FunctionDeclarationContext ctx) {
         if (ctx.typeTypeOrVoid() != null) {
             Function function = (Function) currentScope();
-            function.returnType = cr.node2Type.get(ctx.typeTypeOrVoid());
+            function.returnType = cr.typeOfNode.get(ctx.typeTypeOrVoid());
         }
 
         popScope();
@@ -321,7 +327,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
 
         Class theClass = new Class(idName, ctx);
         cr.types.add(theClass);
-        cr.node2Symbol.put(ctx, theClass);
+        cr.symbolOfNode.put(ctx, theClass);
 
         if (cr.lookupClass(currentScope(), idName) != null) {
             cr.log("duplicate class name:" + idName, ctx); // 只是报警，但仍然继续解析
@@ -365,7 +371,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         // 2.类的声明在引用之前，其scope对象已经被建立起来。
         if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
             // 这是个左递归，要不断的把左边的节点的计算结果存到node2Symbol，所以要在exitExpression里操作
-            Symbol symbol = cr.node2Symbol.get(ctx.expression(0));
+            Symbol symbol = cr.symbolOfNode.get(ctx.expression(0));
             if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                 Class theClass = (Class) ((Variable) symbol).type;
                 Scope classScope = cr.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
@@ -374,8 +380,8 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
                     String idName = ctx.IDENTIFIER().getText();
                     Variable variable = cr.lookupVariable(classScope, idName);
                     if (variable != null) {
-                        cr.node2Symbol.put(ctx, variable);
-                        cr.node2Type.put(ctx, variable.type);
+                        cr.symbolOfNode.put(ctx, variable);
+                        cr.typeOfNode.put(ctx, variable.type);
                     } else {
                         cr.log("unable to find field " + idName + " in Class " + theClass.name, ctx);
                     }
@@ -388,18 +394,18 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
 
         // 往上冒泡传递
         else if (ctx.primary() != null && ctx.primary().IDENTIFIER() != null) {
-            Symbol symbol = cr.node2Symbol.get(ctx.primary());
-            cr.node2Symbol.put(ctx, symbol);
+            Symbol symbol = cr.symbolOfNode.get(ctx.primary());
+            cr.symbolOfNode.put(ctx, symbol);
         }
 
         // 设置类型
         if (ctx.primary() != null) {
-            cr.node2Type.put(ctx, cr.node2Type.get(ctx.primary()));
+            cr.typeOfNode.put(ctx, cr.typeOfNode.get(ctx.primary()));
         } else if (ctx.functionCall() != null) {
-            cr.node2Type.put(ctx, cr.node2Type.get(ctx.functionCall()));
+            cr.typeOfNode.put(ctx, cr.typeOfNode.get(ctx.functionCall()));
         } else if (ctx.bop != null && ctx.expression().size() >= 2) {
-            Type type1 = cr.node2Type.get(ctx.expression(0));
-            Type type2 = cr.node2Type.get(ctx.expression(1));
+            Type type1 = cr.typeOfNode.get(ctx.expression(0));
+            Type type2 = cr.typeOfNode.get(ctx.expression(1));
             Type type = null;
 
             switch (ctx.bop.getType()) {
@@ -408,6 +414,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
             case PlayScriptParser.MUL:
             case PlayScriptParser.DIV:
                 if (type1 instanceof PrimitiveType && type2 instanceof PrimitiveType){
+                    //类型“向上”对齐，比如一个int和一个float，取float
                     type = PrimitiveType.getUpperType(type1,type2);
                 }else{
                     cr.log("operand should be PrimitiveType for additive and multiplicative operation", ctx);
@@ -415,7 +422,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
 
                 break;
             case PlayScriptParser.EQUAL:
-                case PlayScriptParser.NOTEQUAL:
+            case PlayScriptParser.NOTEQUAL:
             case PlayScriptParser.LE:
             case PlayScriptParser.LT:
             case PlayScriptParser.GE:
@@ -438,7 +445,7 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
                 break;
             }
 
-            cr.node2Type.put(ctx, type);
+            cr.typeOfNode.put(ctx, type);
         }
     }
 
@@ -447,15 +454,15 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.getText();
             Class theClass = cr.lookupClass(currentScope(), idName);
-            cr.node2Type.put(ctx, theClass);
+            cr.typeOfNode.put(ctx, theClass);
         }
     }
 
     @Override
     public void exitFormalParameter(FormalParameterContext ctx) {
         // 设置参数类型
-        Type type = cr.node2Type.get(ctx.typeType());
-        Variable variable = (Variable) cr.node2Symbol.get(ctx.variableDeclaratorId());
+        Type type = cr.typeOfNode.get(ctx.typeType());
+        Variable variable = (Variable) cr.symbolOfNode.get(ctx.variableDeclaratorId());
         variable.type = (Type) type;
 
         // 添加到函数的参数列表里
@@ -468,14 +475,14 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
     public void exitTypeType(TypeTypeContext ctx) {
         // 冒泡
         if (ctx.classOrInterfaceType() != null) {
-            Type type = (Type) cr.node2Type.get(ctx.classOrInterfaceType());
-            cr.node2Type.put(ctx, type);
+            Type type = (Type) cr.typeOfNode.get(ctx.classOrInterfaceType());
+            cr.typeOfNode.put(ctx, type);
         } else if (ctx.functionType() != null) {
-            Type type = (Type) cr.node2Type.get(ctx.functionType());
-            cr.node2Type.put(ctx, type);
+            Type type = (Type) cr.typeOfNode.get(ctx.functionType());
+            cr.typeOfNode.put(ctx, type);
         } else if (ctx.primitiveType() != null) {
-            Type type = (Type) cr.node2Type.get(ctx.primitiveType());
-            cr.node2Type.put(ctx, type);
+            Type type = (Type) cr.typeOfNode.get(ctx.primitiveType());
+            cr.typeOfNode.put(ctx, type);
         }
 
     }
@@ -483,10 +490,10 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
     @Override
     public void exitVariableDeclarators(VariableDeclaratorsContext ctx) {
         // 设置变量类型
-        Type type = (Type) cr.node2Type.get(ctx.typeType());
+        Type type = (Type) cr.typeOfNode.get(ctx.typeType());
 
         for (VariableDeclaratorContext child : ctx.variableDeclarator()) {
-            Variable variable = (Variable) cr.node2Symbol.get(child.variableDeclaratorId());
+            Variable variable = (Variable) cr.symbolOfNode.get(child.variableDeclaratorId());
             variable.type = type;
         }
     }
@@ -496,15 +503,15 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         DefaultFunctionType functionType = new DefaultFunctionType();
         cr.types.add(functionType);
 
-        cr.node2Type.put(ctx, functionType);
+        cr.typeOfNode.put(ctx, functionType);
 
-        functionType.returnType = (Type) cr.node2Type.get(ctx.typeTypeOrVoid());
+        functionType.returnType = (Type) cr.typeOfNode.get(ctx.typeTypeOrVoid());
 
         // 参数的类型
         if (ctx.typeList() != null) {
             TypeListContext tcl = (TypeListContext) ctx.typeList();
             for (TypeTypeContext ttc : tcl.typeType()) {
-                Type type = (Type) cr.node2Type.get(ttc);
+                Type type = (Type) cr.typeOfNode.get(ttc);
                 functionType.paramTypes.add(type);
             }
         }
@@ -531,42 +538,42 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
             type = PrimitiveType.Char;
         }
 
-        cr.node2Type.put(ctx, type);
+        cr.typeOfNode.put(ctx, type);
     }
 
     @Override
     public void exitTypeTypeOrVoid(TypeTypeOrVoidContext ctx) {
         if (ctx.VOID() != null) {
-            cr.node2Type.put(ctx, VoidType.voidType);
+            cr.typeOfNode.put(ctx, VoidType.voidType);
         } else if (ctx.typeType() != null) {
-            cr.node2Type.put(ctx, (Type) cr.node2Type.get(ctx.typeType()));
+            cr.typeOfNode.put(ctx, (Type) cr.typeOfNode.get(ctx.typeType()));
         }
     }
 
     @Override
     public void exitFloatLiteral(FloatLiteralContext ctx) {
-        cr.node2Type.put(ctx, PrimitiveType.Float);
+        cr.typeOfNode.put(ctx, PrimitiveType.Float);
     }
 
     @Override
     public void exitIntegerLiteral(IntegerLiteralContext ctx) {
-        cr.node2Type.put(ctx, PrimitiveType.Integer);
+        cr.typeOfNode.put(ctx, PrimitiveType.Integer);
     }
 
     @Override
     public void exitLiteral(LiteralContext ctx) {
         if (ctx.BOOL_LITERAL() != null) {
-            cr.node2Type.put(ctx, PrimitiveType.Boolean);
+            cr.typeOfNode.put(ctx, PrimitiveType.Boolean);
         } else if (ctx.CHAR_LITERAL() != null) {
-            cr.node2Type.put(ctx, PrimitiveType.Char);
+            cr.typeOfNode.put(ctx, PrimitiveType.Char);
         } else if (ctx.NULL_LITERAL() != null) {
-            cr.node2Type.put(ctx, PrimitiveType.Null);
+            cr.typeOfNode.put(ctx, PrimitiveType.Null);
         } else if (ctx.STRING_LITERAL() != null) {
-            cr.node2Type.put(ctx, PrimitiveType.String);
+            cr.typeOfNode.put(ctx, PrimitiveType.String);
         } else if (ctx.integerLiteral() != null) {
-            cr.node2Type.put(ctx, PrimitiveType.Integer);
+            cr.typeOfNode.put(ctx, PrimitiveType.Integer);
         } else if (ctx.floatLiteral() != null) {
-            cr.node2Type.put(ctx, PrimitiveType.Float);
+            cr.typeOfNode.put(ctx, PrimitiveType.Float);
         }
 
     }
