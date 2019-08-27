@@ -2,21 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="52071378-2c11-4461-8688-ca9737da8a4c" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/NullObject.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/mammal.play" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/test2.play" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/BlockScope.play" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/BreakObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ObjectAssign.play" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ReturnObject.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/loop.play" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-cpp/.vscode/settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.core.resources.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.jdt.apt.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.jdt.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.settings/org.eclipse.m2e.core.prefs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/.vscode/settings.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/out/production/playscript-java/play/test1.play" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/out/production/playscript-java/play/test1.play" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/ASTEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/ASTEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PlayScript.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/AnnotatedTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/AnnotatedTree.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/AttributeEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/AttributeEvaluator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/NullObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/NullObject.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/PrimitiveType.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/PrimitiveType.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../playscript-java/src/main/play/test1.play" beforeDir="false" afterPath="$PROJECT_DIR$/../../playscript-java/src/main/play/test1.play" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -208,7 +208,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="9" y="23" width="1082" height="777" extended-state="0" />
-    <editor active="true" />
     <layout>
       <window_info id="Image Layers" />
       <window_info id="Capture Tool" />

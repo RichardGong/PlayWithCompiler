@@ -1,38 +1,23 @@
-//null;
-
-class Mammal{
-    void speak(){
-        println("mammal speeking...");
-    }
+int foo(int a){
+    return a + a;
 }
 
-class Cow extends Mammal{
-    void speak(){
-        println("moo~~ moo~~");
+println("foo(10)=" + foo(10));
+
+
+int bar(int a){
+    for (int i = 0; i< a; i++){
+        //println("i="+i);
+        if (i >= 5){
+            return i;
+        }
     }
+    return a;
 }
 
-class Sheep extends Mammal{
-    void speak(){
-        println("mee~~ mee~~");
-    }
-}
+println("bar(3)=" + bar(3));
 
+println("bar(10)=" + bar(10));
 
-Mammal a = Cow();
-Mammal b = Sheep();
-
-a.speak();
-b.speak();
-
-Mammal c; //= b;
-
-c == null;
-
-//c = b;
-
-//c.speak();
-
-//c == b;
 
 

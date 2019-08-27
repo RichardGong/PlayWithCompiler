@@ -342,6 +342,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     @Override
     public Object visitBlock(BlockContext ctx) {
+
+        BlockScope scope = (BlockScope) cr.node2Scope.get(ctx);
+        StackFrame frame = new StackFrame(scope);
+        // frame.parentFrame = stack.peek();
+        pushStack(frame);
+
         // // 添加ActivationRecord
         // Scope scope = scopeTree.findDescendantByContext(ctx);
         // if (scope != null) {
@@ -350,6 +356,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         // }
 
         Object rtn = visitBlockStatements(ctx.blockStatements());
+
+        stack.pop();
 
         // // 去掉ActivationRecord
         // if (scope != null){
@@ -391,7 +399,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 rightObject = ((LValue) right).getValue();
             }
 
+            //本节点期待的数据类型
             Type type = cr.node2Type.get(ctx);
+
+            //左右两个子节点的类型
+            Type type1 = cr.node2Type.get(ctx.expression(0));
+            Type type2 = cr.node2Type.get(ctx.expression(1));
 
             switch (ctx.bop.getType()) {
                 case PlayScriptParser.ADD:
@@ -407,22 +420,29 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                     rtn = div(leftObject, rightObject, type);
                     break;
                 case PlayScriptParser.EQUAL:
-                    rtn = EQ(leftObject, rightObject, type);
+                    rtn = EQ(leftObject, rightObject, PrimitiveType.getUpperType(type1, type2));
                     break;
                 case PlayScriptParser.NOTEQUAL:
-                    rtn = !EQ(leftObject, rightObject, type);
+                    rtn = !EQ(leftObject, rightObject, PrimitiveType.getUpperType(type1, type2));
                     break;
                 case PlayScriptParser.LE:
-                    rtn = LE(leftObject, rightObject, type);
+                    rtn = LE(leftObject, rightObject, PrimitiveType.getUpperType(type1, type2));
                     break;
                 case PlayScriptParser.LT:
-                    rtn = LT(leftObject, rightObject, type);
+                    rtn = LT(leftObject, rightObject, PrimitiveType.getUpperType(type1, type2));
                     break;
                 case PlayScriptParser.GE:
-                    rtn = GE(leftObject, rightObject, type);
+                    rtn = GE(leftObject, rightObject, PrimitiveType.getUpperType(type1, type2));
                     break;
                 case PlayScriptParser.GT:
-                    rtn = GT(leftObject, rightObject, type);
+                    rtn = GT(leftObject, rightObject, PrimitiveType.getUpperType(type1, type2));
+                    break;
+
+                case PlayScriptParser.AND:
+                    rtn = (Boolean) leftObject && (Boolean) rightObject;
+                    break;
+                case PlayScriptParser.OR:
+                    rtn = (Boolean) leftObject || (Boolean) rightObject;
                     break;
                 case PlayScriptParser.ASSIGN:
                     if (left instanceof LValue) {
@@ -463,17 +483,68 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         } else if (ctx.primary() != null) {
             rtn = visitPrimary(ctx.primary());
-        } else if (ctx.postfix != null) { // i++ 或 i-- 类型的语法
-            LValue lValue = (LValue) visitExpression(ctx.expression(0));
-            Integer value = (Integer) lValue.getValue();
+        }
+
+        // 后缀运算，例如：i++ 或 i--
+        else if (ctx.postfix != null) {
+            Object value = visitExpression(ctx.expression(0));
+            LValue lValue = null;
+            Type type = cr.node2Type.get(ctx.expression(0));
+            if (value instanceof LValue) {
+                lValue = (LValue) value;
+                value = lValue.getValue();
+            }
             switch (ctx.postfix.getType()) {
                 case PlayScriptParser.INC:
-                    lValue.setValue(value + 1);
-                    rtn = value; // 返回值还是原值。如果++放在前面，返回值要加1。
+                    if (type == PrimitiveType.Integer) {
+                        lValue.setValue((Integer) value + 1);
+                    } else {
+                        lValue.setValue((Long) value + 1);
+                    }
+                    rtn = value;
                     break;
                 case PlayScriptParser.DEC:
-                    lValue.setValue(value - 1);
+                    if (type == PrimitiveType.Integer) {
+                        lValue.setValue((Integer) value - 1);
+                    } else {
+                        lValue.setValue((long) value - 1);
+                    }
                     rtn = value;
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        //前缀操作，例如：++i 或 --i
+        else if (ctx.prefix != null) {
+            Object value = visitExpression(ctx.expression(0));
+            LValue lValue = null;
+            Type type = cr.node2Type.get(ctx.expression(0));
+            if (value instanceof LValue) {
+                lValue = (LValue) value;
+                value = lValue.getValue();
+            }
+            switch (ctx.prefix.getType()) {
+                case PlayScriptParser.INC:
+                    if (type == PrimitiveType.Integer) {
+                        rtn = (Integer) value + 1;
+                    } else {
+                        rtn = (Long) value + 1;
+                    }
+                    lValue.setValue(rtn);
+                    break;
+                case PlayScriptParser.DEC:
+                    if (type == PrimitiveType.Integer) {
+                        rtn = (Integer) value - 1;
+                    } else {
+                        rtn = (Long) value - 1;
+                    }
+                    lValue.setValue(rtn);
+                    break;
+                //!符号，逻辑非运算
+                case PlayScriptParser.BANG:
+                    rtn = !((Boolean) value);
                     break;
                 default:
                     break;
@@ -606,7 +677,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitStatement(StatementContext ctx) {
+    public Object visitStatement(StatementContext ctx){
         Object rtn = null;
         if (ctx.statementExpression != null) {
             rtn = visitExpression(ctx.statementExpression);
@@ -617,7 +688,48 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             } else if (ctx.ELSE() != null) {
                 rtn = visitStatement(ctx.statement(1));
             }
-        } else if (ctx.FOR() != null) {
+        }
+
+        //while循环
+        else if (ctx.WHILE() != null) {
+            if (ctx.parExpression().expression() != null && ctx.statement(0) != null) {
+
+                while (true) {
+                    //每次循环都要计算一下循环条件
+                    Boolean condition = true;
+                    Object value = visitExpression(ctx.parExpression().expression());
+                    if (value instanceof LValue) {
+                        condition = (Boolean) ((LValue) value).getValue();
+                    } else {
+                        condition = (Boolean) value;
+                    }
+
+                    if (condition) {
+                        //执行while后面的语句
+                        if (condition) {
+                            rtn = visitStatement(ctx.statement(0));
+
+                            //break
+                            if (rtn instanceof BreakObject){
+                                rtn = null;  //清除BreakObject，也就是只跳出一层循环
+                                break;
+                            }
+                            //return
+                            else if (rtn instanceof ReturnObject){
+                                break;
+                            }
+                        }
+                    }
+                    else{
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        //for循环
+        else if (ctx.FOR() != null) {
             // 添加StackFrame
             BlockScope scope = (BlockScope) cr.node2Scope.get(ctx);
             StackFrame frame = new StackFrame(scope);
@@ -636,12 +748,27 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 while (true) {
                     Boolean condition = true; // 如果没有条件判断部分，意味着一直循环
                     if (forControl.expression() != null) {
-                        condition = (Boolean) visitExpression(forControl.expression());
+                        Object value = visitExpression(forControl.expression());
+                        if (value instanceof LValue) {
+                            condition = (Boolean) ((LValue) value).getValue();
+                        } else {
+                            condition = (Boolean) value;
+                        }
                     }
 
                     if (condition) {
                         // 执行for的语句体
                         rtn = visitStatement(ctx.statement(0));
+
+                        //处理break
+                        if (rtn instanceof BreakObject){
+                            rtn = null;
+                            break;
+                        }
+                        //return
+                        else if (rtn instanceof ReturnObject){
+                            break;
+                        }
 
                         // 执行forUpdate，通常是“i++”这样的语句。这个执行顺序不能出错。
                         if (forControl.forUpdate != null) {
@@ -655,10 +782,21 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
             // 去掉ActivationRecord
             stack.pop();
-        } else if (ctx.blockLabel != null) {
+        }
+
+        //block
+        else if (ctx.blockLabel != null) {
             rtn = visitBlock(ctx.blockLabel);
 
-        } else if (ctx.RETURN() != null) {
+        }
+
+        //break语句
+        else if (ctx.BREAK() != null) {
+            rtn = BreakObject.instance();
+        }
+
+        //return语句
+        else if (ctx.RETURN() != null) {
             if (ctx.expression() != null) {
                 rtn = visitExpression(ctx.expression());
 
@@ -677,8 +815,10 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                     }
                 }
 
-                // TODO 这里应该结束函数，可能要重载visitor中的某些方法，强制返回上一级节点
             }
+
+            //把真实的返回值封装在一个ReturnObject对象里，告诉visitBlockStatements停止执行下面的语句
+            rtn = new ReturnObject(rtn);
         }
         return rtn;
     }
@@ -709,8 +849,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         LValue lValue = (LValue) visitVariableDeclaratorId(ctx.variableDeclaratorId());
         if (ctx.variableInitializer() != null) {
             rtn = visitVariableInitializer(ctx.variableInitializer());
-            if (rtn instanceof LValue){
-                rtn = ((LValue)rtn).getValue();
+            if (rtn instanceof LValue) {
+                rtn = ((LValue) rtn).getValue();
             }
             lValue.setValue(rtn);
         }
@@ -749,6 +889,17 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         Object rtn = null;
         for (BlockStatementContext child : ctx.blockStatement()) {
             rtn = visitBlockStatement(child);
+
+            //如果返回的是break，那么不执行下面的语句
+            if (rtn instanceof BreakObject){
+                break;
+            }
+
+            //碰到Return, 退出函数
+            // TODO 要能层层退出一个个block，弹出一个栈桢
+            else if (rtn instanceof ReturnObject){
+                break;
+            }
         }
         return rtn;
     }
@@ -806,7 +957,16 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         } else {
             // TODO 临时代码，用于打印输出
             if (ctx.IDENTIFIER().getText().equals("println")) {
-                System.out.println(visitExpressionList(ctx.expressionList()));
+                if (ctx.expressionList() != null) {
+                    Object value = visitExpressionList(ctx.expressionList());
+                    if (value instanceof LValue) {
+                        value = ((LValue) value).getValue();
+                    }
+                    System.out.println(value);
+                }
+                else{
+                    System.out.println();
+                }
                 return rtn;
             } else {
                 cr.log("unnable to find an function " + ctx.IDENTIFIER().getText(), ctx);
@@ -879,6 +1039,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         if (newObject != null) {
             rtn = newObject;
+        }
+
+        //如果由一个return语句返回，真实返回值会被封装在一个ReturnObject里。
+        if (rtn instanceof ReturnObject){
+            rtn = ((ReturnObject)rtn).returnValue;
         }
 
         // 弹出StackFrame

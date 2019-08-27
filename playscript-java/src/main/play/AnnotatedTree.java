@@ -84,9 +84,9 @@ public class AnnotatedTree {
         }
 
         //对于BlockScope，要继续往上查找
-        if (!rtn && scope instanceof BlockScope && scope.enclosingScope != null) {
-            rtn = checkDuplicateVariable(scope.enclosingScope, idName);
-        }
+//        if (!rtn && scope instanceof BlockScope && scope.enclosingScope != null) {
+//            rtn = checkDuplicateVariable(scope.enclosingScope, idName);
+//        }
         return rtn;
     }
 

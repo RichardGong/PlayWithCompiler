@@ -71,16 +71,13 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
 
     @Override
     public void enterBlock(BlockContext ctx) {
-        // if (!underForStatement(ctx)) {
-        // Scope scope = new Scope(currentScope(), ctx);
-        // currentScope() = scope;
-        // }
+        BlockScope scope = new BlockScope(currentScope(), ctx);
+        pushScope(scope, ctx);
     }
 
     @Override
-    public void enterEnhancedForControl(EnhancedForControlContext ctx) {
-        BlockScope scope = new BlockScope(currentScope(), ctx);
-        pushScope(scope, ctx);
+    public void exitBlock(BlockContext ctx) {
+        popScope();
     }
 
     @Override
@@ -131,10 +128,25 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
     }
 
     @Override
+    public void exitProg(ProgContext ctx) {
+        popScope();
+    }
+
+    @Override
     public void enterStatement(StatementContext ctx) {
-        if (ctx.FOR() != null || ctx.WHILE() != null) {
+        //为for、while建立Scope
+        //if (ctx.FOR() != null || ctx.WHILE() != null) {
+        if (ctx.FOR() != null) {
             BlockScope scope = new BlockScope(currentScope(), ctx);
             pushScope(scope, ctx);
+        }
+    }
+
+    @Override
+    public void exitStatement(StatementContext ctx) {
+        //if (ctx.FOR() != null || ctx.WHILE() != null) {
+        if (ctx.FOR() != null) {
+            popScope();
         }
     }
 
@@ -168,30 +180,6 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
         // Class theClass = (Class) cr.node2Symbol.get(currentScope().ctx);
         // theClass.fields.add(variable);
         // }
-    }
-
-    @Override
-    public void exitBlock(BlockContext ctx) {
-        // if (!underForStatement(ctx)) {
-        // currentScope() = currentScope().parent;
-        // }
-    }
-
-    @Override
-    public void exitEnhancedForControl(EnhancedForControlContext ctx) {
-        popScope();
-    }
-
-    @Override
-    public void exitProg(ProgContext ctx) {
-        popScope();
-    }
-
-    @Override
-    public void exitStatement(StatementContext ctx) {
-        if (ctx.FOR() != null || ctx.WHILE() != null) {
-            popScope();
-        }
     }
 
     @Override
@@ -419,23 +407,15 @@ public class AttributeEvaluator extends PlayScriptBaseListener {
             case PlayScriptParser.SUB:
             case PlayScriptParser.MUL:
             case PlayScriptParser.DIV:
-                if (type1 == PrimitiveType.String || type2 == PrimitiveType.String) {
-                    type = PrimitiveType.String;
-                } else if (type1 == PrimitiveType.Double || type2 == PrimitiveType.Double) {
-                    type = PrimitiveType.Double;
-                } else if (type1 == PrimitiveType.Float || type2 == PrimitiveType.Float) {
-                    type = PrimitiveType.Float;
-                } else if (type1 == PrimitiveType.Long || type2 == PrimitiveType.Long) {
-                    type = PrimitiveType.Long;
-                } else if (type1 == PrimitiveType.Integer || type2 == PrimitiveType.Integer) {
-                    type = PrimitiveType.Integer;
-                } else if (type1 == PrimitiveType.Short || type2 == PrimitiveType.Short) {
-                    type = PrimitiveType.Short;
-                } else {
-                    type = PrimitiveType.Byte; // TODO 以上这些规则有没有漏洞？
+                if (type1 instanceof PrimitiveType && type2 instanceof PrimitiveType){
+                    type = PrimitiveType.getUpperType(type1,type2);
+                }else{
+                    cr.log("operand should be PrimitiveType for additive and multiplicative operation", ctx);
                 }
+
                 break;
             case PlayScriptParser.EQUAL:
+                case PlayScriptParser.NOTEQUAL:
             case PlayScriptParser.LE:
             case PlayScriptParser.LT:
             case PlayScriptParser.GE:
