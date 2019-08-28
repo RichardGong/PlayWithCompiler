@@ -59,6 +59,33 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return lvalue;
     }
 
+
+    /**
+     * 从栈顶开始，找到第一个ClassObject
+     * 在调用类的方法时，需要找到实际的类。
+     * @return
+     */
+    private ClassObject firstClassObjectInStack(){
+
+        for (int i= stack.size()-1; i>0; i--){
+            StackFrame stackFrame = stack.get(i);
+            if (stackFrame.object instanceof ClassObject){
+                return (ClassObject) stackFrame.object;
+            }
+        }
+
+//        for (StackFrame stackFrame : stack){
+//            if (stackFrame.object instanceof ClassObject){
+//                return (ClassObject) stackFrame.object;
+//            }
+//        }
+        return null;
+    }
+
+
+    ///////////////////////////////////////////////
+    //自己实现的左值对象。
+
     private final class MyLValue implements LValue {
         private Variable variable;
         private PlayObject valueContainer;
@@ -137,6 +164,10 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         visitClassBody(ctx);
     }
 
+
+    ///////////////////////////////////////////////////////////
+    //内置函数
+
     //自己硬编码的println方法
     private void println(FunctionCallContext ctx){
         if (ctx.expressionList() != null) {
@@ -151,8 +182,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         }
     }
 
+
     ///////////////////////////////////////////////////////////
-    /// 工具性的方法
+    /// 各种运算
     private Object add(Object obj1, Object obj2, Type targetType) {
         Object rtn = null;
         if (targetType == PrimitiveType.String) {
@@ -934,7 +966,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         //类的构造函数
         else if (symbol instanceof Class) {
             //类的缺省构造函数。没有一个具体函数跟它关联，只是指向了一个类。
-            //at.log("default construction method: " + ctx.IDENTIFIER().getText(), ctx);
             rtn = createAndInitClassObject((Class) symbol);
             return rtn;
         }
@@ -969,7 +1000,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             //对普通的类函数，需要在运行时动态绑定
             else {
                 //从栈中取出代表这个对象的栈桢  //TODO 注意，栈顶不一定就是对象实例，比如在类方法中嵌套调用方法的时候
-                ClassObject classObject = (ClassObject) stack.peek().object;
+                //ClassObject classObject = (ClassObject) stack.peek().object;
+                ClassObject classObject = firstClassObjectInStack();
                 //获取类的定义
                 theClass = classObject.type;
 
