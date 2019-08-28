@@ -24,6 +24,10 @@
   + ASTEvaluator.java 实现了visitor模式的一个类，对AST遍历，实现表达式求值。
   + PlayScript.java 一个简单的测试程序
   + 其他文件：都是由Antlr解析规则文件后生成的  
+  
+### playscript-java
+这是一个java版本的脚本语言的参考实现，课程第7讲之后的示例以该项目为核心。   
+详细介绍，参见[playscript-java的说明](playscript-java)。
 
 ### 注意
 随着课程进度，会不断更新资料内容和本文档的内容。   
