@@ -27,7 +27,7 @@
   
 ### playscript-java
 这是一个java版本的脚本语言的参考实现，课程第7讲之后的示例以该项目为核心。   
-详细介绍，参见[playscript-java的说明](playscript-java)。
+详细介绍，参见[playscript-java的说明](playscript-java/README.md)。
 
 ### 注意
 随着课程进度，会不断更新资料内容和本文档的内容。   
