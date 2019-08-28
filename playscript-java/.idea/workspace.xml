@@ -3,23 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="52a58941-678e-4b9c-8e57-d0430b58768d" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../playscript-cpp/.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/BlockScope.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/LinkedList.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/ObjectAssign.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/function.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/loop.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/mammal.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/out/production/playscript-java/play/test1.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/BlockScope.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/BlockScope.play" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/LinkedList.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/ObjectAssign.play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/PlayScript.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/UseBeforeDeclare.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/function.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/loop.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/mammal.play" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/test1.play" beforeDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -110,8 +94,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="391">
-              <caret line="38" column="19" lean-forward="true" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="19" />
+            <state relative-caret-position="-1730">
+              <caret line="41" selection-start-line="41" selection-end-line="41" />
             </state>
           </provider>
         </entry>
@@ -241,6 +225,11 @@
             </path>
             <path>
               <item name="playscript-java" type="b2602c69:ProjectViewProjectNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="playscript-java" type="b2602c69:ProjectViewProjectNode" />
               <item name="外部库" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
@@ -320,12 +309,12 @@
       <option name="presentableId" value="Default" />
       <updated>1566801294412</updated>
       <workItem from="1566801298328" duration="30398000" />
-      <workItem from="1566884581364" duration="30842000" />
+      <workItem from="1566884581364" duration="30985000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="61240000" />
+    <option name="totallyTimeSpent" value="61383000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -753,8 +742,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="391">
-          <caret line="38" column="19" lean-forward="true" selection-start-line="38" selection-start-column="19" selection-end-line="38" selection-end-column="19" />
+        <state relative-caret-position="-1730">
+          <caret line="41" selection-start-line="41" selection-end-line="41" />
         </state>
       </provider>
     </entry>

@@ -10,7 +10,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 
 public class PlayScript {
-   
+
     public static void main(String args[]) {
         //String script = "45+10*2;";
         //String script = "int age = 44; { int i = 10; age+i;}";
@@ -39,82 +39,76 @@ public class PlayScript {
         // 是否生成汇编代码
         boolean genAsm = false;
 
-//        if (script == null){
 
         //解析参数
-            for (int i = 0; i< args.length; i++){
-                if (args[i].equals("-S")){
-                    genAsm = true;
-                }
-                else if (args[i].equals("-o")){
-                    if (i+1 <args.length){
-                        outputFile = args[++i];  //让i的序号增加一个
-                    }
-                    else{
-                        System.out.println("Expecting a filename after -o");
-                        return;
-                    }
-                }
-                else{
-                    scriptFile = args[i];
-                }
-            }
-
-            if (scriptFile != null){
-                try {
-                    script = readTextFile(scriptFile);
-                } catch (IOException e) {
-                    System.out.println("unable to read from : "+scriptFile);
+        for (int i = 0; i < args.length; i++) {
+            if (args[i].equals("-S")) {
+                genAsm = true;
+            } else if (args[i].equals("-o")) {
+                if (i + 1 < args.length) {
+                    outputFile = args[++i];  //让i的序号增加一个
+                } else {
+                    System.out.println("Expecting a filename after -o");
                     return;
                 }
+            } else {
+                scriptFile = args[i];
             }
+        }
 
-            if (script == null){
-                //进入REPL
-                REPL();
-            }else if (genAsm){
-                //生成汇编代码
-                generateAsm(script, outputFile);
+        if (scriptFile != null) {
+            try {
+                script = readTextFile(scriptFile);
+            } catch (IOException e) {
+                System.out.println("unable to read from : " + scriptFile);
+                return;
             }
+        }
 
-            else{
-                //执行脚本文件
-                PlayScriptCompiler compiler = new PlayScriptCompiler();
-                AnnotatedTree cr = compiler.Compile(script);
+        if (script == null) {
+            //进入REPL
+            REPL();
+        } else if (genAsm) {
+            //生成汇编代码
+            generateAsm(script, outputFile);
+        } else {
+            //执行脚本文件
+            PlayScriptCompiler compiler = new PlayScriptCompiler();
+            AnnotatedTree cr = compiler.Compile(script);
 
-                Object result = compiler.Execute(cr);
-                System.out.println(result);
-            }
-//        }
-    
+            Object result = compiler.Execute(cr);
+            System.out.println(result);
+        }
+
     }
 
     /**
      * 生成ASM
-     * @param script 脚本
+     *
+     * @param script     脚本
      * @param outputFile 输出的文件名
      */
-    private static void generateAsm(String script,String outputFile){
+    private static void generateAsm(String script, String outputFile) {
         PlayScriptCompiler compiler = new PlayScriptCompiler();
         AnnotatedTree cr = compiler.Compile(script);
         AsmGen asmGen = new AsmGen(cr);
         String asm = asmGen.generate();
-        if (outputFile != null){
+        if (outputFile != null) {
             try {
                 writeTextFile(outputFile, asm);
             } catch (IOException e) {
-                System.out.println("unable to write to : "+outputFile);
+                System.out.println("unable to write to : " + outputFile);
                 return;
             }
-        } else{
+        } else {
             System.out.println(asm);
         }
     }
 
     private static String readTextFile(String pathName) throws IOException {
         StringBuffer buffer = new StringBuffer();
-        try (FileReader reader = new FileReader(pathName); 
-            BufferedReader br = new BufferedReader(reader)) {
+        try (FileReader reader = new FileReader(pathName);
+             BufferedReader br = new BufferedReader(reader)) {
             String line;
             while ((line = br.readLine()) != null) {
                 buffer.append(line).append('\n');
@@ -124,23 +118,23 @@ public class PlayScript {
     }
 
     public static void writeTextFile(String pathName, String text) throws IOException {
-        File file = new File(pathName); 
-        file.createNewFile(); 
-        try (FileWriter writer = new FileWriter(file); 
-            BufferedWriter out = new BufferedWriter(writer)) {
+        File file = new File(pathName);
+        file.createNewFile();
+        try (FileWriter writer = new FileWriter(file);
+             BufferedWriter out = new BufferedWriter(writer)) {
             StringReader reader = new StringReader(text);
             BufferedReader br = new BufferedReader(reader);
             String line;
             while ((line = br.readLine()) != null) {
                 out.write(line);
-            }    
+            }
             out.flush(); // 把缓存区内容压入文件
         }
     }
 
     private static void REPL() {
         System.out.println("Enjoy PlayScript!");
- 
+
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
         String scriptText = "";
@@ -155,7 +149,7 @@ public class PlayScript {
                 }
                 scriptText += line + "\n";
                 if (line.endsWith(";")) {
-             
+
                     // 执行脚本文件
                     PlayScriptCompiler compiler = new PlayScriptCompiler();
                     AnnotatedTree cr = compiler.Compile(scriptText);
@@ -173,14 +167,14 @@ public class PlayScript {
                 System.out.println(e.getLocalizedMessage());
                 System.out.print("\n>");   //提示符
                 scriptText = "";
-            } 
+            }
         }
     }
 
     /**
      * 批量运行所有的示例程序，每个示例程序执行完毕以后，需要按一个键，再继续执行下一个程序。
      */
-    private static void batchTest(){
+    private static void batchTest() {
 
     }
 
