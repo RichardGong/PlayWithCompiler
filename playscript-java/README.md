@@ -33,7 +33,7 @@ play scratch.play
 * [TypeResolver.java](src/main/play/TypeResolver.java) 语义分析-2：类型消解，包括变量声明、函数返回值、类的父类。
 * [RefResolver.java](src/main/play/RefResolver.java) 语义分析-3：引用消解，包括变量引用、函数调用。同时做自下而上的类型推断。
 * [TypeChecker.java](src/main/play/TypeChecker.java) 语义分析-4：类型检查。
-* [SematiceValidator.java](src/main/play/SematiceValidator.java) 语义分析-5：剩余所有的语义分析。
+* [SematicValidator.java](src/main/play/SematicValidator.java) 语义分析-5：剩余所有的语义分析。
 
 ---
 ## 注意
