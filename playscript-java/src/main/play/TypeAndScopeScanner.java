@@ -6,7 +6,7 @@ import play.PlayScriptParser.*;
 import java.util.Stack;
 
 /**
- * 第一遍扫描：识别出所有类型（包括类和函数)，以及Scope
+ * 第一遍扫描：识别出所有类型（包括类和函数)，以及Scope。（但函数的参数信息要等到下一个阶段才会添加进去。）
  */
 public class TypeAndScopeScanner extends PlayScriptBaseListener {
 
@@ -42,8 +42,8 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
 
     @Override
     public void enterProg(ProgContext ctx) {
-        BlockScope scope = new BlockScope(currentScope(), ctx);
-        at.scopeTree = scope; //scope的根
+        NameSpace scope = new NameSpace("", currentScope(), ctx);
+        at.nameSpace = scope; //scope的根
         pushScope(scope, ctx);
     }
 
@@ -83,23 +83,14 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
 
     @Override
     public void enterFunctionDeclaration(FunctionDeclarationContext ctx) {
-        // 把方法的签名存到符号表中,目前不支持方法的重载，每个方法名称必须唯一，并且也不能跟变量名称冲突
         String idName = ctx.IDENTIFIER().getText();
+
+        //注意：目前funtion的信息并不完整，参数要等到TypeResolver.java中去确定。
         Function function = new Function(idName, currentScope(), ctx);
 
         at.types.add(function);
 
-        //函数查重
-        Scope scope = at.enclosingScopeOfNode(ctx);
-        for (Symbol symbol : scope.symbols){
-            if (symbol instanceof Function){
-                if (function.equals(symbol)){
-                    at.log("Function or method already Declared: " + ctx.getText(), ctx);
-                }
-            }
-        }
-
-        currentScope().symbols.add(function);
+        currentScope().addSymbol(function);
 
         // 创建一个新的scope
         pushScope(function, ctx);
@@ -123,7 +114,7 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
             at.log("duplicate class name:" + idName, ctx); // 只是报警，但仍然继续解析
         }
 
-        currentScope().symbols.add(theClass);
+        currentScope().addSymbol(theClass);
 
         // 创建一个新的scope
         pushScope(theClass, ctx);
@@ -135,15 +126,5 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
         popScope();
     }
 
-
-
-    @Override
-    public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext ctx) {
-        if (ctx.IDENTIFIER() != null) {
-            String idName = ctx.getText();
-            Class theClass = at.lookupClass(currentScope(), idName);
-            at.typeOfNode.put(ctx, theClass);
-        }
-    }
 
 }

@@ -47,7 +47,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         PlayObject valueContainer = null;
         while (f != null) {
             //if (f.contains(variable) || f.scope.symbols.contains(variable)) {
-            if (f.scope.symbols.contains(variable)) {
+            if (f.scope.containsSymbol(variable)) {
                 valueContainer = f.object;
                 break;
             }
@@ -73,12 +73,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 return (ClassObject) stackFrame.object;
             }
         }
-
-//        for (StackFrame stackFrame : stack){
-//            if (stackFrame.object instanceof ClassObject){
-//                return (ClassObject) stackFrame.object;
-//            }
-//        }
         return null;
     }
 
@@ -977,13 +971,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         }
         //报错
         else {
-            at.log("unnable to find an function " + functionName, ctx);
+            at.log("unable to find function " + functionName, ctx);
             return rtn;
         }
 
 
         FunctionDeclarationContext functionCode = (FunctionDeclarationContext) function.ctx;
-        //Scope functionScope = at.node2Scope.get(functionCode);
 
         StackFrame classFrame = null;
 
@@ -1000,13 +993,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             //对普通的类函数，需要在运行时动态绑定
             else {
                 //从栈中取出代表这个对象的栈桢  //TODO 注意，栈顶不一定就是对象实例，比如在类方法中嵌套调用方法的时候
-                //ClassObject classObject = (ClassObject) stack.peek().object;
                 ClassObject classObject = firstClassObjectInStack();
                 //获取类的定义
                 theClass = classObject.type;
 
                 //从当前类逐级向上查找，找到正确的方法定义
-                Function overrided = at.lookupFunction(theClass, function.name, function.getParamTypes());
+                Function overrided = theClass.getFunction(function.name, function.getParamTypes());
                 //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上
                 if (overrided != function) {
                     function = overrided;
@@ -1015,15 +1007,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         }
 
-        // 添加StackFrame
-        if (functionObject == null) {
-            functionObject = new FunctionObject(function);
-        }
-        StackFrame functionFrame = new StackFrame(functionObject);
 
-        pushStack(functionFrame);
-
-        // 往栈桢绑定形参和实参，它们要能够一一对应
+        // 计算实参的值，这要在之前的Scope计算完。
         List<Object> paramValues = new LinkedList<Object>();
         if (ctx.expressionList() != null) {
             for (ExpressionContext exp : ctx.expressionList().expression()) {
@@ -1035,6 +1020,16 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         }
 
+        // 添加StackFrame
+        if (functionObject == null) {
+            functionObject = new FunctionObject(function);
+        }
+        StackFrame functionFrame = new StackFrame(functionObject);
+
+        pushStack(functionFrame);
+
+
+        // 给参数赋值，这些值进入functionFrame
         if (functionCode.formalParameters().formalParameterList() != null) {
             for (int i = 0; i < functionCode.formalParameters().formalParameterList().formalParameter().size(); i++) {
                 FormalParameterContext param = functionCode.formalParameters().formalParameterList().formalParameter(i);
@@ -1043,7 +1038,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
         }
 
-        // 调用方法体
+        // 调用函数（方法）体
         rtn = visitFunctionDeclaration(functionCode);
 
         if (newObject != null) {
@@ -1056,10 +1051,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         }
 
         // 弹出StackFrame
+        stack.pop(); //函数的栈桢
+
+        //当运行类的构建方法时，添加的类的栈桢
         if (classFrame != null) {
             stack.pop();
         }
-        stack.pop();
         return rtn;
     }
 

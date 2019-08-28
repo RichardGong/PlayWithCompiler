@@ -14,6 +14,11 @@ public class PrimitiveType implements Type {
         return null;
     }
 
+    @Override
+    public String toString(){
+        return name;
+    }
+
     // 没有公共的构造方法
     private PrimitiveType(String name) {
         this.name = name;

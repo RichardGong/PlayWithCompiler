@@ -388,7 +388,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
             if (ctx.IDENTIFIER().getText().equals("println")) {
                 functionName = "printf";
             } else {
-                at.log("unnable to find an function " + ctx.IDENTIFIER().getText(), ctx);
+                at.log("unable to find function " + ctx.IDENTIFIER().getText(), ctx);
             }
         }
 

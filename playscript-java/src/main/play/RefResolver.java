@@ -33,7 +33,9 @@ public class RefResolver extends PlayScriptBaseListener {
             Variable variable = at.lookupVariable(scope, idName);
             if (variable == null) {
                 // 看看是不是函数，因为函数可以作为值来传递。这个时候，函数重名没法区分。
-                Function function = at.lookupFunction(scope, idName, null); // TODO 应该由上面传递下类型属性下来，然后精确比对
+                // 因为普通Scope中的函数是不可以重名的，所以这应该是没有问题的。
+                // TODO 注意，查找function的时候，可能会把类的方法包含进去
+                Function function = at.lookupFunction(scope, idName);
                 if (function != null) {
                     at.symbolOfNode.put(ctx, function);
                     type = function;
@@ -98,11 +100,12 @@ public class RefResolver extends PlayScriptBaseListener {
                 Symbol symbol = at.symbolOfNode.get(exp.expression(0));
                 if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                     Class theClass = (Class) ((Variable) symbol).type;
-                    Scope classScope = at.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
+                    //Scope classScope = at.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
 
                     String idName = ctx.IDENTIFIER().getText();
                     //查找名称和参数类型都匹配的函数。不允许名称和参数都相同，但返回值不同的情况。
-                    function = at.lookupFunction(classScope, idName, paramTypes);
+                    //function = at.lookupFunction(classScope, idName, paramTypes);
+                    function = theClass.getFunction(idName, paramTypes);
                     if (function != null) {
                         at.symbolOfNode.put(ctx, function);
                         at.typeOfNode.put(ctx, function.returnType);
@@ -118,7 +121,7 @@ public class RefResolver extends PlayScriptBaseListener {
 
         Scope scope = at.enclosingScopeOfNode(ctx);
 
-        //从当前Scope里查找函数(或方法)
+        //从当前Scope逐级查找函数(或方法)
         String idName = ctx.IDENTIFIER().getText();
         if (function == null && ctx.IDENTIFIER() != null) {
             function = at.lookupFunction(scope, idName, paramTypes);
@@ -132,8 +135,7 @@ public class RefResolver extends PlayScriptBaseListener {
             // 看看是不是类的构建函数，用相同的名称查找一个class
             Class theClass = at.lookupClass(scope, idName);
             if (theClass != null) {
-                Scope classScope = at.node2Scope.get(theClass.ctx);
-                function = at.lookupFunction(classScope, idName, paramTypes);
+                function = theClass.findConstructor(paramTypes);
                 if (function != null) {
                     at.symbolOfNode.put(ctx, function);
                 }

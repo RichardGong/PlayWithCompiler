@@ -33,13 +33,12 @@ public class TypeResolver extends PlayScriptBaseListener {
         Scope scope = at.enclosingScopeOfNode(ctx);
         Variable variable = new Variable(idName, scope, ctx);
 
-        if (scope instanceof BlockScope){
-            if (at.checkDuplicateVariable(scope, idName)) {
-                at.log("Variable already Declared: " + idName, ctx);
-            }
+        //变量查重
+        if (Scope.getVariable(scope,idName) != null){
+            at.log("Variable or parameter already Declared: " + idName, ctx);
         }
 
-        scope.symbols.add(variable);
+        scope.addSymbol(variable);
         at.symbolOfNode.put(ctx, variable);
     }
 
@@ -54,6 +53,14 @@ public class TypeResolver extends PlayScriptBaseListener {
             //TODO 如果是类的构建函数，返回值应该是一个类吧？
 
         }
+
+        //函数查重，检查名称和参数（这个时候参数已经齐了）
+        Scope scope = at.enclosingScopeOfNode(ctx);
+        Function found = Scope.getFunction(scope,function.name,function.getParamTypes());
+        if (found != null && found != function){
+            at.log("Function or method already Declared: " + ctx.getText(), ctx);
+        }
+
     }
 
     //设置函数的参数的类型，这些参数已经在enterVariableDeclaratorId中作为变量声明了，现在设置它们的类型

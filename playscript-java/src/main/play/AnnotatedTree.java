@@ -29,8 +29,8 @@ public class AnnotatedTree {
     // 用于做类型推断，每个节点推断出来的类型
     protected Map<ParserRuleContext, Type> typeOfNode = new HashMap<ParserRuleContext, Type>();
 
-    // 编译后形成的scope树
-    protected Scope scopeTree = null;
+    // 命名空间
+    NameSpace nameSpace = null;  //全局命名空间
 
     // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
     //protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
@@ -55,21 +55,14 @@ public class AnnotatedTree {
     }
 
     /**
-     * 通过名称查找Variable
+     * 通过名称查找Variable。逐级Scope查找。
      *
      * @param scope
      * @param idName
      * @return
      */
     protected Variable lookupVariable(Scope scope, String idName) {
-        Variable rtn = null;
-        for (Symbol s : scope.symbols) {
-            // typeType是可选的参数
-            if (s instanceof Variable && s.name.equals(idName)) {
-                rtn = (Variable) s;
-                break;
-            }
-        }
+        Variable rtn = scope.getVariable(idName);
 
         if (rtn == null && scope.enclosingScope != null) {
             rtn = lookupVariable(scope.enclosingScope, idName);
@@ -77,39 +70,15 @@ public class AnnotatedTree {
         return rtn;
     }
 
-    protected Boolean checkDuplicateVariable(Scope scope, String idName) {
-        Boolean rtn = Boolean.FALSE;
-        for (Symbol s : scope.symbols) {
-            // typeType是可选的参数
-            if (s instanceof Variable && s.name.equals(idName)) {
-                rtn = true;
-                break;
-            }
-        }
-
-        //对于BlockScope，要继续往上查找
-//        if (!rtn && scope instanceof BlockScope && scope.enclosingScope != null) {
-//            rtn = checkDuplicateVariable(scope.enclosingScope, idName);
-//        }
-        return rtn;
-    }
-
     /**
-     * 通过名称查找Class
+     * 通过名称查找Class。逐级Scope查找。
      *
      * @param scope
      * @param idName
      * @return
      */
     protected Class lookupClass(Scope scope, String idName) {
-        Class rtn = null;
-        for (Symbol s : scope.symbols) {
-            // typeType是可选的参数
-            if (s instanceof Class && s.name.equals(idName)) {
-                rtn = (Class) s;
-                break;
-            }
-        }
+        Class rtn = scope.getClass(idName);
 
         if (rtn == null && scope.enclosingScope != null) {
             rtn = lookupClass(scope.enclosingScope, idName);
@@ -120,7 +89,6 @@ public class AnnotatedTree {
     protected Type lookupType(String idName) {   //TODO 单纯根据名称并不严密
         Type rtn = null;
         for (Type type : types) {
-            // typeType是可选的参数
             if (type.getName().equals(idName)) {
                 rtn = type;
                 break;
@@ -130,7 +98,7 @@ public class AnnotatedTree {
     }
 
     /**
-     * 通过方法的名称和方法签名查找Function
+     * 通过方法的名称和方法签名查找Function。逐级Scope查找。
      *
      * @param scope
      * @param idName
@@ -138,46 +106,55 @@ public class AnnotatedTree {
      * @return
      */
     protected Function lookupFunction(Scope scope, String idName, List<Type> paramTypes) {
-        Function rtn = null;
-        for (Symbol s : scope.symbols) {
-            // typeType是可选的参数
-            if (s instanceof Function && s.name.equals(idName)) {
-                Function function = (Function) s;
+        Function rtn = scope.getFunction(idName, paramTypes);
 
-                if (paramTypes != null) {
-                    // 比较每个参数
-                    if (function.parameters.size() != paramTypes.size()) {
-                        break;
-                    }
-
-                    boolean match = true;
-                    for (int i = 0; i < paramTypes.size(); i++) {
-                        Variable var = function.parameters.get(i);
-                        Type type = paramTypes.get(i);
-                        if (var.type != type) {  //TODO 这里应该做类型兼容性测试，只要类型能够转换，或者是其子类都可以。
-                            match = false;
-                            break;
-                        }
-                    }
-                    if (match) {
-                        rtn = function;
-                    }
-
-                } else {
-                    // TODO 临时的，弱比较，不比较参数
-                    rtn = function;
-                }
-
-                if (rtn != null) {
-                    break;
-                }
-            }
-        }
 
         if (rtn == null && scope.enclosingScope != null) {
             rtn = lookupFunction(scope.enclosingScope, idName, paramTypes);
         }
         return rtn;
+    }
+
+    /**
+     * 逐级查找函数（或方法）。仅通过名字查找。如果有重名的，返回第一个就算了。//TODO 未来应该报警。
+     * @param scope
+     * @param name
+     * @return
+     */
+    protected Function lookupFunction(Scope scope, String name){
+        Function rtn = null;
+        if (scope instanceof Class){
+            rtn = getMethodOnlyByName((Class)scope, name);
+        }
+        else {
+            rtn = getFunctionOnlyByName(scope, name);
+        }
+
+        if (rtn == null && scope.enclosingScope != null){
+            rtn = lookupFunction(scope.enclosingScope,name);
+        }
+
+        return rtn;
+    }
+
+    //对于类，需要连父类也查找
+    private Function getMethodOnlyByName(Class theClass, String name){
+        Function rtn = getFunctionOnlyByName(theClass, name);
+
+        if (rtn == null && theClass.getParentClass() != null){
+            rtn = getMethodOnlyByName(theClass.getParentClass(), name);
+        }
+
+        return rtn;
+    }
+
+    private Function getFunctionOnlyByName(Scope scope, String name){
+        for (Symbol s : scope.symbols){
+            if (s instanceof Function && s.name.equals(name)){
+                return  (Function)s;
+            }
+        }
+        return  null;
     }
 
 
@@ -209,7 +186,7 @@ public class AnnotatedTree {
      */
     public String getScopeTreeString(){
         StringBuffer sb = new StringBuffer();
-        scopeToString(sb, scopeTree, "");
+        scopeToString(sb, nameSpace, "");
         return sb.toString();
     }
 
