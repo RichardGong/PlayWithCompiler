@@ -29,7 +29,7 @@ play scratch.play
 * [PlayScriptCompiler.java](src/main/play/PlayScriptCompiler.java) 将语法分析器和词法分析器进行了封装。
 * [AnnotatedTree.java](src/main/play/AnnotatedTree.java) 对AST所做的属性标注，语义分析的结果都放在这里。
 * [ASTEvaluator.java](src/main/play/ASTEvaluator.java) 解释器，对AST遍历求值。
-* [TypeAndScopeCanner.java](src/main/play/TypeAndScopeCanner.java) 语义分析-1：检测所有的自定义类型，包括函数；同时建立起Scope树。
+* [TypeAndScopeScanner.java](src/main/play/TypeAndScopeScanner.java) 语义分析-1：检测所有的自定义类型，包括函数；同时建立起Scope树。
 * [TypeResolver.java](src/main/play/TypeResolver.java) 语义分析-2：类型消解，包括变量声明、函数返回值、类的父类。
 * [RefResolver.java](src/main/play/RefResolver.java) 语义分析-3：引用消解，包括变量引用、函数调用。同时做自下而上的类型推断。
 * [TypeChecker.java](src/main/play/TypeChecker.java) 语义分析-4：类型检查。
