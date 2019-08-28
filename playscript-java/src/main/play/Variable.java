@@ -18,4 +18,10 @@ public class Variable extends Symbol {
         this.enclosingScope = enclosingScope;
         this.ctx = ctx;
     }
+
+    @Override
+    public String toString(){
+        return "Variable " + name + " -> "+ type;
+    }
+
 }

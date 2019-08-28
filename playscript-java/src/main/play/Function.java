@@ -45,6 +45,8 @@ public class Function extends Scope implements FunctionType {
      */
     @Override
     public boolean equals(Object o){
+        if (o == null) return false;
+
         if (o instanceof Function){
             Function function = (Function)o;
 
@@ -64,13 +66,15 @@ public class Function extends Scope implements FunctionType {
             }
 
             //参数
-            if (function.paramTypes.size() != this.paramTypes.size()){
+            List<Type> paramTypes1 = this.getParamTypes();
+            List<Type> paramTypes2 = function.getParamTypes();
+            if (paramTypes1.size() != paramTypes2.size()){
                 return false;
             }
 
-            for (int i = 0; i< function.paramTypes.size(); i++){
-                Type type1 = function.paramTypes.get(i);
-                Type type2 = function.paramTypes.get(i);
+            for (int i = 0; i< paramTypes1.size(); i++){
+                Type type1 = paramTypes1.get(i);
+                Type type2 = paramTypes2.get(i);
                 if (!type1.equals(type2)){
                     return false;
                 }
@@ -80,6 +84,11 @@ public class Function extends Scope implements FunctionType {
         else{
             return false;
         }
+    }
+
+    @Override
+    public String toString(){
+        return "Function " + name;
     }
 
 }

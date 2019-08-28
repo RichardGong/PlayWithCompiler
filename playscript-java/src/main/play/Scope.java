@@ -16,4 +16,10 @@ public abstract class Scope extends Symbol{
         }
         return rtn;
     }
+
+    @Override
+    public String toString(){
+        return "Scope: " + name;
+    }
+
 }

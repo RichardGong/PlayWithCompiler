@@ -74,9 +74,9 @@ public class PlayScript {
         } else {
             //执行脚本文件
             PlayScriptCompiler compiler = new PlayScriptCompiler();
-            AnnotatedTree cr = compiler.Compile(script);
+            AnnotatedTree at = compiler.Compile(script);
 
-            Object result = compiler.Execute(cr);
+            Object result = compiler.Execute(at);
             System.out.println(result);
         }
 
@@ -90,8 +90,8 @@ public class PlayScript {
      */
     private static void generateAsm(String script, String outputFile) {
         PlayScriptCompiler compiler = new PlayScriptCompiler();
-        AnnotatedTree cr = compiler.Compile(script);
-        AsmGen asmGen = new AsmGen(cr);
+        AnnotatedTree at = compiler.Compile(script);
+        AsmGen asmGen = new AsmGen(at);
         String asm = asmGen.generate();
         if (outputFile != null) {
             try {
@@ -152,8 +152,8 @@ public class PlayScript {
 
                     // 执行脚本文件
                     PlayScriptCompiler compiler = new PlayScriptCompiler();
-                    AnnotatedTree cr = compiler.Compile(scriptText);
-                    Object result = compiler.Execute(cr);
+                    AnnotatedTree at = compiler.Compile(scriptText);
+                    Object result = compiler.Execute(at);
                     System.out.println(result);
 
                     System.out.print("\n>");   //提示符

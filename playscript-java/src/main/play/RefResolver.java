@@ -17,41 +17,41 @@ import java.util.List;
  */
 public class RefResolver extends PlayScriptBaseListener {
 
-    private AnnotatedTree cr = null;
+    private AnnotatedTree at = null;
 
-    public RefResolver(AnnotatedTree cr) {
-        this.cr = cr;
+    public RefResolver(AnnotatedTree at) {
+        this.at = at;
     }
 
 
     @Override
     public void exitPrimary(PrimaryContext ctx) {
-        Scope scope = cr.enclosingScopeOfNode(ctx);
+        Scope scope = at.enclosingScopeOfNode(ctx);
         Type type = null;
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
-            Variable variable = cr.lookupVariable(scope, idName);
+            Variable variable = at.lookupVariable(scope, idName);
             if (variable == null) {
                 // 看看是不是函数，因为函数可以作为值来传递。这个时候，函数重名没法区分。
-                Function function = cr.lookupFunction(scope, idName, null); // TODO 应该由上面传递下类型属性下来，然后精确比对
+                Function function = at.lookupFunction(scope, idName, null); // TODO 应该由上面传递下类型属性下来，然后精确比对
                 if (function != null) {
-                    cr.symbolOfNode.put(ctx, function);
+                    at.symbolOfNode.put(ctx, function);
                     type = function;
                 } else {
-                    cr.log("unknown variable or function: " + idName, ctx);
+                    at.log("unknown variable or function: " + idName, ctx);
                 }
 
             } else {
-                cr.symbolOfNode.put(ctx, variable);
+                at.symbolOfNode.put(ctx, variable);
 
                 type = variable.type;
 
                 //记录所引用的外部变量，用于闭包
                 if (scope instanceof Function && variable.enclosingScope != scope){
-                    List<Variable> referedVariables = cr.outerReference.get(scope);
+                    List<Variable> referedVariables = at.outerReference.get(scope);
                     if (referedVariables == null){
                         referedVariables = new LinkedList<Variable>();
-                        cr.outerReference.put(scope,referedVariables);
+                        at.outerReference.put(scope,referedVariables);
                     }
                     if(!referedVariables.contains(variable)){
                         referedVariables.add(variable);
@@ -59,13 +59,13 @@ public class RefResolver extends PlayScriptBaseListener {
                 }
             }
         } else if (ctx.literal() != null) {
-            type = cr.typeOfNode.get(ctx.literal());
+            type = at.typeOfNode.get(ctx.literal());
         } else if (ctx.expression() != null) {
-            type = cr.typeOfNode.get(ctx.expression());
+            type = at.typeOfNode.get(ctx.expression());
         }
 
         //类型推断、冒泡
-        cr.typeOfNode.put(ctx,type);
+        at.typeOfNode.put(ctx,type);
     }
 
 
@@ -84,7 +84,7 @@ public class RefResolver extends PlayScriptBaseListener {
         List<Type> paramTypes = new LinkedList<Type>();
         if (ctx.expressionList() != null) {
             for (ExpressionContext exp : ctx.expressionList().expression()) {
-                Type type = cr.typeOfNode.get(exp);
+                Type type = at.typeOfNode.get(exp);
                 paramTypes.add(type);
             }
         }
@@ -95,68 +95,68 @@ public class RefResolver extends PlayScriptBaseListener {
         if (ctx.parent instanceof ExpressionContext) {
             ExpressionContext exp = (ExpressionContext) ctx.parent;
             if (exp.bop != null && exp.bop.getType() == PlayScriptParser.DOT) {
-                Symbol symbol = cr.symbolOfNode.get(exp.expression(0));
+                Symbol symbol = at.symbolOfNode.get(exp.expression(0));
                 if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                     Class theClass = (Class) ((Variable) symbol).type;
-                    Scope classScope = cr.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
+                    Scope classScope = at.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
 
                     String idName = ctx.IDENTIFIER().getText();
                     //查找名称和参数类型都匹配的函数。不允许名称和参数都相同，但返回值不同的情况。
-                    function = cr.lookupFunction(classScope, idName, paramTypes);
+                    function = at.lookupFunction(classScope, idName, paramTypes);
                     if (function != null) {
-                        cr.symbolOfNode.put(ctx, function);
-                        cr.typeOfNode.put(ctx, function.returnType);
+                        at.symbolOfNode.put(ctx, function);
+                        at.typeOfNode.put(ctx, function.returnType);
                     } else {
-                        cr.log("unable to find method " + idName + " in Class " + theClass.name, exp);
+                        at.log("unable to find method " + idName + " in Class " + theClass.name, exp);
                     }
 
                 } else {
-                    cr.log("unable to resolve a class", ctx);
+                    at.log("unable to resolve a class", ctx);
                 }
             }
         }
 
-        Scope scope = cr.enclosingScopeOfNode(ctx);
+        Scope scope = at.enclosingScopeOfNode(ctx);
 
         //从当前Scope里查找函数(或方法)
         String idName = ctx.IDENTIFIER().getText();
         if (function == null && ctx.IDENTIFIER() != null) {
-            function = cr.lookupFunction(scope, idName, paramTypes);
+            function = at.lookupFunction(scope, idName, paramTypes);
             if (function != null){
-                cr.symbolOfNode.put(ctx, function);
-                cr.typeOfNode.put(ctx, function.returnType);
+                at.symbolOfNode.put(ctx, function);
+                at.typeOfNode.put(ctx, function.returnType);
             }
         }
 
         if (function == null) {
             // 看看是不是类的构建函数，用相同的名称查找一个class
-            Class theClass = cr.lookupClass(scope, idName);
+            Class theClass = at.lookupClass(scope, idName);
             if (theClass != null) {
-                Scope classScope = cr.node2Scope.get(theClass.ctx);
-                function = cr.lookupFunction(classScope, idName, paramTypes);
+                Scope classScope = at.node2Scope.get(theClass.ctx);
+                function = at.lookupFunction(classScope, idName, paramTypes);
                 if (function != null) {
-                    cr.symbolOfNode.put(ctx, function);
+                    at.symbolOfNode.put(ctx, function);
                 }
                 //如果是与类名相同的方法，并且没有参数，那么就是缺省构造方法
                 else if (ctx.expressionList() == null){
-                    cr.symbolOfNode.put(ctx, theClass); // TODO 直接赋予class
+                    at.symbolOfNode.put(ctx, theClass); // TODO 直接赋予class
                 }
                 else{
-                    cr.log("unknown class constructor: " + ctx.getText(), ctx);
+                    at.log("unknown class constructor: " + ctx.getText(), ctx);
                 }
 
-                cr.typeOfNode.put(ctx, theClass); // 这次函数调用是返回一个对象
+                at.typeOfNode.put(ctx, theClass); // 这次函数调用是返回一个对象
             }
 
             //看看是不是一个函数型的变量
             else{
-                Variable variable = cr.lookupVariable(scope, idName);
+                Variable variable = at.lookupVariable(scope, idName);
                 if (variable != null && variable.type instanceof FunctionType){
-                    cr.symbolOfNode.put(ctx, variable);
-                    cr.typeOfNode.put(ctx, variable.type);
+                    at.symbolOfNode.put(ctx, variable);
+                    at.typeOfNode.put(ctx, variable.type);
                 }
                 else {
-                    cr.log("unknown function or function variable: " + ctx.getText(), ctx);
+                    at.log("unknown function or function variable: " + ctx.getText(), ctx);
                 }
             }
 
@@ -171,48 +171,48 @@ public class RefResolver extends PlayScriptBaseListener {
 
         if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.DOT) {
             // 这是个左递归，要不断的把左边的节点的计算结果存到node2Symbol，所以要在exitExpression里操作
-            Symbol symbol = cr.symbolOfNode.get(ctx.expression(0));
+            Symbol symbol = at.symbolOfNode.get(ctx.expression(0));
             if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                 Class theClass = (Class) ((Variable) symbol).type;
-                Scope classScope = cr.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
+                Scope classScope = at.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
 
                 //引用类的属性
                 if (ctx.IDENTIFIER() != null) {
                     String idName = ctx.IDENTIFIER().getText();
-                    Variable variable = cr.lookupVariable(classScope, idName);
+                    Variable variable = at.lookupVariable(classScope, idName);
                     if (variable != null) {
-                        cr.symbolOfNode.put(ctx, variable);
+                        at.symbolOfNode.put(ctx, variable);
                         type = variable.type;  //类型综合（冒泡)
                     } else {
-                        cr.log("unable to find field " + idName + " in Class " + theClass.name, ctx);
+                        at.log("unable to find field " + idName + " in Class " + theClass.name, ctx);
                     }
                 }
 
                 //引用类的方法
                 else if (ctx.functionCall() != null){
-                    type = cr.typeOfNode.get(ctx.functionCall());
+                    type = at.typeOfNode.get(ctx.functionCall());
                 }
 
             } else {
-                cr.log("symbol is not a qualified object：" + symbol, ctx);
+                at.log("symbol is not a qualified object：" + symbol, ctx);
             }
         }
 
         //变量引用冒泡： 如果下级是一个变量，往上冒泡传递，以便在点符号表达式中使用
         else if (ctx.primary() != null && ctx.primary().IDENTIFIER() != null) {
-            Symbol symbol = cr.symbolOfNode.get(ctx.primary());
-            cr.symbolOfNode.put(ctx, symbol);
+            Symbol symbol = at.symbolOfNode.get(ctx.primary());
+            at.symbolOfNode.put(ctx, symbol);
         }
 
 
         //类型推断和综合
         if (ctx.primary() != null) {
-            type = cr.typeOfNode.get(ctx.primary());
+            type = at.typeOfNode.get(ctx.primary());
         } else if (ctx.functionCall() != null) {
-            type = cr.typeOfNode.get(ctx.functionCall());
+            type = at.typeOfNode.get(ctx.functionCall());
         } else if (ctx.bop != null && ctx.expression().size() >= 2) {
-            Type type1 = cr.typeOfNode.get(ctx.expression(0));
-            Type type2 = cr.typeOfNode.get(ctx.expression(1));
+            Type type1 = at.typeOfNode.get(ctx.expression(0));
+            Type type2 = at.typeOfNode.get(ctx.expression(1));
 
             switch (ctx.bop.getType()) {
                 case PlayScriptParser.ADD:
@@ -223,7 +223,7 @@ public class RefResolver extends PlayScriptBaseListener {
                         //类型“向上”对齐，比如一个int和一个float，取float
                         type = PrimitiveType.getUpperType(type1,type2);
                     }else{
-                        cr.log("operand should be PrimitiveType for additive and multiplicative operation", ctx);
+                        at.log("operand should be PrimitiveType for additive and multiplicative operation", ctx);
                     }
 
                     break;
@@ -253,7 +253,7 @@ public class RefResolver extends PlayScriptBaseListener {
         }
 
         //类型冒泡
-        cr.typeOfNode.put(ctx, type);
+        at.typeOfNode.put(ctx, type);
 
     }
 
@@ -262,7 +262,7 @@ public class RefResolver extends PlayScriptBaseListener {
     @Override
     public void exitVariableInitializer(VariableInitializerContext ctx) {
         if (ctx.expression() != null){
-            cr.typeOfNode.put(ctx, cr.typeOfNode.get(ctx.expression()));
+            at.typeOfNode.put(ctx, at.typeOfNode.get(ctx.expression()));
         }
     }
 
@@ -270,17 +270,17 @@ public class RefResolver extends PlayScriptBaseListener {
     @Override
     public void exitLiteral(LiteralContext ctx) {
         if (ctx.BOOL_LITERAL() != null) {
-            cr.typeOfNode.put(ctx, PrimitiveType.Boolean);
+            at.typeOfNode.put(ctx, PrimitiveType.Boolean);
         } else if (ctx.CHAR_LITERAL() != null) {
-            cr.typeOfNode.put(ctx, PrimitiveType.Char);
+            at.typeOfNode.put(ctx, PrimitiveType.Char);
         } else if (ctx.NULL_LITERAL() != null) {
-            cr.typeOfNode.put(ctx, PrimitiveType.Null);
+            at.typeOfNode.put(ctx, PrimitiveType.Null);
         } else if (ctx.STRING_LITERAL() != null) {
-            cr.typeOfNode.put(ctx, PrimitiveType.String);
+            at.typeOfNode.put(ctx, PrimitiveType.String);
         } else if (ctx.integerLiteral() != null) {
-            cr.typeOfNode.put(ctx, PrimitiveType.Integer);
+            at.typeOfNode.put(ctx, PrimitiveType.Integer);
         } else if (ctx.floatLiteral() != null) {
-            cr.typeOfNode.put(ctx, PrimitiveType.Float);
+            at.typeOfNode.put(ctx, PrimitiveType.Float);
         }
 
     }

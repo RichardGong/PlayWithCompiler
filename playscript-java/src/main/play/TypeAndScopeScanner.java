@@ -10,16 +10,16 @@ import java.util.Stack;
  */
 public class TypeAndScopeScanner extends PlayScriptBaseListener {
 
-    private AnnotatedTree cr = null;
+    private AnnotatedTree at = null;
 
     private Stack<Scope> scopeStack = new Stack<Scope>();
 
-    public TypeAndScopeScanner(AnnotatedTree cr) {
-        this.cr = cr;
+    public TypeAndScopeScanner(AnnotatedTree at) {
+        this.at = at;
     }
 
     private Scope pushScope(Scope scope, ParserRuleContext ctx) {
-        cr.node2Scope.put(ctx, scope);
+        at.node2Scope.put(ctx, scope);
         scope.ctx = ctx;
 
         scopeStack.push(scope);
@@ -43,7 +43,7 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
     @Override
     public void enterProg(ProgContext ctx) {
         BlockScope scope = new BlockScope(currentScope(), ctx);
-        cr.scopeTree = scope; //scope的根
+        at.scopeTree = scope; //scope的根
         pushScope(scope, ctx);
     }
 
@@ -87,9 +87,18 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
         String idName = ctx.IDENTIFIER().getText();
         Function function = new Function(idName, currentScope(), ctx);
 
-        cr.types.add(function);
+        at.types.add(function);
 
-        // TODO 需要查重
+        //函数查重
+        Scope scope = at.enclosingScopeOfNode(ctx);
+        for (Symbol symbol : scope.symbols){
+            if (symbol instanceof Function){
+                if (function.equals(symbol)){
+                    at.log("Function or method already Declared: " + ctx.getText(), ctx);
+                }
+            }
+        }
+
         currentScope().symbols.add(function);
 
         // 创建一个新的scope
@@ -108,10 +117,10 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
         String idName = ctx.IDENTIFIER().getText();
 
         Class theClass = new Class(idName, ctx);
-        cr.types.add(theClass);
+        at.types.add(theClass);
 
-        if (cr.lookupClass(currentScope(), idName) != null) {
-            cr.log("duplicate class name:" + idName, ctx); // 只是报警，但仍然继续解析
+        if (at.lookupClass(currentScope(), idName) != null) {
+            at.log("duplicate class name:" + idName, ctx); // 只是报警，但仍然继续解析
         }
 
         currentScope().symbols.add(theClass);
@@ -132,8 +141,8 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
     public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext ctx) {
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.getText();
-            Class theClass = cr.lookupClass(currentScope(), idName);
-            cr.typeOfNode.put(ctx, theClass);
+            Class theClass = at.lookupClass(currentScope(), idName);
+            at.typeOfNode.put(ctx, theClass);
         }
     }
 

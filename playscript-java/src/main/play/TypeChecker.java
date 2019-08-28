@@ -5,24 +5,29 @@ import play.PlayScriptParser.*;
 
 /**
  * 类型检查。
- * 主要检查表达式里的：(1)赋值；(2)变量初始化；(3)表达式里的一些运算，比如加减乘除。
+ * 主要检查:
+ * 1.赋值表达式；
+ * 2.变量初始化；
+ * 3.表达式里的一些运算，比如加减乘除，是否类型匹配；
+ * 4.返回值的类型；
+ *
  */
 
 public class TypeChecker extends PlayScriptBaseListener {
 
-    private AnnotatedTree cr = null;
+    private AnnotatedTree at = null;
 
-    public TypeChecker(AnnotatedTree cr) {
-        this.cr = cr;
+    public TypeChecker(AnnotatedTree at) {
+        this.at = at;
     }
 
 
     @Override
     public void exitVariableDeclarator(VariableDeclaratorContext ctx) {
         if (ctx.variableInitializer() != null){
-            Variable variable = (Variable) cr.symbolOfNode.get(ctx.variableDeclaratorId());
+            Variable variable = (Variable) at.symbolOfNode.get(ctx.variableDeclaratorId());
             Type type1 = variable.type;
-            Type type2 = cr.typeOfNode.get(ctx.variableDeclaratorId());
+            Type type2 = at.typeOfNode.get(ctx.variableDeclaratorId());
             checkAssign(type1,type2,ctx,ctx.variableDeclaratorId(),ctx.variableInitializer());
         }
     }
@@ -31,8 +36,8 @@ public class TypeChecker extends PlayScriptBaseListener {
     public void exitExpression(ExpressionContext ctx) {
         if (ctx.bop != null && ctx.expression().size() >= 2) {
 
-            Type type1 = cr.typeOfNode.get(ctx.expression(0));
-            Type type2 = cr.typeOfNode.get(ctx.expression(1));
+            Type type1 = at.typeOfNode.get(ctx.expression(0));
+            Type type2 = at.typeOfNode.get(ctx.expression(1));
 
             switch (ctx.bop.getType()) {
                 case PlayScriptParser.ADD:
@@ -77,11 +82,11 @@ public class TypeChecker extends PlayScriptBaseListener {
                 case PlayScriptParser.URSHIFT_ASSIGN:
                     if (PrimitiveType.isNumeric(type2)) {
                         if (!checkNumericAssign(type2, type1)) {
-                            cr.log("can not assign " + ctx.expression(1).getText() + " of type " + type2 + "to " + ctx.expression(0) + " of type " + type1, ctx);
+                            at.log("can not assign " + ctx.expression(1).getText() + " of type " + type2 + "to " + ctx.expression(0) + " of type " + type1, ctx);
                         }
                     }
                     else{
-                        cr.log("operand + " + ctx.expression(1).getText() + " should be numeric。", ctx );
+                        at.log("operand + " + ctx.expression(1).getText() + " should be numeric。", ctx );
                     }
 
                     break;
@@ -101,7 +106,7 @@ public class TypeChecker extends PlayScriptBaseListener {
      */
     private void checkAddOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
         if (!(PrimitiveType.isNumeric(type) || type == PrimitiveType.String)) {
-            cr.log("operand for add should be numeric or string: " + operand.getText(), exp);
+            at.log("operand for add should be numeric or string: " + operand.getText(), exp);
         }
     }
 
@@ -114,7 +119,7 @@ public class TypeChecker extends PlayScriptBaseListener {
      */
     private void checkNumericOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
         if (!(PrimitiveType.isNumeric(type))) {
-            cr.log("operand for should be numeric : " + operand.getText(), exp);
+            at.log("operand for should be numeric : " + operand.getText(), exp);
         }
     }
 
@@ -127,7 +132,7 @@ public class TypeChecker extends PlayScriptBaseListener {
      */
     private void checkBooleanOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
         if (!(type == PrimitiveType.Boolean)) {
-            cr.log("operand for should be boolean : " + operand.getText(), exp);
+            at.log("operand for should be boolean : " + operand.getText(), exp);
         }
     }
 
@@ -142,7 +147,7 @@ public class TypeChecker extends PlayScriptBaseListener {
     private void checkAssign(Type type1, Type type2,  ParserRuleContext ctx, ParserRuleContext operand1, ParserRuleContext operand2){
         if (PrimitiveType.isNumeric(type2)) {
             if (!checkNumericAssign(type2, type1)) {
-                cr.log("can not assign " + operand2.getText() + " of type " + type2 + "to " + operand1.getText() + " of type " + type1, ctx);
+                at.log("can not assign " + operand2.getText() + " of type " + type2 + "to " + operand1.getText() + " of type " + type1, ctx);
             }
         }
         else if (type2 instanceof Class){
@@ -195,8 +200,5 @@ public class TypeChecker extends PlayScriptBaseListener {
 
         return canAssign;
     }
-
-
-
 
 }

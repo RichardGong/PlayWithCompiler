@@ -8,20 +8,20 @@ import play.PlayScriptParser.*;
  */
 public class TypeResolver extends PlayScriptBaseListener {
 
-    private AnnotatedTree cr = null;
+    private AnnotatedTree at = null;
 
-    public TypeResolver(AnnotatedTree cr) {
-        this.cr = cr;
+    public TypeResolver(AnnotatedTree at) {
+        this.at = at;
     }
 
     //设置所声明的变量的类型
     @Override
     public void exitVariableDeclarators(VariableDeclaratorsContext ctx) {
         // 设置变量类型
-        Type type = (Type) cr.typeOfNode.get(ctx.typeType());
+        Type type = (Type) at.typeOfNode.get(ctx.typeType());
 
         for (VariableDeclaratorContext child : ctx.variableDeclarator()) {
-            Variable variable = (Variable) cr.symbolOfNode.get(child.variableDeclaratorId());
+            Variable variable = (Variable) at.symbolOfNode.get(child.variableDeclaratorId());
             variable.type = type;
         }
     }
@@ -30,53 +30,42 @@ public class TypeResolver extends PlayScriptBaseListener {
     @Override
     public void enterVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         String idName = ctx.IDENTIFIER().getText();
-        Scope scope = cr.enclosingScopeOfNode(ctx);
+        Scope scope = at.enclosingScopeOfNode(ctx);
         Variable variable = new Variable(idName, scope, ctx);
 
         if (scope instanceof BlockScope){
-            if (cr.checkDuplicateVariable(scope, idName)) {
-                cr.log("Variable already Declared: " + idName, ctx);
+            if (at.checkDuplicateVariable(scope, idName)) {
+                at.log("Variable already Declared: " + idName, ctx);
             }
         }
 
         scope.symbols.add(variable);
-        cr.symbolOfNode.put(ctx, variable);
+        at.symbolOfNode.put(ctx, variable);
     }
 
     //设置函数的返回值类型
     @Override
     public void exitFunctionDeclaration(FunctionDeclarationContext ctx) {
-        Function function = (Function) cr.node2Scope.get(ctx);
+        Function function = (Function) at.node2Scope.get(ctx);
         if (ctx.typeTypeOrVoid() != null) {
-            function.returnType = cr.typeOfNode.get(ctx.typeTypeOrVoid());
+            function.returnType = at.typeOfNode.get(ctx.typeTypeOrVoid());
         }
         else{
             //TODO 如果是类的构建函数，返回值应该是一个类吧？
 
         }
-
-        //函数查重
-        Scope scope = cr.enclosingScopeOfNode(ctx);
-        for (Symbol symbol : scope.symbols){
-            if (symbol instanceof Function){
-                if (function.equals(symbol)){
-                    cr.log("Function or method already Declared: " + ctx.getText(), ctx);
-                }
-            }
-        }
-
     }
 
     //设置函数的参数的类型，这些参数已经在enterVariableDeclaratorId中作为变量声明了，现在设置它们的类型
     @Override
     public void exitFormalParameter(FormalParameterContext ctx) {
         // 设置参数类型
-        Type type = cr.typeOfNode.get(ctx.typeType());
-        Variable variable = (Variable) cr.symbolOfNode.get(ctx.variableDeclaratorId());
+        Type type = at.typeOfNode.get(ctx.typeType());
+        Variable variable = (Variable) at.symbolOfNode.get(ctx.variableDeclaratorId());
         variable.type = (Type) type;
 
         // 添加到函数的参数列表里
-        Scope scope = cr.enclosingScopeOfNode(ctx);
+        Scope scope = at.enclosingScopeOfNode(ctx);
         if (scope instanceof Function) {    //TODO 从目前的语法来看，只有function才会使用FormalParameter
             ((Function) scope).parameters.add(variable);
         }
@@ -85,17 +74,17 @@ public class TypeResolver extends PlayScriptBaseListener {
     //设置类的父类
     @Override
     public void enterClassDeclaration(ClassDeclarationContext ctx) {
-        Class theClass = (Class) cr.node2Scope.get(ctx);
+        Class theClass = (Class) at.node2Scope.get(ctx);
 
         //设置父类
         if (ctx.EXTENDS() != null){
             String parentClassName = ctx.typeType().getText();
-            Type type = cr.lookupType(parentClassName);
+            Type type = at.lookupType(parentClassName);
             if (type != null && type instanceof Class){
                 theClass.setParentClass ( (Class)type);
             }
             else{
-                cr.log("unknown class: " + parentClassName, ctx);
+                at.log("unknown class: " + parentClassName, ctx);
             }
         }
 
@@ -105,9 +94,9 @@ public class TypeResolver extends PlayScriptBaseListener {
     @Override
     public void exitTypeTypeOrVoid(TypeTypeOrVoidContext ctx) {
         if (ctx.VOID() != null) {
-            cr.typeOfNode.put(ctx, VoidType.voidType);
+            at.typeOfNode.put(ctx, VoidType.voidType);
         } else if (ctx.typeType() != null) {
-            cr.typeOfNode.put(ctx, (Type) cr.typeOfNode.get(ctx.typeType()));
+            at.typeOfNode.put(ctx, (Type) at.typeOfNode.get(ctx.typeType()));
         }
     }
 
@@ -116,14 +105,14 @@ public class TypeResolver extends PlayScriptBaseListener {
     public void exitTypeType(TypeTypeContext ctx) {
         // 冒泡，将下级的属性标注在本级
         if (ctx.classOrInterfaceType() != null) {
-            Type type = (Type) cr.typeOfNode.get(ctx.classOrInterfaceType());
-            cr.typeOfNode.put(ctx, type);
+            Type type = (Type) at.typeOfNode.get(ctx.classOrInterfaceType());
+            at.typeOfNode.put(ctx, type);
         } else if (ctx.functionType() != null) {
-            Type type = (Type) cr.typeOfNode.get(ctx.functionType());
-            cr.typeOfNode.put(ctx, type);
+            Type type = (Type) at.typeOfNode.get(ctx.functionType());
+            at.typeOfNode.put(ctx, type);
         } else if (ctx.primitiveType() != null) {
-            Type type = (Type) cr.typeOfNode.get(ctx.primitiveType());
-            cr.typeOfNode.put(ctx, type);
+            Type type = (Type) at.typeOfNode.get(ctx.primitiveType());
+            at.typeOfNode.put(ctx, type);
         }
 
     }
@@ -131,27 +120,27 @@ public class TypeResolver extends PlayScriptBaseListener {
     @Override
     public void enterClassOrInterfaceType(ClassOrInterfaceTypeContext ctx) {
         if (ctx.IDENTIFIER() != null) {
-            Scope scope = cr.enclosingScopeOfNode(ctx);
+            Scope scope = at.enclosingScopeOfNode(ctx);
             String idName = ctx.getText();
-            Class theClass = cr.lookupClass(scope, idName);
-            cr.typeOfNode.put(ctx, theClass);
+            Class theClass = at.lookupClass(scope, idName);
+            at.typeOfNode.put(ctx, theClass);
         }
     }
 
     @Override
     public void exitFunctionType(FunctionTypeContext ctx) {
         DefaultFunctionType functionType = new DefaultFunctionType();
-        cr.types.add(functionType);
+        at.types.add(functionType);
 
-        cr.typeOfNode.put(ctx, functionType);
+        at.typeOfNode.put(ctx, functionType);
 
-        functionType.returnType = (Type) cr.typeOfNode.get(ctx.typeTypeOrVoid());
+        functionType.returnType = (Type) at.typeOfNode.get(ctx.typeTypeOrVoid());
 
         // 参数的类型
         if (ctx.typeList() != null) {
             TypeListContext tcl = (TypeListContext) ctx.typeList();
             for (TypeTypeContext ttc : tcl.typeType()) {
-                Type type = (Type) cr.typeOfNode.get(ttc);
+                Type type = (Type) at.typeOfNode.get(ttc);
                 functionType.paramTypes.add(type);
             }
         }
@@ -178,7 +167,7 @@ public class TypeResolver extends PlayScriptBaseListener {
             type = PrimitiveType.Char;
         }
 
-        cr.typeOfNode.put(ctx, type);
+        at.typeOfNode.put(ctx, type);
     }
 
 

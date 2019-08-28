@@ -1,10 +1,8 @@
 package play;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
@@ -196,6 +194,30 @@ public class AnnotatedTree {
 
         return rtn;
     }
+
+
+    /**
+     * 输出本Scope中的内容，包括每个变量的名称、类型。
+     * @return 树状显示的字符串
+     */
+    public String getScopeTreeString(){
+        StringBuffer sb = new StringBuffer();
+        scopeToString(sb, scopeTree, "");
+        return sb.toString();
+    }
+
+    private void scopeToString(StringBuffer sb, Scope scope, String indent){
+        sb.append(indent).append(scope).append('\n');
+        for (Symbol symbol : scope.symbols){
+            if (symbol instanceof Scope){
+                scopeToString(sb, (Scope)symbol, indent+"\t");
+            }
+            else{
+                sb.append(indent).append("\t").append(symbol).append('\n');
+            }
+        }
+    }
+
 
 
 }

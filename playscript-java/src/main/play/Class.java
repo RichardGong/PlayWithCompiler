@@ -19,4 +19,10 @@ public class Class extends Scope implements Type{
     protected void setParentClass(Class theClass){
         enclosingScope = theClass;
     }
+
+
+    @Override
+    public String toString(){
+        return "Class " + name;
+    }
 }
