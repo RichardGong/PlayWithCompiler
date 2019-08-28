@@ -1,0 +1,10 @@
+/**
+测试各种表达式功能
+*/
+
+println(2+3*5);
+
+int a = 10;
+int b = 2;
+println(a + b*b);
+

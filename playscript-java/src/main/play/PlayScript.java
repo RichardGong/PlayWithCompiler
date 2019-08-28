@@ -16,7 +16,7 @@ public class PlayScript {
         //String script = "int age = 44; { int i = 10; age+i;}";
         //String script = "int age = 44; for(int i = 0;i<10;i++) { age = age + 2;} int i = 8;";
         //String script = "int b= 10; int myfunc(int a) {return a+b+3;} myfunc(2);";
-        String script = "class myclass{int a=2; int b; myclass(){ b = 3;} }  myclass c = myclass(); c.b;";
+        //String script = "class myclass{int a=2; int b; myclass(){ b = 3;} }  myclass c = myclass(); c.b;";
         //String script = "class class1{int a=2; int b; void method1(){println(\"in class1\");}} class class2 extends class1{int b = 5; void method1(){println(\"in class2\");} } class1 c = class2(); println(c.a); println(c.b); c.method1();";
         //String script = "class myclass{int a; int b; myclass(){a=1; b=2;} int calc(){return a + b;} } myclass c = myclass(); c.calc();";
         //String script = "println(2);";
@@ -31,7 +31,7 @@ public class PlayScript {
         //源代码文件
         String scriptFile = null;
 
-        //String script = null;
+        String script = null;
 
         //输出文件
         String outputFile = null;
@@ -175,6 +175,13 @@ public class PlayScript {
                 scriptText = "";
             } 
         }
+    }
+
+    /**
+     * 批量运行所有的示例程序，每个示例程序执行完毕以后，需要按一个键，再继续执行下一个程序。
+     */
+    private static void batchTest(){
+
     }
 
 
