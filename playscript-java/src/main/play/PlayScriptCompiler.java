@@ -5,7 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 /**
- * 把词法分析、语法分析、语义分析和解释执行封装在一起。
+ * 把词法分析、语法分析、语义分析和解释执行简单地封装在一起。
  */
 public class PlayScriptCompiler {
 
@@ -25,7 +25,7 @@ public class PlayScriptCompiler {
 
         //语义分析
         ParseTreeWalker walker = new ParseTreeWalker();
-        
+
         //多步的语义解析。
         //优点：1.代码更清晰；2.允许使用在声明之前，这在支持面向对象、递归函数等特征时是必须的。
         //pass1：类型和Scope

@@ -3,24 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="52a58941-678e-4b9c-8e57-d0430b58768d" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/.vscode/settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/../playscript-cpp/.vscode/settings.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/examples/scratch.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/scratch.play" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/AsmGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/AsmGen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/AttributeEvaluator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/BlockScope.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/BlockScope.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/Class.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/Class.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/Function.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/Function.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/PlayScript.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/play/PlayScriptCompiler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/PlayScriptCompiler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/RefResolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/RefResolver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/Scope.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/Scope.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/play/SematicValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/SematicValidator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/TypeAndScopeScanner.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/TypeAndScopeScanner.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/TypeChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/TypeChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/TypeResolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/TypeResolver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/Variable.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/Variable.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/VoidType.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/VoidType.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -51,13 +38,54 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="244">
-              <caret line="1020" selection-start-line="1020" selection-end-line="1020" />
+            <state relative-caret-position="135">
+              <caret line="9" column="44" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
               <folding>
-                <element signature="e#2549#2550#0" expanded="true" />
-                <element signature="e#2577#2578#0" expanded="true" />
-                <element signature="e#4141#4142#0" expanded="true" />
-                <element signature="e#4205#4206#0" expanded="true" />
+                <element signature="imports" expanded="true" />
+                <element signature="e#376#377#0" expanded="true" />
+                <element signature="e#404#405#0" expanded="true" />
+                <element signature="e#1840#1841#0" expanded="true" />
+                <element signature="e#1904#1905#0" expanded="true" />
+                <element signature="e#1968#1969#0" expanded="true" />
+                <element signature="e#2032#2033#0" expanded="true" />
+                <element signature="e#2091#2092#0" expanded="true" />
+                <element signature="e#2130#2131#0" expanded="true" />
+                <element signature="e#2184#2185#0" expanded="true" />
+                <element signature="e#2264#2265#0" expanded="true" />
+                <element signature="e#2331#2332#0" expanded="true" />
+                <element signature="e#2376#2377#0" expanded="true" />
+                <element signature="e#12833#12834#0" expanded="true" />
+                <element signature="e#12890#12891#0" expanded="true" />
+                <element signature="e#22010#22011#0" expanded="true" />
+                <element signature="e#22061#22062#0" expanded="true" />
+                <element signature="e#22141#22142#0" expanded="true" />
+                <element signature="e#22197#22198#0" expanded="true" />
+                <element signature="e#28835#28836#0" expanded="true" />
+                <element signature="e#28885#28886#0" expanded="true" />
+                <element signature="e#29129#29130#0" expanded="true" />
+                <element signature="e#29179#29180#0" expanded="true" />
+                <element signature="e#29249#29250#0" expanded="true" />
+                <element signature="e#29311#29312#0" expanded="true" />
+                <element signature="e#31557#31558#0" expanded="true" />
+                <element signature="e#31611#31612#0" expanded="true" />
+                <element signature="e#31847#31848#0" expanded="true" />
+                <element signature="e#31902#31903#0" expanded="true" />
+                <element signature="e#36859#36860#0" expanded="true" />
+                <element signature="e#36911#36912#0" expanded="true" />
+                <element signature="e#36999#37000#0" expanded="true" />
+                <element signature="e#37055#37056#0" expanded="true" />
+                <element signature="e#37137#37138#0" expanded="true" />
+                <element signature="e#37190#37191#0" expanded="true" />
+                <element signature="e#38344#38345#0" expanded="true" />
+                <element signature="e#38399#38400#0" expanded="true" />
+                <element signature="e#38626#38627#0" expanded="true" />
+                <element signature="e#38672#38673#0" expanded="true" />
+                <element signature="e#38750#38751#0" expanded="true" />
+                <element signature="e#38801#38802#0" expanded="true" />
+                <element signature="e#38871#38872#0" expanded="true" />
+                <element signature="e#38918#38919#0" expanded="true" />
+                <element signature="e#39004#39005#0" expanded="true" />
+                <element signature="e#39059#39060#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -66,8 +94,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/play/PlayScriptCompiler.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="117">
-              <caret line="27" column="8" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
+            <state relative-caret-position="75">
+              <caret line="7" column="26" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
             </state>
           </provider>
         </entry>
@@ -85,7 +113,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/play/SematicValidator.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="150">
-              <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+              <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
             </state>
           </provider>
         </entry>
@@ -95,6 +123,18 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="598">
               <caret line="202" selection-start-line="202" selection-end-line="202" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/play/AnnotatedTree.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="180">
+              <caret line="12" column="16" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -178,11 +218,11 @@
         <option value="$PROJECT_DIR$/src/main/play/Function.java" />
         <option value="$PROJECT_DIR$/src/main/play/BlockScope.java" />
         <option value="$PROJECT_DIR$/src/main/play/Variable.java" />
-        <option value="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" />
         <option value="$PROJECT_DIR$/src/main/play/TypeChecker.java" />
-        <option value="$PROJECT_DIR$/src/main/play/SematicValidator.java" />
         <option value="$PROJECT_DIR$/src/examples/scratch.play" />
+        <option value="$PROJECT_DIR$/src/main/play/SematicValidator.java" />
         <option value="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" />
+        <option value="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" />
         <option value="$PROJECT_DIR$/src/main/play/PlayScriptCompiler.java" />
       </list>
     </option>
@@ -304,12 +344,12 @@
       <option name="presentableId" value="Default" />
       <updated>1566801294412</updated>
       <workItem from="1566801298328" duration="30398000" />
-      <workItem from="1566884581364" duration="39866000" />
+      <workItem from="1566884581364" duration="40683000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="70264000" />
+    <option name="totallyTimeSpent" value="71081000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -324,7 +364,7 @@
     <frame x="0" y="0" width="1280" height="800" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.678501" visible="true" weight="0.2358643" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.678501" visible="true" weight="0.2358643" />
       <window_info id="Structure" order="1" sideWeight="0.32149902" side_tool="true" weight="0.2358643" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
@@ -366,19 +406,19 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>233</line>
+          <line>194</line>
           <properties />
           <option name="timeStamp" value="6" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>436</line>
+          <line>397</line>
           <properties />
           <option name="timeStamp" value="10" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>866</line>
+          <line>827</line>
           <properties />
           <option name="timeStamp" value="12" />
         </line-breakpoint>
@@ -390,49 +430,49 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>700</line>
+          <line>661</line>
           <properties />
           <option name="timeStamp" value="21" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>813</line>
+          <line>774</line>
           <properties />
           <option name="timeStamp" value="22" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>998</line>
+          <line>959</line>
           <properties />
           <option name="timeStamp" value="34" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>1002</line>
+          <line>963</line>
           <properties />
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>1053</line>
+          <line>1014</line>
           <properties />
           <option name="timeStamp" value="38" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>1055</line>
+          <line>1016</line>
           <properties />
           <option name="timeStamp" value="40" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>484</line>
+          <line>445</line>
           <properties />
           <option name="timeStamp" value="41" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java</url>
-          <line>976</line>
+          <line>937</line>
           <properties />
           <option name="timeStamp" value="42" />
         </line-breakpoint>
@@ -719,17 +759,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/play/AnnotatedTree.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="220" selection-start-line="220" selection-end-line="220" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#754#779#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/Variable.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="345">
@@ -762,13 +791,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/play/SematicValidator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/examples/scratch.play">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="120">
@@ -776,23 +798,81 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/play/SematicValidator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="244">
-          <caret line="1020" selection-start-line="1020" selection-end-line="1020" />
+        <state relative-caret-position="135">
+          <caret line="9" column="44" selection-start-line="9" selection-start-column="44" selection-end-line="9" selection-end-column="44" />
           <folding>
-            <element signature="e#2549#2550#0" expanded="true" />
-            <element signature="e#2577#2578#0" expanded="true" />
-            <element signature="e#4141#4142#0" expanded="true" />
-            <element signature="e#4205#4206#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#376#377#0" expanded="true" />
+            <element signature="e#404#405#0" expanded="true" />
+            <element signature="e#1840#1841#0" expanded="true" />
+            <element signature="e#1904#1905#0" expanded="true" />
+            <element signature="e#1968#1969#0" expanded="true" />
+            <element signature="e#2032#2033#0" expanded="true" />
+            <element signature="e#2091#2092#0" expanded="true" />
+            <element signature="e#2130#2131#0" expanded="true" />
+            <element signature="e#2184#2185#0" expanded="true" />
+            <element signature="e#2264#2265#0" expanded="true" />
+            <element signature="e#2331#2332#0" expanded="true" />
+            <element signature="e#2376#2377#0" expanded="true" />
+            <element signature="e#12833#12834#0" expanded="true" />
+            <element signature="e#12890#12891#0" expanded="true" />
+            <element signature="e#22010#22011#0" expanded="true" />
+            <element signature="e#22061#22062#0" expanded="true" />
+            <element signature="e#22141#22142#0" expanded="true" />
+            <element signature="e#22197#22198#0" expanded="true" />
+            <element signature="e#28835#28836#0" expanded="true" />
+            <element signature="e#28885#28886#0" expanded="true" />
+            <element signature="e#29129#29130#0" expanded="true" />
+            <element signature="e#29179#29180#0" expanded="true" />
+            <element signature="e#29249#29250#0" expanded="true" />
+            <element signature="e#29311#29312#0" expanded="true" />
+            <element signature="e#31557#31558#0" expanded="true" />
+            <element signature="e#31611#31612#0" expanded="true" />
+            <element signature="e#31847#31848#0" expanded="true" />
+            <element signature="e#31902#31903#0" expanded="true" />
+            <element signature="e#36859#36860#0" expanded="true" />
+            <element signature="e#36911#36912#0" expanded="true" />
+            <element signature="e#36999#37000#0" expanded="true" />
+            <element signature="e#37055#37056#0" expanded="true" />
+            <element signature="e#37137#37138#0" expanded="true" />
+            <element signature="e#37190#37191#0" expanded="true" />
+            <element signature="e#38344#38345#0" expanded="true" />
+            <element signature="e#38399#38400#0" expanded="true" />
+            <element signature="e#38626#38627#0" expanded="true" />
+            <element signature="e#38672#38673#0" expanded="true" />
+            <element signature="e#38750#38751#0" expanded="true" />
+            <element signature="e#38801#38802#0" expanded="true" />
+            <element signature="e#38871#38872#0" expanded="true" />
+            <element signature="e#38918#38919#0" expanded="true" />
+            <element signature="e#39004#39005#0" expanded="true" />
+            <element signature="e#39059#39060#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/play/AnnotatedTree.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="12" column="16" selection-start-line="12" selection-start-column="16" selection-end-line="12" selection-end-column="16" />
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/PlayScriptCompiler.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="117">
-          <caret line="27" column="8" selection-start-line="27" selection-start-column="8" selection-end-line="27" selection-end-column="8" />
+        <state relative-caret-position="75">
+          <caret line="7" column="26" selection-start-line="7" selection-start-column="26" selection-end-line="7" selection-end-column="26" />
         </state>
       </provider>
     </entry>

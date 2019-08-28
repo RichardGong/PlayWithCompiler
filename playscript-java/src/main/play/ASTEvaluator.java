@@ -4,50 +4,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
-import play.PlayScriptParser.BlockContext;
-import play.PlayScriptParser.BlockStatementContext;
-import play.PlayScriptParser.BlockStatementsContext;
-import play.PlayScriptParser.ClassBodyContext;
-import play.PlayScriptParser.ClassBodyDeclarationContext;
-import play.PlayScriptParser.ClassDeclarationContext;
-import play.PlayScriptParser.ConstructorDeclarationContext;
-import play.PlayScriptParser.CreatorContext;
-import play.PlayScriptParser.EnhancedForControlContext;
-import play.PlayScriptParser.ExpressionContext;
-import play.PlayScriptParser.ExpressionListContext;
-import play.PlayScriptParser.FieldDeclarationContext;
-import play.PlayScriptParser.FloatLiteralContext;
-import play.PlayScriptParser.ForControlContext;
-import play.PlayScriptParser.ForInitContext;
-import play.PlayScriptParser.FormalParameterContext;
-import play.PlayScriptParser.FormalParameterListContext;
-import play.PlayScriptParser.FormalParametersContext;
-import play.PlayScriptParser.IntegerLiteralContext;
-import play.PlayScriptParser.LiteralContext;
-import play.PlayScriptParser.MemberDeclarationContext;
-import play.PlayScriptParser.FunctionBodyContext;
-import play.PlayScriptParser.FunctionCallContext;
-import play.PlayScriptParser.FunctionDeclarationContext;
-import play.PlayScriptParser.ParExpressionContext;
-import play.PlayScriptParser.PrimaryContext;
-import play.PlayScriptParser.PrimitiveTypeContext;
-import play.PlayScriptParser.ProgContext;
-import play.PlayScriptParser.QualifiedNameContext;
-import play.PlayScriptParser.QualifiedNameListContext;
-import play.PlayScriptParser.StatementContext;
-import play.PlayScriptParser.SuperSuffixContext;
-import play.PlayScriptParser.SwitchBlockStatementGroupContext;
-import play.PlayScriptParser.SwitchLabelContext;
-import play.PlayScriptParser.TypeArgumentContext;
-import play.PlayScriptParser.TypeListContext;
-import play.PlayScriptParser.TypeTypeContext;
-import play.PlayScriptParser.TypeTypeOrVoidContext;
-import play.PlayScriptParser.VariableDeclaratorContext;
-import play.PlayScriptParser.VariableDeclaratorIdContext;
-import play.PlayScriptParser.VariableDeclaratorsContext;
-import play.PlayScriptParser.VariableInitializerContext;
-import play.PlayScriptParser.VariableModifierContext;
+import play.PlayScriptParser.*;
 
+/**
+ * AST解释器。利用语义信息(AnnotatedTree)，在AST上解释执行脚本。
+ */
 public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     // 之前的编译结果
