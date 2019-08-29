@@ -1,80 +1,21 @@
 /**
-做了一个简单的链表，并演示了高阶函数的功能，比如在javascript中常用的map功能，
-它能根据遍历列表中的每个元素，执行一个函数，并返回一个新的列表。给它传不同的函数，会返回不同的列表。
+测试各种表达式功能。
 */
 
-//链表的节点
-class ListNode{
-    int value;
-    ListNode next;
+//纯字面量计算
+println(2+3*5);
 
-    ListNode (int v){
-        value = v;
-    }
-}
+//表达式中使用变量
+int a = 10;
+int b = 2;
+println(a + b*b);
 
-//链表
-class LinkedList{
-    ListNode start;
-    ListNode end;
+//关系运算
+println("a == b : " + (a == b));
+println("a > b : " + (a > b));
 
-    //在外部添加新节点
-    void add(int value){
-        ListNode node = ListNode(value);
-        if (start == null){
-            start = node;
-            end = node;
-        }
-        else{
-            end.next = node;
-            end = node;
-        }
-    }
+//逻辑运算
+boolean c = a == b;
+println("c || true || a>b : " + (c || true || a>b));
 
-    //打印所有节点内容
-    void dump(){
-        ListNode node = start;
-        while (node != null){
-            println(node.value);
-            node = node.next;
-        }
-    }
-
-    //高阶函数功能，参数是一个函数，对每个成员做一个计算，形成一个新的LinkedList
-    LinkedList map(function int(int) fun){
-        ListNode node = start;
-        LinkedList newList = LinkedList();
-        while (node != null){
-            int newValue = fun(node.value);
-            newList.add(newValue);
-            node = node.next;
-        }
-        return newList;
-    }
-}
-
-int square(int value){
-    return value * value;
-}
-
-int addOne(int value){
-    return value + 1;
-}
-
-LinkedList list = LinkedList();
-list.add(2);
-list.add(3);
-list.add(5);
-
-println("original list:");
-list.dump();
-
-println();
-println("add 1 to each element:");
-LinkedList list2 = list.map(addOne);
-list2.dump();
-
-println();
-println("square of each element:");
-LinkedList list3 = list.map(square);
-list3.dump();
+boolean d = !c;

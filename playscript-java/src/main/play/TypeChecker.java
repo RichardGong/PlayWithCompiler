@@ -41,8 +41,11 @@ public class TypeChecker extends PlayScriptBaseListener {
 
             switch (ctx.bop.getType()) {
                 case PlayScriptParser.ADD:
-                    checkAddOperand(type1, ctx, ctx.expression(0));
-                    checkAddOperand(type2, ctx, ctx.expression(1));
+                    //字符串能够跟任何对象做 + 运算
+                    if (type1 != PrimitiveType.String && type2 != PrimitiveType.String){
+                        checkNumericOperand(type1, ctx, ctx.expression(0));
+                        checkNumericOperand(type2, ctx, ctx.expression(1));
+                    }
                     break;
                 case PlayScriptParser.SUB:
                 case PlayScriptParser.MUL:
@@ -94,21 +97,23 @@ public class TypeChecker extends PlayScriptBaseListener {
         }
 
 
+        //TODO 对各种一元运算做类型检查，比如NOT操作
+
     }
 
 
-    /**
-     * 检查加法的操作数。允许数值和字符串
-     *
-     * @param type
-     * @param exp
-     * @param operand
-     */
-    private void checkAddOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
-        if (!(PrimitiveType.isNumeric(type) || type == PrimitiveType.String)) {
-            at.log("operand for add should be numeric or string: " + operand.getText(), exp);
-        }
-    }
+//    /**
+//     * 检查加法的操作数。允许数值和字符串
+//     *
+//     * @param type
+//     * @param exp
+//     * @param operand
+//     */
+//    private void checkAddOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
+//        if (!(PrimitiveType.isNumeric(type) || type == PrimitiveType.String)) {
+//            at.log("operand for add should be numeric or string: " + operand.getText(), exp);
+//        }
+//    }
 
     /**
      * 检查类型是不是数值型的。
@@ -119,7 +124,7 @@ public class TypeChecker extends PlayScriptBaseListener {
      */
     private void checkNumericOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
         if (!(PrimitiveType.isNumeric(type))) {
-            at.log("operand for should be numeric : " + operand.getText(), exp);
+            at.log("operand for arithmetic operation should be numeric : " + operand.getText(), exp);
         }
     }
 
@@ -132,7 +137,7 @@ public class TypeChecker extends PlayScriptBaseListener {
      */
     private void checkBooleanOperand(Type type, ExpressionContext exp, ExpressionContext operand) {
         if (!(type == PrimitiveType.Boolean)) {
-            at.log("operand for should be boolean : " + operand.getText(), exp);
+            at.log("operand for logical operation should be boolean : " + operand.getText(), exp);
         }
     }
 

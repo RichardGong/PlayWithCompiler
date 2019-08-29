@@ -191,6 +191,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         } else if (targetType == PrimitiveType.Short) {
             rtn = ((Number) obj1).shortValue() + ((Number) obj2).shortValue();
         }
+        else {
+            System.out.println("unsupported add operation");
+        }
 
         return rtn;
     }
@@ -626,9 +629,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     @Override
     public Object visitPrimary(PrimaryContext ctx) {
         Object rtn = null;
+        //字面量
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal());
-        } else if (ctx.IDENTIFIER() != null) {
+        }
+        //变量
+        else if (ctx.IDENTIFIER() != null) {
             Symbol symbol = at.symbolOfNode.get(ctx);
             if (symbol instanceof Variable) {
                 rtn = getLValue((Variable) symbol);
@@ -636,6 +642,10 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 FunctionObject obj = new FunctionObject((Function) symbol);
                 rtn = obj;
             }
+        }
+        //括号括起来的表达式
+        else if (ctx.expression() != null){
+            rtn = visitExpression(ctx.expression());
         }
         return rtn;
     }

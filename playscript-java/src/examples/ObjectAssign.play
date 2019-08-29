@@ -1,4 +1,6 @@
-//null;
+/**
+对象赋值、对象比较、null值的支持。
+*/
 
 class Mammal{
     void speak(){
@@ -29,10 +31,10 @@ Mammal c; //= b;
 
 c == null;
 
-//c = b;
+c = b;
 
-//c.speak();
+c.speak();
 
-//c == b;
+c == b;
 
 

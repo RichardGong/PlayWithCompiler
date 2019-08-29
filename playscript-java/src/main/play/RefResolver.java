@@ -235,6 +235,9 @@ public class RefResolver extends PlayScriptBaseListener {
                 case PlayScriptParser.LT:
                 case PlayScriptParser.GE:
                 case PlayScriptParser.GT:
+                case PlayScriptParser.AND:
+                case PlayScriptParser.OR:
+                case PlayScriptParser.BANG:
                     type = PrimitiveType.Boolean;
                     break;
                 case PlayScriptParser.ASSIGN:

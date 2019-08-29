@@ -1,3 +1,8 @@
+/**
+测试几种循环语句。
+包括对break的支持（只跳出一层循环)。
+*/
+
 //测试while循环
 println("while loop:");
 int i = 0;
