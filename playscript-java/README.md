@@ -32,6 +32,7 @@ play scratch.play
 * [regression.play](src/examples/regression.play) 递归函数功能。递归函数对语义分析有一定要求，要在函数定义完毕之前就能引用它。
 * [FirstClassFunction.play](src/examples/FirstClassFunction.play) 作为一等公民的函数，可以像数值一样给变量赋值，或者作为函数参数和返回值。
 * [UseBeforeDeclare.play](src/examples/UseBeforeDeclare.play) 对于各种自定义类型和类的成员，可以在声明之前就使用。语义分析时能正确的解析出来。
+* [ClassTest.play](src/examples/ClassTest.play) 面向对象的基本特性，包括构造函数、缺省构造函数、访问对象属性和方法。
 * [ObjectAssign.play](src/examples/ObjectAssign.play) 对象可以像基础类型一样赋值和比较，并且支持null。
 * [mammal.play](src/examples/mammal.play) 演示面向对象功能，比如继承和多态。
 * [LinkedList.play](src/examples/LinkedList.play) 实现了一个简单的链表，并且演示了高阶函数功能，有点像javascript的map函数。
