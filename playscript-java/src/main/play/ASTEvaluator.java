@@ -43,7 +43,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         PlayObject valueContainer = null;
         while (f != null) {
-            //if (f.contains(variable) || f.scope.symbols.contains(variable)) {
             if (f.scope.containsSymbol(variable)) {
                 valueContainer = f.object;
                 break;
