@@ -5,5 +5,6 @@ public enum TypeType{
     Integer,
     Long,
     Float,
-    Double
+    Double,
+    String
 }

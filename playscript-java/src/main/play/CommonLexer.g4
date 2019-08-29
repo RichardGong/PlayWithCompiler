@@ -93,6 +93,8 @@ WHILE:              'while';
 
 FUNCTION:           'function';
 
+STRING:             'string';   //added on 2019-08-29 by Richard Gong
+
 // Literals
 
 DECIMAL_LITERAL:    ('0' | [1-9] (Digits? | '_'+ Digits)) [lL]?;

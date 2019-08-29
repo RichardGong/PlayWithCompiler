@@ -16,7 +16,13 @@ println("a > b : " + (a > b));
 
 //逻辑运算
 boolean c = a == b;
-
 println("c || true || a>b : " + (c || true || a>b));
+println("!c : " + !c );
 
-c || true || a>b;
+//字符串类型
+string str1 = "Hello ";
+string str2 = "World!";
+println(str1 + str2);
+
+String str3 = null;   //可以赋值null
+str1 + str3;

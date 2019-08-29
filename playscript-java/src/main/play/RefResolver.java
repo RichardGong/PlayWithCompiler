@@ -218,6 +218,16 @@ public class RefResolver extends PlayScriptBaseListener {
 
             switch (ctx.bop.getType()) {
                 case PlayScriptParser.ADD:
+                    if (type1 == PrimitiveType.String || type2 == PrimitiveType.String){
+                        type = PrimitiveType.String;
+                    }
+                    else if (type1 instanceof PrimitiveType && type2 instanceof PrimitiveType){
+                        //类型“向上”对齐，比如一个int和一个float，取float
+                        type = PrimitiveType.getUpperType(type1,type2);
+                    }else{
+                        at.log("operand should be PrimitiveType for additive and multiplicative operation", ctx);
+                    }
+                    break;
                 case PlayScriptParser.SUB:
                 case PlayScriptParser.MUL:
                 case PlayScriptParser.DIV:

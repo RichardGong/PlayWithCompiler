@@ -340,6 +340,7 @@ primitiveType
     | LONG
     | FLOAT
     | DOUBLE
+    | STRING    //added on 2019-08-29 by Richard Gong
     ;
 
 creator

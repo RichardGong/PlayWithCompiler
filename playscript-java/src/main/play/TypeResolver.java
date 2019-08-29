@@ -172,6 +172,8 @@ public class TypeResolver extends PlayScriptBaseListener {
             type = PrimitiveType.Short;
         } else if (ctx.CHAR() != null) {
             type = PrimitiveType.Char;
+        }else if (ctx.STRING() != null) {
+            type = PrimitiveType.String;
         }
 
         at.typeOfNode.put(ctx, type);
