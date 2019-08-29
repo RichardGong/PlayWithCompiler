@@ -5,7 +5,7 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 * 静态类型：支持int、long、float、double等基础数据类型。
 * 支持函数，并且函数是一等公民，可以嵌套声明函数，支持闭包。 
 * 支持面向对象特性。  
-* Coming soon: 很快将添加一些测试用例，展示脚本的功能。
+* Coming soon: 很快将添加更多的脚本用例，展示playscript的功能。
 
 ### 构建和开发
 从代码库中克隆下代码以后，可以基于源代码构建一个项目。或者使用里面原来带的idea项目文件。后面我将提供Maven的项目文件。  
@@ -23,6 +23,18 @@ alias play='java play.PlayScript'
 这样，运行一个.play脚本的时候，可以很简单：  
 play scratch.play
 
+### examples目录中的示例脚本
+添加了一些示例脚本，来演示playscript的功能，大家可以玩一玩！    
+* [expressions.play](src/expressions.play) 各种表达式功能。
+* [BlockScope.play](src/BlockScope.play) 块作用域。
+* [loop.play](src/loop.play) for和while循环，以及break语句。
+* [function.play](src/function.play) 基本的函数功能。
+* [regression.play](src/regression.play) 递归函数功能。递归函数对语义分析有一定要求，要在函数定义完毕之前就能引用它。
+* [FirstClassFunction.play](src/FirstClassFunction.play) 作为一等公民的函数，可以像数值一样给变量赋值，或者作为函数参数和返回值。
+* [UseBeforeDeclare.play](src/UseBeforeDeclare.play) 对于各种自定义类型和类的成员，可以在声明之前就使用。语义分析时能正确的解析出来。
+* [ObjectAssign.play](src/ObjectAssign.play) 对象可以像基础类型一样赋值，并且支持null。
+* [mammal.play](src/mammal.play) 演示面向对象功能，比如继承和多态。
+* [LinkedList.play](src/LinkedList.play) 实现了一个简单的链表，并且演示了高阶函数功能，有点像javascript的map函数。
 
 ### 项目中主要的示例代码
 * [PlayScript.java](src/main/play/PlayScript.java) 程序入口。
