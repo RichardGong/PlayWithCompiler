@@ -1000,7 +1000,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 //从当前类逐级向上查找，找到正确的方法定义
                 Function overrided = theClass.getFunction(function.name, function.getParamTypes());
                 //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上
-                if (overrided != function) {
+                if (overrided != null && overrided != function) {
                     function = overrided;
                     functionCode = (FunctionDeclarationContext) function.ctx;
                 }

@@ -1,27 +1,65 @@
-/*
-函数作为一等公民。
-也就是函数可以数值，赋给别的变量。
-支持函数类型，即FunctionType。
+/**
+做一个简单的链表。
 */
 
-int foo(int a){
-    println("in foo, a = " + a);
-    return a;
+//链表的节点
+class ListNode{
+    int value;
+    ListNode next;
+
+    ListNode (int v){
+        value = v;
+    }
 }
 
-int bar (function int(int) fun){
-    int b = fun(6);
-    println("in bar, b = " + b);
-    return b;
+//链表
+class LinkedList{
+    ListNode start;
+    ListNode end;
+
+    //在外部添加新节点
+    void add(int value){
+        ListNode node = ListNode(value);
+        if (start == null){
+            start = node;
+            end = node;
+        }
+        else{
+            end.next = node;
+            end = node;
+        }
+    }
+
+    //打印所有节点内容
+    void dump(){
+        ListNode node = start;
+        while (node != null){
+            println(node.value);
+            node = node.next;
+        }
+    }
+
+    //高阶函数功能，参数是一个函数，对每个成员做一个计算，形成一个新的LinkedList
+    LinkedList map(function int(int) fun){
+        ListNode node = start;
+        LinkedList newList = LinkedList();
+        while (node != null){
+            int newValue = fun(node.value);
+            newList.add(newValue);
+            node = node.next;
+        }
+    }
 }
 
+int square(int value){
+    return value * value;
+}
 
-function int(int) a = foo;  //函数作为变量初始化值
-a(4);
+LinkedList list = LinkedList();
+list.add(2);
+list.add(3);
+list.add(5);
+list.dump();
 
-function int(int) b;        
-b = foo;                    //函数用于赋值语句
-b(5);
-
-bar(foo);                   //函数做为参数
-
+//LinkedList newList = list.map(square);
+//newList.dump();
