@@ -14,9 +14,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     // 之前的编译结果
     private AnnotatedTree at = null;
 
-    // 局部变量的栈
-    // private VMStack stack = new VMStack();
-
     // 堆，用于保存对象
     public ASTEvaluator(AnnotatedTree at) {
         this.at = at;
@@ -349,21 +346,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         // frame.parentFrame = stack.peek();
         pushStack(frame);
 
-        // // 添加ActivationRecord
-        // Scope scope = scopeTree.findDescendantByContext(ctx);
-        // if (scope != null) {
-        // ActivationRecord record = new ActivationRecord(scope);
-        // activationRecordStack.push(record);
-        // }
 
         Object rtn = visitBlockStatements(ctx.blockStatements());
 
         stack.pop();
 
-        // // 去掉ActivationRecord
-        // if (scope != null){
-        // activationRecordStack.pop();
-        // }
         return rtn;
     }
 
@@ -473,9 +460,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                         LValue lValue = new MyLValue(valueContainer, overloaded);
                         rtn = lValue;
                     } else if (ctx.functionCall() != null) {
-                        pushStack(new StackFrame(valueContainer));
-                        rtn = visitFunctionCall(ctx.functionCall());
-                        stack.pop();
+                        //要先计算方法的参数，才能加对象的StackFrame.
+                        rtn = methodCall(valueContainer, ctx.functionCall());
                     }
                 }
             } else {
@@ -781,7 +767,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 }
             }
 
-            // 去掉ActivationRecord
+            // 去掉StackFrame
             stack.pop();
         }
 
@@ -938,9 +924,78 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         Object rtn = null;
 
+        String functionName = ctx.IDENTIFIER().getText();  //这是调用时的名称，不一定是真正的函数名，还可能是函数尅性的变量名
+
+        //如果调用的是类的缺省构造函数，则直接创建对象并返回
+        Symbol symbol = at.symbolOfNode.get(ctx);
+        if (symbol instanceof Class) {
+            //类的缺省构造函数。没有一个具体函数跟它关联，只是指向了一个类。
+            return createAndInitClassObject((Class) symbol);  //返回新创建的对象
+        }
+        //硬编码的一些函数
+        else if(functionName.equals("println")){
+            // TODO 临时代码，用于打印输出
+            println(ctx);
+            return rtn;
+        }
+
+        //在上下文中查找出函数，并根据需要创建FunctionObject
+        FunctionObject functionObject = getFuntionObject(ctx);
+        Function function = functionObject.function;
+
+        //如果是对象的构造方法，则按照对象方法掉用去执行，并返回所创建出的对象。
+        if (function.enclosingScope instanceof Class) {
+            Class theClass = (Class) function.enclosingScope;
+
+            if (theClass.name.equals(function.name)) {
+                ClassObject newObject = createAndInitClassObject(theClass);  //先做缺省的初始化
+
+                methodCall(newObject, ctx);
+
+                return  newObject;  //返回新创建的对象。
+            }
+        }
+
+        //计算参数值
+        List<Object> paramValues = calcParamValues(ctx);
+
+        //执行函数调用
+        rtn = functionCall(functionObject, paramValues);
+
+        return rtn;
+    }
+
+    /**
+     * 计算某个函数调用时的参数值
+     * @param ctx
+     * @return
+     */
+    private List<Object> calcParamValues(FunctionCallContext ctx){
+        List<Object> paramValues = new LinkedList<Object>();
+        if (ctx.expressionList() != null) {
+            for (ExpressionContext exp : ctx.expressionList().expression()) {
+                Object value = visitExpression(exp);
+                if (value instanceof LValue) {
+                    value = ((LValue) value).getValue();
+                }
+                paramValues.add(value);
+            }
+        }
+        return paramValues;
+    }
+
+    /**
+     * 根据函数调用的上下文，返回一个FunctionObject。
+     * 对于函数类型的变量，这个functionObject是存在变量里的；
+     * 对于普通的函数调用，此时创建一个。
+     * @param ctx
+     * @return
+     */
+    private FunctionObject getFuntionObject(FunctionCallContext ctx){
+        if (ctx.IDENTIFIER() == null) return null;  //暂时不支持this和super
+
         Function function = null;
         FunctionObject functionObject = null;
-        String functionName = ctx.IDENTIFIER().getText();  //这是调用时的名称，不一定是真正的函数名，还可能是函数尅性的变量名
 
         Symbol symbol = at.symbolOfNode.get(ctx);
         //函数类型的变量
@@ -957,79 +1012,35 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         else if (symbol instanceof Function) {
             function = (Function) symbol;
         }
-        //类的构造函数
-        else if (symbol instanceof Class) {
-            //类的缺省构造函数。没有一个具体函数跟它关联，只是指向了一个类。
-            rtn = createAndInitClassObject((Class) symbol);
-            return rtn;
-        }
-        //硬编码的一些函数
-        else if(functionName.equals("println")){
-            // TODO 临时代码，用于打印输出
-            println(ctx);
-            return rtn;
-        }
         //报错
         else {
-            at.log("unable to find function " + functionName, ctx);
-            return rtn;
+            String functionName = ctx.IDENTIFIER().getText();  //这是调用时的名称，不一定是真正的函数名，还可能是函数类型的变量名
+            at.log("unable to find function or function variable " + functionName, ctx);
+            return null;
         }
 
-
-        FunctionDeclarationContext functionCode = (FunctionDeclarationContext) function.ctx;
-
-        StackFrame classFrame = null;
-
-        //看看是不是类的方法
-        ClassObject newObject = null;
-        if (function.enclosingScope instanceof Class) {
-            Class theClass = (Class) function.enclosingScope;
-            // 看看是不是类的构建函数。
-            if (theClass.name.equals(function.name)) {
-                newObject = createAndInitClassObject(theClass);  //先做缺省的初始化
-                classFrame = new StackFrame(newObject);
-                pushStack(classFrame);
-            }
-            //对普通的类函数，需要在运行时动态绑定
-            else {
-                //从栈中取出代表这个对象的栈桢  //TODO 注意，栈顶不一定就是对象实例，比如在类方法中嵌套调用方法的时候
-                ClassObject classObject = firstClassObjectInStack();
-                //获取类的定义
-                theClass = classObject.type;
-
-                //从当前类逐级向上查找，找到正确的方法定义
-                Function overrided = theClass.getFunction(function.name, function.getParamTypes());
-                //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上
-                if (overrided != null && overrided != function) {
-                    function = overrided;
-                    functionCode = (FunctionDeclarationContext) function.ctx;
-                }
-            }
-        }
-
-
-        // 计算实参的值，这要在之前的Scope计算完。
-        List<Object> paramValues = new LinkedList<Object>();
-        if (ctx.expressionList() != null) {
-            for (ExpressionContext exp : ctx.expressionList().expression()) {
-                Object value = visitExpression(exp);
-                if (value instanceof LValue) {
-                    value = ((LValue) value).getValue();
-                }
-                paramValues.add(value);
-            }
-        }
-
-        // 添加StackFrame
         if (functionObject == null) {
             functionObject = new FunctionObject(function);
         }
-        StackFrame functionFrame = new StackFrame(functionObject);
 
+        return functionObject;
+    }
+
+    /**
+     * 执行一个函数的方法体。需要先设置参数值，然后再执行代码。
+     * @param functionObject
+     * @param paramValues
+     * @return
+     */
+    private Object functionCall(FunctionObject functionObject, List<Object> paramValues){
+        Object rtn = null;
+
+        //添加函数的栈桢
+        StackFrame functionFrame = new StackFrame(functionObject);
         pushStack(functionFrame);
 
-
         // 给参数赋值，这些值进入functionFrame
+        FunctionDeclarationContext functionCode = (FunctionDeclarationContext) functionObject.function.ctx;
         if (functionCode.formalParameters().formalParameterList() != null) {
             for (int i = 0; i < functionCode.formalParameters().formalParameterList().formalParameter().size(); i++) {
                 FormalParameterContext param = functionCode.formalParameters().formalParameterList().formalParameter(i);
@@ -1041,24 +1052,61 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         // 调用函数（方法）体
         rtn = visitFunctionDeclaration(functionCode);
 
-        if (newObject != null) {
-            rtn = newObject;
-        }
+        // 弹出StackFrame
+        stack.pop(); //函数的栈桢
 
         //如果由一个return语句返回，真实返回值会被封装在一个ReturnObject里。
         if (rtn instanceof ReturnObject){
             rtn = ((ReturnObject)rtn).returnValue;
         }
 
-        // 弹出StackFrame
-        stack.pop(); //函数的栈桢
-
-        //当运行类的构建方法时，添加的类的栈桢
-        if (classFrame != null) {
-            stack.pop();
-        }
         return rtn;
     }
+
+
+
+    /**
+     * 对象方法调用。
+     * 要先计算完参数的值，然后再添加对象的StackFrame，然后再调用方法。
+     * @param classObject  实际调用时的对象。通过这个对象可以获得真实的类，支持多态。
+     * @param ctx
+     * @return
+     */
+    private Object methodCall(ClassObject classObject, FunctionCallContext ctx){
+        Object rtn = null;
+
+        //查找函数，并根据需要创建FunctionObject
+        FunctionObject funtionObject = getFuntionObject(ctx);
+        Function function = funtionObject.function;
+
+        //对普通的类方法，需要在运行时动态绑定
+        Class theClass = classObject.type;   //这是从对象获得的类型，是真实类型。可能是变量声明时的类型的子类
+        if (!theClass.name.equals(function.name)) {
+            //从当前类逐级向上查找，找到正确的方法定义
+            Function overrided = theClass.getFunction(function.name, function.getParamTypes());
+            //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上
+            if (overrided != null && overrided != function) {
+                function = overrided;
+                funtionObject.setFunction(function);
+            }
+        }
+
+        //计算参数值
+        List<Object> paramValues = calcParamValues(ctx);
+
+        //对象的frame要等到函数参数都计算完了才能添加。
+        StackFrame classFrame = new StackFrame(classObject);
+        pushStack(classFrame);
+
+        //执行函数
+        rtn = functionCall(funtionObject, paramValues);
+
+        //弹出栈桢
+        stack.pop();
+
+        return rtn;
+    }
+
 
     @Override
     public Object visitFunctionDeclaration(FunctionDeclarationContext ctx) {

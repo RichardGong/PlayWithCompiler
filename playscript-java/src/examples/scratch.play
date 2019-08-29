@@ -1,5 +1,6 @@
 /**
-做一个简单的链表。
+做了一个简单的链表，并演示了高阶函数的功能，比如在javascript中常用的map功能，
+它能根据遍历列表中的每个元素，执行一个函数，并返回一个新的列表。给它传不同的函数，会返回不同的列表。
 */
 
 //链表的节点
@@ -48,6 +49,7 @@ class LinkedList{
             newList.add(newValue);
             node = node.next;
         }
+        return newList;
     }
 }
 
@@ -55,11 +57,24 @@ int square(int value){
     return value * value;
 }
 
+int addOne(int value){
+    return value + 1;
+}
+
 LinkedList list = LinkedList();
 list.add(2);
 list.add(3);
 list.add(5);
+
+println("original list:");
 list.dump();
 
-//LinkedList newList = list.map(square);
-//newList.dump();
+println();
+println("add 1 to each element:");
+LinkedList list2 = list.map(addOne);
+list2.dump();
+
+println();
+println("square of each element:");
+LinkedList list3 = list.map(square);
+list3.dump();
