@@ -107,4 +107,36 @@ public class Class extends Scope implements Type{
         return rtn;
     }
 
+    /**
+     * 当自身是目标类型的子类型的时候，返回true;
+     * @param type 目标类型
+     * @return
+     */
+    @Override
+    public boolean isType(Type type){
+        if (this == type) return true; //shortcut
+
+        if (type instanceof Class){
+            return ((Class) type).isAncestor(this);
+        }
+        return false;
+    }
+
+    /**
+     * 本类型是不是另一个类型的祖先类型
+     * @param theClass
+     * @return
+     */
+    public boolean isAncestor(Class theClass){
+        if (theClass.getParentClass() != null) {
+            if (theClass.getParentClass()==this){
+                return true;
+            }
+            else{
+                return isAncestor(theClass.getParentClass());
+            }
+        }
+        return false;
+    }
+
 }

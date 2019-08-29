@@ -54,7 +54,6 @@ public abstract class Scope extends Symbol{
     protected static Function getFunction(Scope scope, String name, List<Type> paramTypes){
         Function rtn = null;
         for (Symbol s : scope.symbols) {
-            // typeType是可选的参数
             if (s instanceof Function && s.name.equals(name)) {
                 Function function = (Function) s;
 
@@ -67,7 +66,7 @@ public abstract class Scope extends Symbol{
                 for (int i = 0; i < paramTypes.size(); i++) {
                     Variable var = function.parameters.get(i);
                     Type type = paramTypes.get(i);
-                    if (var.type != type) {  //TODO 这里应该做类型兼容性测试，只要类型能够转换，或者是其子类都可以。
+                    if (!var.type.isType(type)) {
                         match = false;
                         break;
                     }

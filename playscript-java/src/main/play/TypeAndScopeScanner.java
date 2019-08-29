@@ -55,6 +55,9 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
     @Override
     public void enterBlock(BlockContext ctx) {
         BlockScope scope = new BlockScope(currentScope(), ctx);
+
+        currentScope().addSymbol(scope);
+
         pushScope(scope, ctx);
     }
 

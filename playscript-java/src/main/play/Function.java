@@ -38,57 +38,17 @@ public class Function extends Scope implements FunctionType {
         return paramTypes;
     }
 
-//    /**
-//     * 比较两个函数定义是否相等，需要作用域相同、名称相同、参数类型相同、返回值类型相同。
-//     * @param o
-//     * @return
-//     */
-//    @Override
-//    public boolean equals(Object o){
-//        if (o == null) return false;
-//
-//        if (o instanceof Function){
-//            Function function = (Function)o;
-//
-//            //scope
-//            if (function.enclosingScope != this.enclosingScope){
-//                return false;
-//            }
-//
-//            //函数名称
-//            if (!function.name.equals(name)){
-//                return false;
-//            }
-//
-//            //返回值
-//            if (!function.returnType.equals(this.returnType)){
-//                return false;
-//            }
-//
-//            //参数
-//            List<Type> paramTypes1 = this.getParamTypes();
-//            List<Type> paramTypes2 = function.getParamTypes();
-//            if (paramTypes1.size() != paramTypes2.size()){
-//                return false;
-//            }
-//
-//            for (int i = 0; i< paramTypes1.size(); i++){
-//                Type type1 = paramTypes1.get(i);
-//                Type type2 = paramTypes2.get(i);
-//                if (!type1.equals(type2)){
-//                    return false;
-//                }
-//            }
-//            return true;  //所有条件都满足
-//        }
-//        else{
-//            return false;
-//        }
-//    }
-
     @Override
     public String toString(){
         return "Function " + name;
+    }
+
+    @Override
+    public boolean isType(Type type){
+        if (type instanceof FunctionType){
+            return DefaultFunctionType.isType(this, (FunctionType)type);
+        }
+        return false;
     }
 
 }

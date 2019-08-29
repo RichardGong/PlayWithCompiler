@@ -101,7 +101,7 @@ public class TypeResolver extends PlayScriptBaseListener {
     @Override
     public void exitTypeTypeOrVoid(TypeTypeOrVoidContext ctx) {
         if (ctx.VOID() != null) {
-            at.typeOfNode.put(ctx, VoidType.voidType);
+            at.typeOfNode.put(ctx, VoidType.instance());
         } else if (ctx.typeType() != null) {
             at.typeOfNode.put(ctx, (Type) at.typeOfNode.get(ctx.typeType()));
         }

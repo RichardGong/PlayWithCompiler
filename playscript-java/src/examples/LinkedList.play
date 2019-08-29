@@ -5,7 +5,11 @@
 //链表的节点
 class ListNode{
     int value;
-    listNode next;
+    ListNode next;
+
+    ListNode (int v){
+        value = v;
+    }
 }
 
 //链表
@@ -36,7 +40,7 @@ class LinkedList{
     }
 
     //高阶函数功能，参数是一个函数，对每个成员做一个计算，形成一个新的LinkedList
-    LinkedList map(funtion int(int) fun){
+    LinkedList map(function int(int) fun){
         ListNode node = start;
         LinkedList newList = LinkedList();
         while (node != null){

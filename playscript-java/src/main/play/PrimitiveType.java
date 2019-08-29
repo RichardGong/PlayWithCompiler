@@ -1,6 +1,6 @@
 package play;
 
-public class PrimitiveType implements Type {
+public final class PrimitiveType implements Type {
 
     private String name = null;
 
@@ -82,6 +82,11 @@ public class PrimitiveType implements Type {
         } else {
             return false;
         }
+    }
+
+    @Override
+    public boolean isType(Type type){
+        return this == type;
     }
 
 }
