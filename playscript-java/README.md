@@ -13,9 +13,10 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 在idea项目中，我设置了一个PlayScript scratch任务，可以解析执行examples目录中的scratch.play文件。你可以在这个文件里随意写一些脚本，并编译执行，或者跟踪调试。
 
 ### 运行playscript
-* 设置好本机的java环境。
+在运行之前：
+* 要设置好本机的java环境；
 * 设置好CLASSPATH,让java能够找到play包中的类。
-* 命令行工具
+命令行工具 java play.PlayScript     
 usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]  
 	-h or --help : print this help information  
 	-v verbose mode : dump AST and symbols   
@@ -24,7 +25,7 @@ usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] 
 	-S : compile to assembly code   
 	scriptfile : file contains playscript code   
 
-examples:   
+举例:   
 >java play.PlayScript    
 >这将启动一个REPL界面，在里面输入脚本，并解释执行。   
 
@@ -37,7 +38,7 @@ examples:
 >java play.PlayScript -v scratch.play   
 >编译和执行scratch.play脚本，并输出AST和符号表   
 
-* 设置你的bash命令，可以使用起来更方便，比如，我在.bash_profile文件中添加了：    
+设置你的bash命令，可以使用起来更方便，比如，我在.bash_profile文件中添加了：    
 >alias play='java play.PlayScript'   
 这样，运行一个.play脚本的时候，可以很简单：  
 >play scratch.play
