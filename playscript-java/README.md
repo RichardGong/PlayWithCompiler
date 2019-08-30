@@ -25,22 +25,22 @@ usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] 
 	scriptfile : file contains playscript code   
 
 examples:   
-	java play.PlayScript    
-	>>这将启动一个REPL界面，在里面输入脚本，并解释执行。   
+>java play.PlayScript    
+>这将启动一个REPL界面，在里面输入脚本，并解释执行。   
 
-	java play.PlayScript -v   
-	>>REPL模式，并打印AST和符号表   
+>java play.PlayScript -v   
+>REPL模式，并打印AST和符号表   
 
-	java play.PlayScript scratch.play   
-	>>编译和执行scratch.play脚本   
+>java play.PlayScript scratch.play   
+>编译和执行scratch.play脚本   
 
-	java play.PlayScript -v scratch.play   
-	>>编译和执行scratch.play脚本，并输出AST和符号表   
+>java play.PlayScript -v scratch.play   
+>编译和执行scratch.play脚本，并输出AST和符号表   
 
 * 设置你的bash命令，可以使用起来更方便，比如，我在.bash_profile文件中添加了：    
-alias play='java play.PlayScript'   
+>alias play='java play.PlayScript'   
 这样，运行一个.play脚本的时候，可以很简单：  
-play scratch.play
+>play scratch.play
 
 ### examples目录中的示例脚本
 添加了一些示例脚本，来演示playscript的功能，大家可以玩一玩！    
