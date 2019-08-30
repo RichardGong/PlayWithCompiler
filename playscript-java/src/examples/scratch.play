@@ -1,25 +1,27 @@
 /**
- * closure-fibonacci.play
- * 用闭包实现斐波那契数列。斐波那契数列是这样的数字：0,1,1,2,3,5,8,13...  每个数字是前面两个数字的和。
- * 作者：宫文学
- */
+普通函数功能。
+包括普通函数功能和从中间返回的功能。
+*/
+int foo(int a){
+    return a + a;
+}
 
-void fun(){
-    long a = 0;
-    long b = 1;
-    long fibonacci(){
-        long c = a;
-        a = b;
-        b = a+c;
-        return c;
+println("foo(10)=" + foo(10));
+
+//测试return语句从中间返回
+int bar(int a){
+    for (int i = 0; i< a; i++){
+        //println("i="+i);
+        if (i >= 5){
+            return i;   //在任意点返回
+        }
     }
-    return fibonacci;
+    return a;
 }
 
-function long() fib = fun();
+println("bar(3)=" + bar(3));    //返回3，执行return a
 
-//打印斐波那契数列，在闭包里记住了相邻两次计算的结果
-for (int i = 0; i < 80; i++){
-    println(fib());
-}
+println("bar(10)=" + bar(10));  //返回5，执行return i
+
+
 

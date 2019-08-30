@@ -43,12 +43,24 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         PlayObject valueContainer = null;
         while (f != null) {
-            if (f.scope.containsSymbol(variable) ||
-                    f.contains(variable)) {  //加这个条件，是为了闭包功能。因为闭包的数据是存在FunctionObject中的。
+            if (f.scope.containsSymbol(variable)) {
                 valueContainer = f.object;
                 break;
             }
             f = f.parentFrame;
+        }
+
+        //通过正常的作用域找不到，就从闭包里找
+        //原理：PlayObject中可能有一些变量，其作用域跟StackFrame.scope是不同的。
+        if (valueContainer == null){
+            f = stack.peek();
+            while (f != null) {
+                if (f.contains(variable)) {
+                    valueContainer = f.object;
+                    break;
+                }
+                f = f.parentFrame;
+            }
         }
 
         MyLValue lvalue = new MyLValue(valueContainer, variable);

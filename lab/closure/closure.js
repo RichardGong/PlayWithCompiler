@@ -22,12 +22,15 @@ console.log("outside:  a=%d", a);
 //console.log("outside: a=%d b=%d",a, b);     //在外层不能访问b
 
 var fun2 = fun1();                            //生成闭包
-console.log("fun2: b=%d a=%d",fun2(), a);     //通过fun2()来访问b
-console.log("fun2: b=%d a=%d",fun2(), a);
+for (var i = 0; i< 2; i++){
+    console.log("fun2: b=%d a=%d",fun2(), a); //通过fun2()来访问b
+}
+
 
 var fun3 = fun1();                            //生成第二个闭包
-console.log("fun3: b=%d a=%d",fun3(), a);     //b等于1，重新开始
-console.log("fun3: b=%d a=%d",fun3(), a);
+for (var i = 0; i< 2; i++){
+    console.log("fun3: b=%d a=%d",fun3(), a); //b等于1，重新开始
+}
 
 ////测试更深层次的闭包
 var fun4 = function(){

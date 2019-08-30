@@ -19,8 +19,11 @@ function int() fun1(){
 }
 
 function int() fun2 = fun1();  
+for (int i = 0; i< 3; i++){
+    println("b = " + fun2() + ", a = "+a);
+}
 
-println(fun2());
-println(fun2());
-println(fun2());
-println(fun2());
+function int() fun3 = fun1();  
+for (int i = 0; i< 3; i++){
+    println("b = " + fun3() + ", a = "+a);
+}
