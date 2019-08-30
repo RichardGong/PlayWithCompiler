@@ -1,5 +1,5 @@
 /**
- * Clojure.js
+ * closure.js
  * 测试闭包特性
  * 作者：宫文学
  */
