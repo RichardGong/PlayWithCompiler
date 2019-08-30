@@ -15,7 +15,7 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 ### 运行playscript
 在运行之前：
 * 要设置好本机的java环境；
-* 设置好CLASSPATH,让java能够找到play包中的类。
+* 设置好CLASSPATH,让java能够找到play包中的类。    
 命令行工具 java play.PlayScript     
 usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]  
 	-h or --help : print this help information  
