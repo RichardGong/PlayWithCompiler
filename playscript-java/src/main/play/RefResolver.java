@@ -100,11 +100,9 @@ public class RefResolver extends PlayScriptBaseListener {
                 Symbol symbol = at.symbolOfNode.get(exp.expression(0));
                 if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                     Class theClass = (Class) ((Variable) symbol).type;
-                    //Scope classScope = at.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
 
                     String idName = ctx.IDENTIFIER().getText();
                     //查找名称和参数类型都匹配的函数。不允许名称和参数都相同，但返回值不同的情况。
-                    //function = at.lookupFunction(classScope, idName, paramTypes);
                     function = theClass.getFunction(idName, paramTypes);
                     if (function != null) {
                         at.symbolOfNode.put(ctx, function);

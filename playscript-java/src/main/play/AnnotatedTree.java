@@ -43,15 +43,41 @@ public class AnnotatedTree {
 
     }
 
-    protected void log(String message, ParserRuleContext ctx) {
+
+    /**
+     * 记录编译错误和警告
+     * @param message
+     * @param type  信息类型，ComplilationLog中的INFO、WARNING和ERROR
+     * @param ctx
+     */
+    protected void log(String message,int type, ParserRuleContext ctx) {
         CompilationLog log = new CompilationLog();
         log.ctx = ctx;
         log.message = message;
         log.line = ctx.getStart().getLine();
         log.positionInLine = ctx.getStart().getStartIndex();
-        log.type = CompilationLog.ERROR;
+        log.type = type;
+
+        logs.add(log);
 
         System.out.println(log);
+    }
+
+    public void log(String message, ParserRuleContext ctx) {
+        this.log(message, CompilationLog.ERROR, ctx);
+    }
+
+    /**
+     * 是否有编译错误
+     * @return
+     */
+    protected boolean hasCompilationError(){
+        for (CompilationLog log : logs){
+            if (log.type == CompilationLog.ERROR){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

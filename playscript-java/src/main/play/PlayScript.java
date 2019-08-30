@@ -76,8 +76,10 @@ public class PlayScript {
             PlayScriptCompiler compiler = new PlayScriptCompiler();
             AnnotatedTree at = compiler.Compile(script);
 
-            Object result = compiler.Execute(at);
-            System.out.println(result);
+            if (!at.hasCompilationError()) {
+                Object result = compiler.Execute(at);
+                //System.out.println(result);
+            }
         }
 
     }
@@ -137,7 +139,9 @@ public class PlayScript {
 
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
 
-        String scriptText = "";
+        String script = "";
+
+        String scriptLet = "";
         System.out.print("\n>");   //提示符
 
         while (true) {
@@ -147,18 +151,21 @@ public class PlayScript {
                     System.out.println("good bye!");
                     break;
                 }
-                scriptText += line + "\n";
+                scriptLet += line + "\n";
                 if (line.endsWith(";")) {
 
                     // 执行脚本文件
                     PlayScriptCompiler compiler = new PlayScriptCompiler();
-                    AnnotatedTree at = compiler.Compile(scriptText);
-                    Object result = compiler.Execute(at);
-                    System.out.println(result);
+                    AnnotatedTree at = compiler.Compile(script + scriptLet);
+                    if (!at.hasCompilationError()) {
+                        Object result = compiler.Execute(at);
+                        System.out.println(result);
+                        script = script + scriptLet;
+                    }
 
                     System.out.print("\n>");   //提示符
 
-                    scriptText = "";
+                    scriptLet = "";
                 }
 
             } catch (Exception e) {
@@ -166,7 +173,7 @@ public class PlayScript {
 
                 System.out.println(e.getLocalizedMessage());
                 System.out.print("\n>");   //提示符
-                scriptText = "";
+                scriptLet = "";
             }
         }
     }
