@@ -9,19 +9,20 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  */
 public class PlayScriptCompiler {
 
-    public AnnotatedTree Compile(String script) {
-        AnnotatedTree at = new AnnotatedTree();
+    AnnotatedTree at = null;
+    PlayScriptLexer lexer = null;
+    PlayScriptParser parser = null;
+
+    public AnnotatedTree compile(String script, boolean verbose, boolean ast_dump) {
+        at = new AnnotatedTree();
 
         //词法分析
-        PlayScriptLexer lexer = new PlayScriptLexer(CharStreams.fromString(script));
+        lexer = new PlayScriptLexer(CharStreams.fromString(script));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
 
         //语法分析
-        PlayScriptParser parser = new PlayScriptParser(tokens);
+        parser = new PlayScriptParser(tokens);
         at.ast = parser.prog();
-
-        //打印AST，以lisp格式
-        System.out.println(at.ast.toStringTree(parser));
 
         //语义分析
         ParseTreeWalker walker = new ParseTreeWalker();
@@ -47,10 +48,51 @@ public class PlayScriptCompiler {
         //pass5：其他语义检查
 
 
-        //显示一下语义解析结果
-        System.out.println(at.getScopeTreeString());
+
+        //打印AST
+        if (verbose || ast_dump){
+            dumpAST();
+        }
+
+        //打印符号表
+        if(verbose){
+            dumpSymbols();
+        }
 
         return at;
+    }
+
+    public AnnotatedTree compile(String script) {
+        return  compile(script,false, false);
+    }
+
+    /**
+     * 打印符号表
+     */
+    public void dumpSymbols(){
+        if (at != null){
+            System.out.println(at.getScopeTreeString());
+        }
+    }
+
+    /**
+     * 打印AST，以lisp格式
+     */
+    public void dumpAST(){
+        if (at!=null) {
+            System.out.println(at.ast.toStringTree(parser));
+        }
+    }
+
+    /**
+     * 输出编译信息
+     */
+    public void dumpCompilationLogs(){
+        if (at != null){
+            for (CompilationLog log : at.logs){
+                System.out.println(log);
+            }
+        }
     }
 
     public Object Execute(AnnotatedTree at) {
