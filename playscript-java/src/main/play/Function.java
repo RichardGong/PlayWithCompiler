@@ -2,6 +2,7 @@ package play;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 
@@ -11,6 +12,9 @@ public class Function extends Scope implements FunctionType {
 
     //返回值
     protected Type returnType = null;
+
+    //闭包变量，即它所引用的外部环境变量
+    protected Set<Variable> closureVariables = null;
 
     private List<Type> paramTypes = null;
 
@@ -47,6 +51,25 @@ public class Function extends Scope implements FunctionType {
     public boolean isType(Type type){
         if (type instanceof FunctionType){
             return DefaultFunctionType.isType(this, (FunctionType)type);
+        }
+        return false;
+    }
+
+    /**
+     * 该函数是不是类的方法
+     * @return
+     */
+    public boolean isMethod(){
+        return enclosingScope instanceof Class;
+    }
+
+    /**
+     * 该函数是不是类的构建函数
+     * @return
+     */
+    public boolean isConstructor(){
+        if (enclosingScope instanceof Class){
+            return enclosingScope.name.equals(name);
         }
         return false;
     }

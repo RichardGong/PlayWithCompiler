@@ -53,10 +53,12 @@ class LinkedList{
     }
 }
 
+//函数：平方值
 int square(int value){
     return value * value;
 }
 
+//函数：加1
 int addOne(int value){
     return value + 1;
 }

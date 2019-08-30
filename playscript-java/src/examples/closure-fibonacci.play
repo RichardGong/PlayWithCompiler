@@ -1,0 +1,25 @@
+/**
+ * closure-fibonacci.play
+ * 用闭包实现斐波那契数列。斐波那契数列是这样的数字：1,1,2,3,5,8,13...  每个数字是前面两个数字的和。
+ * 作者：宫文学
+ */
+
+void fun(){
+    int i = 1;
+    int j = 1;
+    int fibonacci(int n){
+        int result = j;
+        for (int k = 3; k<=n; k++){
+            result = i + j;
+            i = j;
+            j = result;
+        }
+        return result;
+    }
+    return fibonacci;
+}
+
+function int(int) a = fun();
+
+println(a(5));
+

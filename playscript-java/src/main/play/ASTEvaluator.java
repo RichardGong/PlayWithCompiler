@@ -43,7 +43,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         PlayObject valueContainer = null;
         while (f != null) {
-            if (f.scope.containsSymbol(variable)) {
+            if (f.scope.containsSymbol(variable) ||
+                    f.contains(variable)) {  //加这个条件，是为了闭包功能。因为闭包的数据是存在FunctionObject中的。
                 valueContainer = f.object;
                 break;
             }
@@ -344,14 +345,18 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     public Object visitBlock(BlockContext ctx) {
 
         BlockScope scope = (BlockScope) at.node2Scope.get(ctx);
-        StackFrame frame = new StackFrame(scope);
-        // frame.parentFrame = stack.peek();
-        pushStack(frame);
+        if (scope != null){  //有些block是不对应scope的，比如函数底下的block.
+            StackFrame frame = new StackFrame(scope);
+            // frame.parentFrame = stack.peek();
+            pushStack(frame);
+        }
 
 
         Object rtn = visitBlockStatements(ctx.blockStatements());
 
-        stack.pop();
+        if (scope !=null) {
+            stack.pop();
+        }
 
         return rtn;
     }
@@ -799,9 +804,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 // 把闭包涉及的环境变量都打包带走
                 if (rtn instanceof FunctionObject) {
                     FunctionObject functionObject = (FunctionObject) rtn;
-                    List<Variable> variables = at.outerReference.get(functionObject.function);
-                    if (variables != null) {
-                        for (Variable var : variables) {
+                    if (functionObject.function.closureVariables != null) {
+                        for (Variable var : functionObject.function.closureVariables) {
                             LValue lValue = getLValue(var); // 现在还可以从栈里取，退出函数以后就不行了
                             Object value = lValue.getValue();
                             if (value != null) {

@@ -48,6 +48,9 @@ public class PlayScriptCompiler {
         //pass5：其他语义检查
 
 
+        //pass6：做闭包的分析
+        ClosureAnalyzer closureAnalyzer = new ClosureAnalyzer(at);
+        closureAnalyzer.analyzeClosures();
 
         //打印AST
         if (verbose || ast_dump){

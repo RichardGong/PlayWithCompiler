@@ -48,17 +48,17 @@ public class RefResolver extends PlayScriptBaseListener {
 
                 type = variable.type;
 
-                //记录所引用的外部变量，用于闭包
-                if (scope instanceof Function && variable.enclosingScope != scope){
-                    List<Variable> referedVariables = at.outerReference.get(scope);
-                    if (referedVariables == null){
-                        referedVariables = new LinkedList<Variable>();
-                        at.outerReference.put(scope,referedVariables);
-                    }
-                    if(!referedVariables.contains(variable)){
-                        referedVariables.add(variable);
-                    }
-                }
+//                //记录所引用的外部变量，用于闭包
+//                if (scope instanceof Function && variable.enclosingScope != scope){
+//                    List<Variable> referedVariables = at.outerReference.get(scope);
+//                    if (referedVariables == null){
+//                        referedVariables = new LinkedList<Variable>();
+//                        at.outerReference.put(scope,referedVariables);
+//                    }
+//                    if(!referedVariables.contains(variable)){
+//                        referedVariables.add(variable);
+//                    }
+//                }
             }
         } else if (ctx.literal() != null) {
             type = at.typeOfNode.get(ctx.literal());

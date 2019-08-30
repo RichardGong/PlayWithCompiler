@@ -3,6 +3,7 @@ package play;
 import java.util.*;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 
@@ -32,11 +33,7 @@ public class AnnotatedTree {
     // 命名空间
     NameSpace nameSpace = null;  //全局命名空间
 
-    // class、function等对应的代码的位置，可以是AST节点，后面可以是IR
-    //protected Map<Type, ParserRuleContext> type2Node = new HashMap<Type, ParserRuleContext>();
-
-    //函数、类等引用的外部变量
-    protected Map<Scope, List<Variable>> outerReference = new HashMap<Scope, List<Variable>>();
+    //语义分析过程中生成的信息，包括普通信息、警告和错误
     protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
 
     protected AnnotatedTree() {
@@ -227,7 +224,6 @@ public class AnnotatedTree {
             }
         }
     }
-
 
 
 }

@@ -54,16 +54,20 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
 
     @Override
     public void enterBlock(BlockContext ctx) {
-        BlockScope scope = new BlockScope(currentScope(), ctx);
 
-        currentScope().addSymbol(scope);
-
-        pushScope(scope, ctx);
+        //对于函数，不需要再额外建一个scope
+        if (!(ctx.parent instanceof FunctionBodyContext)){
+            BlockScope scope = new BlockScope(currentScope(), ctx);
+            currentScope().addSymbol(scope);
+            pushScope(scope, ctx);
+        }
     }
 
     @Override
     public void exitBlock(BlockContext ctx) {
-        popScope();
+        if (!(ctx.parent instanceof FunctionBodyContext)) {
+            popScope();
+        }
     }
 
 
@@ -72,6 +76,7 @@ public class TypeAndScopeScanner extends PlayScriptBaseListener {
         //为for建立额外的Scope
         if (ctx.FOR() != null) {
             BlockScope scope = new BlockScope(currentScope(), ctx);
+            currentScope().addSymbol(scope);
             pushScope(scope, ctx);
         }
     }

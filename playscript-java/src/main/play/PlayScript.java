@@ -11,6 +11,9 @@ import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 命令行工具。可以执行一个脚本，或者以REPL模式运行。
+ */
 public class PlayScript {
 
     public static void main(String args[]) {
