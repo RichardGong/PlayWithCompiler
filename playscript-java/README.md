@@ -18,13 +18,13 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 * 设置好CLASSPATH,让java能够找到play包中的类。    
      
 命令行工具 java play.PlayScript     
-usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]  
-	-h or --help : print this help information  
-	-v verbose mode : dump AST and symbols   
-	-ast-dump : dump AST in lisp style   
-	-o outputfile : file pathname used to save generated code, eg. assembly code   
-	-S : compile to assembly code   
-	scriptfile : file contains playscript code   
+>usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]  
+>	-h or --help : print this help information  
+>	-v verbose mode : dump AST and symbols   
+>	-ast-dump : dump AST in lisp style   
+>	-o outputfile : file pathname used to save generated code, eg. assembly code   
+>	-S : compile to assembly code   
+>	scriptfile : file contains playscript code   
 
 举例:   
 >java play.PlayScript    
