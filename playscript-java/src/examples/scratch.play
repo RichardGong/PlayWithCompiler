@@ -9,6 +9,7 @@ class Mammal{
     function int() getWeight;
     function void(int) setWeight;
     void foo(){
+        //在内部的方法中也可以调用这些函数型变量，与普通方法没有任何区别。
         println("in foo");
         setWeight(23);
         speak();
@@ -56,9 +57,6 @@ Mammal Sheep(){
     return m;
 }
 
-Mammal m3 = Sheep();
-m3.foo();
-
 Mammal m1 = Cow();
 m1.speak();
 println("weight of mammal1 : " + m1.getWeight());
@@ -74,3 +72,6 @@ m2.setWeight(21);
 println("new weight of mammal2 : " + m2.getWeight());
 m2.foo();
 println("new weight of mammal2 : " + m2.getWeight());
+
+Mammal m3 = Sheep();
+m3.foo();

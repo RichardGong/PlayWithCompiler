@@ -50,13 +50,16 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 * [BlockScope.play](src/examples/BlockScope.play) 块作用域。
 * [loop.play](src/examples/loop.play) for和while循环，以及break语句。
 * [function.play](src/examples/function.play) 基本的函数功能。
-* [regression.play](src/examples/regression.play) 递归函数功能。递归函数对语义分析有一定要求，要在函数定义完毕之前就能引用它。
+* [regression.play](src/examples/regression.play) 递归函数功能。递归函数对语义分析有一定要求，要在函数定义完毕之前就能引用它。这个例子用递归方式显现了斐波那契数列的计算。
 * [FirstClassFunction.play](src/examples/FirstClassFunction.play) 作为一等公民的函数，可以像数值一样给变量赋值，或者作为函数参数和返回值。
+* [LinkedList.play](src/examples/LinkedList.play) 实现了一个简单的链表，并且演示了高阶函数功能，有点像javascript的map函数。
+* [closure.play](src/examples/closure.play) 基础的闭包特性。
+* [closure-fibonacci.play](src/examples/closure-fibonacci.play) 用闭包特性实现了斐波那契数列的计算。
+* [closure-mammal.play](src/examples/closure-mammal.play) 用闭包特性实现了斐波那契数列。这个闭包特性还比普通的函数闭包更强。它能让多个函数共享一个闭包，就像对象的多个方法可以共享对象属性一样。
 * [UseBeforeDeclare.play](src/examples/UseBeforeDeclare.play) 对于各种自定义类型和类的成员，可以在声明之前就使用。语义分析时能正确的解析出来。
 * [ClassTest.play](src/examples/ClassTest.play) 面向对象的基本特性，包括构造函数、缺省构造函数、访问对象属性和方法。
-* [ObjectAssign.play](src/examples/ObjectAssign.play) 对象可以像基础类型一样赋值和比较，并且支持null。
 * [mammal.play](src/examples/mammal.play) 演示面向对象功能，比如继承和多态。
-* [LinkedList.play](src/examples/LinkedList.play) 实现了一个简单的链表，并且演示了高阶函数功能，有点像javascript的map函数。
+* 
 
 ### 项目中主要的示例代码
 * [PlayScript.java](src/main/play/PlayScript.java) 程序入口。

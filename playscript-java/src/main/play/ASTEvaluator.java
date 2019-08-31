@@ -123,6 +123,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     ///////////////////////////////////////////////
     //为闭包获取环境变量的值
+
+    /**
+     * 为闭包获取环境变量的值
+     * @param function 闭包所关联的函数。这个函数会访问一些环境变量。
+     * @param valueContainer 存放环境变量的值的容器
+     */
     private void getClosureValues(Function function, PlayObject valueContainer){
         if (function.closureVariables != null) {
             for (Variable var : function.closureVariables) {
