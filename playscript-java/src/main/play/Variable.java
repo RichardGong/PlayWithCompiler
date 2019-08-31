@@ -19,6 +19,14 @@ public class Variable extends Symbol {
         this.ctx = ctx;
     }
 
+    /**
+     * 是不是类的属性
+     * @return
+     */
+    public boolean isClassMember(){
+        return enclosingScope instanceof Class;
+    }
+
     @Override
     public String toString(){
         return "Variable " + name + " -> "+ type;

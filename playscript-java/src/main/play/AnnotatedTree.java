@@ -3,7 +3,6 @@ package play;
 import java.util.*;
 
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 
@@ -139,11 +138,28 @@ public class AnnotatedTree {
     }
 
     /**
-     * 逐级查找函数（或方法）。仅通过名字查找。如果有重名的，返回第一个就算了。//TODO 未来应该报警。
+     * 查找函数型变量，逐级查找。
      * @param scope
-     * @param name
+     * @param idName
+     * @param paramTypes
      * @return
      */
+    protected Variable lookupFunctionVariable(Scope scope, String idName, List<Type> paramTypes) {
+        Variable rtn = scope.getFunctionVariable(idName, paramTypes);
+
+        if (rtn == null && scope.enclosingScope != null) {
+            rtn = lookupFunctionVariable(scope.enclosingScope, idName, paramTypes);
+        }
+        return rtn;
+    }
+
+
+        /**
+         * 逐级查找函数（或方法）。仅通过名字查找。如果有重名的，返回第一个就算了。//TODO 未来应该报警。
+         * @param scope
+         * @param name
+         * @return
+         */
     protected Function lookupFunction(Scope scope, String name){
         Function rtn = null;
         if (scope instanceof Class){

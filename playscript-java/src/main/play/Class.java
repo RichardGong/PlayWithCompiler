@@ -91,6 +91,16 @@ public class Class extends Scope implements Type{
         return rtn;
     }
 
+    protected Variable getFunctionVariable(String name, List<Type> paramTypes){
+        Variable rtn = super.getFunctionVariable(name, paramTypes);  //TODO 是否要检查visibility?
+
+        if (rtn == null && parentClass != null){
+            rtn = parentClass.getFunctionVariable(name,paramTypes);
+        }
+
+        return rtn;
+    }
+
 
     /**
      * 是否包含某个Symbol。这时候要把父类的成员考虑进来。

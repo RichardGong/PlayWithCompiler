@@ -56,6 +56,31 @@ public class Function extends Scope implements FunctionType {
     }
 
     /**
+     * 检查改函数是否匹配所需的参数。
+     * @param paramTypes
+     * @return
+     */
+    @Override
+    public boolean matchParameterTypes(List<Type> paramTypes){
+        // 比较每个参数
+        if (parameters.size() != paramTypes.size()) {
+            return false;
+        }
+
+        boolean match = true;
+        for (int i = 0; i < paramTypes.size(); i++) {
+            Variable var = parameters.get(i);
+            Type type = paramTypes.get(i);
+            if (!var.type.isType(type)) {
+                match = false;
+                break;
+            }
+        }
+
+        return match;
+    }
+
+    /**
      * 该函数是不是类的方法
      * @return
      */

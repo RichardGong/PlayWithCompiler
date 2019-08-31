@@ -7,12 +7,7 @@
 class Mammal{
     function void() speak;
     function int() getWeight;
-    function void(int) setWeight;
-    void foo(){
-        println("in foo");
-        setWeight(23);
-        speak();
-    }
+    function void(int) setWeight;    
 }
 
 //返回一个Mammal对象，其特征是
@@ -56,9 +51,6 @@ Mammal Sheep(){
     return m;
 }
 
-Mammal m3 = Sheep();
-m3.foo();
-
 Mammal m1 = Cow();
 m1.speak();
 println("weight of mammal1 : " + m1.getWeight());
@@ -71,6 +63,4 @@ Mammal m2 = Sheep();
 m2.speak();
 println("weight of mammal2 : " + m2.getWeight());
 m2.setWeight(21);
-println("new weight of mammal2 : " + m2.getWeight());
-m2.foo();
 println("new weight of mammal2 : " + m2.getWeight());

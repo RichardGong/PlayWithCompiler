@@ -37,10 +37,22 @@ public class StackFrame {
         this.object = object;
     }
 
+    /**
+     * 为函数调用创建一个StackFrame
+     * @param object
+     */
     public StackFrame(FunctionObject object){
         this.scope = object.function;
         this.object = object;
     }
 
+    @Override
+    public String toString(){
+        String rtn = ""+scope;
+        if (parentFrame != null){
+            rtn += " -> " + parentFrame;
+        }
+        return rtn;
+    }
 
 }

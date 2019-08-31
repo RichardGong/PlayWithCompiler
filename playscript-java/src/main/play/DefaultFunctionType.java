@@ -81,4 +81,29 @@ public class DefaultFunctionType implements FunctionType {
         return true;
     }
 
+    /**
+     * 检查改函数是否匹配所需的参数。
+     * @param paramTypes
+     * @return
+     */
+    @Override
+    public boolean matchParameterTypes(List<Type> paramTypes){
+        // 比较每个参数
+        if (paramTypes.size() != paramTypes.size()) {
+            return false;
+        }
+
+        boolean match = true;
+        for (int i = 0; i < paramTypes.size(); i++) {
+            Type type1 = this.paramTypes.get(i);
+            Type type = paramTypes.get(i);
+            if (!type1.isType(type)) {
+                match = false;
+                break;
+            }
+        }
+
+        return match;
+    }
+
 }

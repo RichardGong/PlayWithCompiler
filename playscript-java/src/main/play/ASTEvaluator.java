@@ -19,23 +19,59 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         this.at = at;
     }
 
+    protected boolean traceStackFrame = false;
+
+    protected boolean traceFunctionCall = false;
+
     ///////////////////////////////////////////////////////////
     /// 栈桢的管理
     private Stack<StackFrame> stack = new Stack<StackFrame>();
 
-    public void pushStack(StackFrame frame) {
+    private void pushStack(StackFrame frame) {
         // 如果新加入的frame是当前frame的下一级，则入栈
         if (stack.size() > 0) {
-            if (frame.scope.enclosingScope == stack.peek().scope) {
-                frame.parentFrame = stack.peek();
+
+            for (int i = stack.size()-1; i>0; i--){
+                StackFrame f = stack.get(i);
+                if (f.scope.enclosingScope == frame.scope.enclosingScope){
+                    frame.parentFrame = f.parentFrame;
+                    break;
+                }
+                else if (f.scope == frame.scope.enclosingScope){
+                    frame.parentFrame = f;
+                    break;
+                }
+                else if (frame.object instanceof FunctionObject){
+                    FunctionObject functionObject = (FunctionObject)frame.object;
+                    if (functionObject.receiver != null && functionObject.receiver.enclosingScope == f.scope) {
+                        frame.parentFrame = f;
+                        break;
+                    }
+                }
             }
-            // 否则，跟栈顶元素的parentFrame相同
-            else {
-                frame.parentFrame = stack.peek().parentFrame;
+
+            if (frame.parentFrame == null){
+                frame.parentFrame = stack.peek();
             }
         }
 
         stack.push(frame);
+
+        if (traceStackFrame){
+            dumpStackFrame();
+        }
+    }
+
+    private void popStack(){
+        stack.pop();
+    }
+
+    private void dumpStackFrame(){
+        System.out.println("\nStack Frames ----------------");
+        for (StackFrame frame : stack){
+            System.out.println(frame);
+        }
+        System.out.println("-----------------------------\n");
     }
 
     public LValue getLValue(Variable variable) {
@@ -43,7 +79,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         PlayObject valueContainer = null;
         while (f != null) {
-            if (f.scope.containsSymbol(variable)) {
+            if (f.scope.containsSymbol(variable)) { //对于对象来说，会查找所有父类的属性
                 valueContainer = f.object;
                 break;
             }
@@ -85,6 +121,38 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return null;
     }
 
+    ///////////////////////////////////////////////
+    //为闭包获取环境变量的值
+    private void getClosureValues(Function function, PlayObject valueContainer){
+        if (function.closureVariables != null) {
+            for (Variable var : function.closureVariables) {
+                LValue lValue = getLValue(var); // 现在还可以从栈里取，退出函数以后就不行了
+                Object value = lValue.getValue();
+                valueContainer.fields.put(var, value);
+            }
+        }
+    }
+
+    /**
+     * 为从函数中返回的对象设置闭包值。因为多个函数型属性可能共享值，所以要打包到ClassObject中，而不是functionObject中
+     * @param classObject
+     */
+    private void getClosureValues(ClassObject classObject){
+        //先放在一个临时对象里，避免对classObject即读又写
+        PlayObject tempObject = new PlayObject();
+        for ( Variable v : classObject.fields.keySet()) {
+            if (v.type instanceof FunctionType) {
+                Object object = classObject.fields.get(v);
+                if (object != null) {
+                    FunctionObject functionObject = (FunctionObject) object;
+                    getClosureValues(functionObject.function, tempObject);
+                }
+            }
+        }
+
+        classObject.fields.putAll(tempObject.fields);
+    }
+
 
     ///////////////////////////////////////////////
     //自己实现的左值对象。
@@ -106,6 +174,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         @Override
         public void setValue(Object value) {
             valueContainer.setValue(variable, value);
+
+            //如果variable是函数型变量，那改变functionObject.receiver
+            if (value instanceof FunctionObject){
+                ((FunctionObject) value).receiver = (Variable)variable;
+            }
         }
 
         @Override
@@ -148,7 +221,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             Class c = ancestorChain.pop();
             defaultObjectInit(c, obj);
         }
-        stack.pop();
+        popStack();
 
         return obj;
     }
@@ -367,7 +440,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         Object rtn = visitBlockStatements(ctx.blockStatements());
 
         if (scope !=null) {
-            stack.pop();
+            popStack();
         }
 
         return rtn;
@@ -480,6 +553,10 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                         rtn = lValue;
                     } else if (ctx.functionCall() != null) {
                         //要先计算方法的参数，才能加对象的StackFrame.
+                        if (traceFunctionCall){
+                            System.out.println("\n>>MethodCall : " + ctx.getText());
+                        }
+
                         rtn = methodCall(valueContainer, ctx.functionCall());
                     }
                 }
@@ -794,7 +871,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             }
 
             // 去掉StackFrame
-            stack.pop();
+            popStack();
         }
 
         //block
@@ -813,18 +890,20 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             if (ctx.expression() != null) {
                 rtn = visitExpression(ctx.expression());
 
+                //return语句应该不需要左值   //TODO 取左值的场景需要优化，目前都是取左值。
+                if (rtn instanceof LValue){
+                    rtn = ((LValue)rtn).getValue();
+                }
+
                 // 把闭包涉及的环境变量都打包带走
                 if (rtn instanceof FunctionObject) {
                     FunctionObject functionObject = (FunctionObject) rtn;
-                    if (functionObject.function.closureVariables != null) {
-                        for (Variable var : functionObject.function.closureVariables) {
-                            LValue lValue = getLValue(var); // 现在还可以从栈里取，退出函数以后就不行了
-                            Object value = lValue.getValue();
-                            if (value != null) {
-                                functionObject.fields.put(var, value);
-                            }
-                        }
-                    }
+                    getClosureValues(functionObject.function, functionObject);
+                }
+                //如果返回的是一个对象，那么检查它的所有属性里有没有是闭包的。//TODO 如果属性仍然是一个对象，可能就要向下递归查找了。
+                else if (rtn instanceof ClassObject){
+                    ClassObject classObject = (ClassObject)rtn;
+                    getClosureValues(classObject);
                 }
 
             }
@@ -923,7 +1002,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         rtn = visitBlockStatements(ctx.blockStatements());
 
-        stack.pop();
+        popStack();
 
         return rtn;
     }
@@ -968,7 +1047,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         FunctionObject functionObject = getFuntionObject(ctx);
         Function function = functionObject.function;
 
-        //如果是对象的构造方法，则按照对象方法掉用去执行，并返回所创建出的对象。
+        //如果是对象的构造方法，则按照对象方法调用去执行，并返回所创建出的对象。
         if (function.enclosingScope instanceof Class) {
             Class theClass = (Class) function.enclosingScope;
 
@@ -984,7 +1063,10 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         //计算参数值
         List<Object> paramValues = calcParamValues(ctx);
 
-        //执行函数调用
+        if (traceFunctionCall){
+            System.out.println("\n>>FunctionCall : " + ctx.getText());
+        }
+
         rtn = functionCall(functionObject, paramValues);
 
         return rtn;
@@ -1078,7 +1160,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         rtn = visitFunctionDeclaration(functionCode);
 
         // 弹出StackFrame
-        stack.pop(); //函数的栈桢
+        popStack(); //函数的栈桢
 
         //如果由一个return语句返回，真实返回值会被封装在一个ReturnObject里。
         if (rtn instanceof ReturnObject){
@@ -1101,7 +1183,14 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         Object rtn = null;
 
         //查找函数，并根据需要创建FunctionObject
+        //如果查找到的是类的属性，FunctionType型的，需要把在对象的栈桢里查。
+        StackFrame classFrame = new StackFrame(classObject);
+        pushStack(classFrame);
+
         FunctionObject funtionObject = getFuntionObject(ctx);
+
+        popStack();
+
         Function function = funtionObject.function;
 
         //对普通的类方法，需要在运行时动态绑定
@@ -1120,14 +1209,14 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         List<Object> paramValues = calcParamValues(ctx);
 
         //对象的frame要等到函数参数都计算完了才能添加。
-        StackFrame classFrame = new StackFrame(classObject);
+        //StackFrame classFrame = new StackFrame(classObject);
         pushStack(classFrame);
 
         //执行函数
         rtn = functionCall(funtionObject, paramValues);
 
         //弹出栈桢
-        stack.pop();
+        popStack();
 
         return rtn;
     }

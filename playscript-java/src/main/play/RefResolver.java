@@ -33,7 +33,7 @@ public class RefResolver extends PlayScriptBaseListener {
             Variable variable = at.lookupVariable(scope, idName);
             if (variable == null) {
                 // 看看是不是函数，因为函数可以作为值来传递。这个时候，函数重名没法区分。
-                // 因为普通Scope中的函数是不可以重名的，所以这应该是没有问题的。
+                // 因为普通Scope中的函数是不可以重名的，所以这应该是没有问题的。  //TODO 但如果允许重名，那就不行了。
                 // TODO 注意，查找function的时候，可能会把类的方法包含进去
                 Function function = at.lookupFunction(scope, idName);
                 if (function != null) {
@@ -47,18 +47,6 @@ public class RefResolver extends PlayScriptBaseListener {
                 at.symbolOfNode.put(ctx, variable);
 
                 type = variable.type;
-
-//                //记录所引用的外部变量，用于闭包
-//                if (scope instanceof Function && variable.enclosingScope != scope){
-//                    List<Variable> referedVariables = at.outerReference.get(scope);
-//                    if (referedVariables == null){
-//                        referedVariables = new LinkedList<Variable>();
-//                        at.outerReference.put(scope,referedVariables);
-//                    }
-//                    if(!referedVariables.contains(variable)){
-//                        referedVariables.add(variable);
-//                    }
-//                }
             }
         } else if (ctx.literal() != null) {
             type = at.typeOfNode.get(ctx.literal());
@@ -82,6 +70,8 @@ public class RefResolver extends PlayScriptBaseListener {
             return;
         }
 
+        String idName = ctx.IDENTIFIER().getText();
+
         // 获得参数类型，这些类型已经在表达式中推断出来
         List<Type> paramTypes = new LinkedList<Type>();
         if (ctx.expressionList() != null) {
@@ -91,7 +81,7 @@ public class RefResolver extends PlayScriptBaseListener {
             }
         }
 
-        Function function = null;
+        boolean found = false;
 
         // 看看是不是点符号表达式调用的，调用的是类的方法
         if (ctx.parent instanceof ExpressionContext) {
@@ -101,14 +91,23 @@ public class RefResolver extends PlayScriptBaseListener {
                 if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                     Class theClass = (Class) ((Variable) symbol).type;
 
-                    String idName = ctx.IDENTIFIER().getText();
                     //查找名称和参数类型都匹配的函数。不允许名称和参数都相同，但返回值不同的情况。
-                    function = theClass.getFunction(idName, paramTypes);
+                    Function function = theClass.getFunction(idName, paramTypes);
                     if (function != null) {
+                        found = true;
                         at.symbolOfNode.put(ctx, function);
-                        at.typeOfNode.put(ctx, function.returnType);
-                    } else {
-                        at.log("unable to find method " + idName + " in Class " + theClass.name, exp);
+                        at.typeOfNode.put(ctx, function.getReturnType());
+                    }
+                    else {
+                        Variable funcVar = theClass.getFunctionVariable(idName,paramTypes);
+                        if (funcVar != null){
+                            found = true;
+                            at.symbolOfNode.put(ctx, funcVar);
+                            at.typeOfNode.put(ctx, ((FunctionType)funcVar.type).getReturnType());
+                        }
+                        else {
+                            at.log("unable to find method " + idName + " in Class " + theClass.name, exp);
+                        }
                     }
 
                 } else {
@@ -120,25 +119,27 @@ public class RefResolver extends PlayScriptBaseListener {
         Scope scope = at.enclosingScopeOfNode(ctx);
 
         //从当前Scope逐级查找函数(或方法)
-        String idName = ctx.IDENTIFIER().getText();
-        if (function == null && ctx.IDENTIFIER() != null) {
-            function = at.lookupFunction(scope, idName, paramTypes);
+        if (!found) {
+            Function function = at.lookupFunction(scope, idName, paramTypes);
             if (function != null){
+                found = true;
                 at.symbolOfNode.put(ctx, function);
                 at.typeOfNode.put(ctx, function.returnType);
             }
         }
 
-        if (function == null) {
+        if (!found) {
             // 看看是不是类的构建函数，用相同的名称查找一个class
             Class theClass = at.lookupClass(scope, idName);
             if (theClass != null) {
-                function = theClass.findConstructor(paramTypes);
+                Function function = theClass.findConstructor(paramTypes);
                 if (function != null) {
+                    found = true;
                     at.symbolOfNode.put(ctx, function);
                 }
                 //如果是与类名相同的方法，并且没有参数，那么就是缺省构造方法
                 else if (ctx.expressionList() == null){
+                    found = true;
                     at.symbolOfNode.put(ctx, theClass); // TODO 直接赋予class
                 }
                 else{
@@ -150,8 +151,9 @@ public class RefResolver extends PlayScriptBaseListener {
 
             //看看是不是一个函数型的变量
             else{
-                Variable variable = at.lookupVariable(scope, idName);
+                Variable variable = at.lookupFunctionVariable(scope,idName, paramTypes);
                 if (variable != null && variable.type instanceof FunctionType){
+                    found = true;
                     at.symbolOfNode.put(ctx, variable);
                     at.typeOfNode.put(ctx, variable.type);
                 }
