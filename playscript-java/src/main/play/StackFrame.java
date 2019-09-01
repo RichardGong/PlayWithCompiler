@@ -15,6 +15,11 @@ public class StackFrame {
     //实际存放变量的地方
     PlayObject object = null;
 
+    /**
+     * 本栈桢里有没有包含某个变量的数据
+     * @param variable
+     * @return
+     */
     protected boolean contains(Variable variable) {
         if(object != null && object.fields != null){
             return object.fields.containsKey(variable);
@@ -32,10 +37,22 @@ public class StackFrame {
         this.object = object;
     }
 
+    /**
+     * 为函数调用创建一个StackFrame
+     * @param object
+     */
     public StackFrame(FunctionObject object){
         this.scope = object.function;
         this.object = object;
     }
 
+    @Override
+    public String toString(){
+        String rtn = ""+scope;
+        if (parentFrame != null){
+            rtn += " -> " + parentFrame;
+        }
+        return rtn;
+    }
 
 }

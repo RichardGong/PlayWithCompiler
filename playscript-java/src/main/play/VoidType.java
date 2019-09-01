@@ -1,6 +1,6 @@
 package play;
 
-public class VoidType implements Type{
+public final class VoidType implements Type{
 
     @Override
     public String getName() {
@@ -16,6 +16,20 @@ public class VoidType implements Type{
     }
 
     //只保留一个实例即可。
-    public static VoidType voidType = new VoidType();
+    private static VoidType voidType = new VoidType();
+
+    public static VoidType instance(){
+        return voidType;
+    }
+
+    @Override
+    public boolean isType(Type type){
+        return this == type;
+    }
+
+    @Override
+    public String toString(){
+        return "void";
+    }
 
 }

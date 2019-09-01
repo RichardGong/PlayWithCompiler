@@ -6,7 +6,7 @@ scope.c
 
 int a = 1;
 
-void func()
+void fun()
 {
     a = 2;
     //b = 3;    //出错，不知道b是谁
@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 {
     printf("main--1: a=%d b=%d \n", a, b);
 
-    func();
+    fun();
     printf("main--2: a=%d b=%d \n", a, b);
 
     //用本地变量覆盖全局变量

@@ -1,7 +1,7 @@
 /*
  [The "BSD licence"]
  版权说明
- 本文件的大部分内容来自：https://github.com/antlr/grammars-v4/blob/master/java/JavaParser.g4
+ 本文件的大部分内容来自：https://github.com/antlr/grammars-v4/blob/master/java/JavaLexer.g4
  在此基础上进行了一些修改。
  修改者：宫文学  2019年
 
@@ -39,7 +39,6 @@
 
 lexer grammar CommonLexer;  //lexer关键字意味着这是一个词法规则
 
-// §3.9 Keywords
 
 //ABSTRACT : 'abstract';
 //ASSERT : 'assert';

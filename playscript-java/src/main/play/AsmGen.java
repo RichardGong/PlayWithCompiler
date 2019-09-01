@@ -36,10 +36,10 @@ import play.PlayScriptParser.VariableInitializerContext;
 public class AsmGen extends PlayScriptBaseVisitor<String> {
 
     // 之前的编译结果
-    private AnnotatedTree cr = null;
+    private AnnotatedTree at = null;
 
-    public AsmGen(AnnotatedTree cr) {
-        this.cr = cr;
+    public AsmGen(AnnotatedTree at) {
+        this.at = at;
     }
 
     ///////////////////////////////////////
@@ -77,7 +77,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         sb.append("\t.section	__TEXT,__text,regular,pure_instructions\n");
 
         // 2.生成函数的代码
-        for (Type type : cr.types) {
+        for (Type type : at.types) {
             if (type instanceof Function) {
                 Function function = (Function) type;
                 FunctionDeclarationContext fdc = (FunctionDeclarationContext) function.ctx;
@@ -87,7 +87,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         }
 
         // 3.对主程序生成_main函数
-        visitProg((ProgContext) cr.ast);
+        visitProg((ProgContext) at.ast);
         generateProcedure("main", sb);
 
         // 4.文本字面量
@@ -266,7 +266,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         rspOffset += 4; // 本地整型变量占4字节
         String rtn = "-" + rspOffset + "(%rbp)";
 
-        Symbol symbol = cr.node2Symbol.get(ctx);
+        Symbol symbol = at.symbolOfNode.get(ctx);
         localVars.put((Variable) symbol, rtn);
 
         return rtn;
@@ -320,7 +320,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         if (ctx.literal() != null) {
             rtn = visitLiteral(ctx.literal()); // 直接操作数
         } else if (ctx.IDENTIFIER() != null) {
-            Symbol symbol = cr.node2Symbol.get(ctx);
+            Symbol symbol = at.symbolOfNode.get(ctx);
             if (symbol instanceof Variable) {
                 rtn = localVars.get((Variable) symbol); // TODO: 本地变量地址，暂时不支持上一级Scope的变量
             }
@@ -378,7 +378,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
 
         String functionName = null;
 
-        Symbol symbol = cr.node2Symbol.get(ctx);
+        Symbol symbol = at.symbolOfNode.get(ctx);
 
         if (symbol instanceof Function) {
             Function function = (Function) symbol;
@@ -388,7 +388,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
             if (ctx.IDENTIFIER().getText().equals("println")) {
                 functionName = "printf";
             } else {
-                cr.log("unnable to find an function " + ctx.IDENTIFIER().getText(), ctx);
+                at.log("unable to find function " + ctx.IDENTIFIER().getText(), ctx);
             }
         }
 
@@ -462,7 +462,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
     public String visitFunctionDeclaration(FunctionDeclarationContext ctx) {
         // 给所有参数确定地址
 
-        Function function = (Function) cr.node2Type.get(ctx);
+        Function function = (Function) at.typeOfNode.get(ctx);
         for (int i = 0; i < function.parameters.size(); i++) {
             if (i < 6) {
                 // 少于6个参数，使用寄存器

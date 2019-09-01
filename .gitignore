@@ -27,9 +27,10 @@ hs_err_pid*
 .DS_Store
 
 #idea files
-*.iml
-.idea/
-lab/craft/out/
+#*.iml
+#.idea/
+# lab/craft/out/
+lab/antlrtest/bin
 
 #antlr temp files
 .antlr/

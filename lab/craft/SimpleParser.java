@@ -21,15 +21,39 @@ public class SimpleParser {
     public static void main(String[] args) {
 
         SimpleParser parser = new SimpleParser();
+        String script = null;
+        ASTNode tree = null;
 
         try {
-            ASTNode tree = parser.parse("int age = 45+2; age= 20; age+10*2;");
+            script = "int age = 45+2; age= 20; age+10*2;";
+            System.out.println("解析："+script);
+            tree = parser.parse(script);
             parser.dumpAST(tree, "");
-
         } catch (Exception e) {
 
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
+
+        //测试异常语法
+        try {
+            script = "2+3+;";
+            System.out.println("解析："+script);
+            tree = parser.parse(script);
+            parser.dumpAST(tree, "");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
+        //测试异常语法
+        try {
+            script = "2+3*;";
+            System.out.println("解析："+script);
+            tree = parser.parse(script);
+            parser.dumpAST(tree, "");
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+
 
     }
 
@@ -102,30 +126,30 @@ public class SimpleParser {
      */
     private SimpleASTNode assignmentStatement(TokenReader tokens) throws Exception {
         SimpleASTNode node = null;
-        Token token = tokens.peek();
+        Token token = tokens.peek();    //预读，看看下面是不是标识符
         if (token != null && token.getType() == TokenType.Identifier) {
-            token = tokens.read();              //读入标识符
+            token = tokens.read();      //读入标识符
             node = new SimpleASTNode(ASTNodeType.AssignmentStmt, token.getText());
-            token = tokens.peek();
+            token = tokens.peek();      //预读，看看下面是不是等号
             if (token != null && token.getType() == TokenType.Assignment) {
-                tokens.read();  //取出等号
+                tokens.read();          //取出等号
                 SimpleASTNode child = additive(tokens);
-                if (child == null) {
+                if (child == null) {    //出错，等号右面没有一个合法的表达式
                     throw new Exception("invalide assignment statement, expecting an expression");
                 }
                 else{
-                    node.addChild(child);
-                    token = tokens.peek();
+                    node.addChild(child);   //添加子节点
+                    token = tokens.peek();  //预读，看看后面是不是分号
                     if (token != null && token.getType() == TokenType.SemiColon) {
-                        tokens.read();
+                        tokens.read();      //消耗掉这个分号
 
-                    } else {
+                    } else {                //报错，缺少分号
                         throw new Exception("invalid statement, expecting semicolon");
                     }
                 }
             }
             else {
-                tokens.unread();              //回溯，吐出之前消化掉的标识符
+                tokens.unread();            //回溯，吐出之前消化掉的标识符
                 node = null;
             }
         }
@@ -181,18 +205,22 @@ public class SimpleParser {
      * @throws Exception
      */
     private SimpleASTNode additive(TokenReader tokens) throws Exception {
-        SimpleASTNode child1 = multiplicative(tokens);
+        SimpleASTNode child1 = multiplicative(tokens);  //应用add规则
         SimpleASTNode node = child1;
         if (child1 != null) {
-            while (true) {
+            while (true) {                              //循环应用add'规则
                 Token token = tokens.peek();
                 if (token != null && (token.getType() == TokenType.Plus || token.getType() == TokenType.Minus)) {
-                    token = tokens.read();
-                    SimpleASTNode child2 = multiplicative(tokens);
-                    node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
-                    node.addChild(child1);
-                    node.addChild(child2);
-                    child1 = node;
+                    token = tokens.read();              //读出加号
+                    SimpleASTNode child2 = multiplicative(tokens);  //计算下级节点
+                    if (child2 !=null) {
+                        node = new SimpleASTNode(ASTNodeType.Additive, token.getText());
+                        node.addChild(child1);              //注意，新节点在顶层，保证正确的结合性
+                        node.addChild(child2);
+                        child1 = node;
+                    }else{
+                        throw new Exception("invalid additive expression, expecting the right part.");
+                    }
                 } else {
                     break;
                 }
@@ -215,10 +243,14 @@ public class SimpleParser {
             if (token != null && (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)) {
                 token = tokens.read();
                 SimpleASTNode child2 = primary(tokens);
-                node = new SimpleASTNode(ASTNodeType.Multicative, token.getText());
-                node.addChild(child1);
-                node.addChild(child2);
-                child1 = node;
+                if (child2 != null) {
+                    node = new SimpleASTNode(ASTNodeType.Multiplicative, token.getText());
+                    node.addChild(child1);
+                    node.addChild(child2);
+                    child1 = node;
+                }else{
+                    throw new Exception("invalid multiplicative expression, expecting the right part.");
+                }
             } else {
                 break;
             }
