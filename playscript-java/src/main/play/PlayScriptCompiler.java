@@ -46,7 +46,8 @@ public class PlayScriptCompiler {
         walker.walk(pass4,at.ast);
 
         //pass5：其他语义检查
-
+        SematicValidator pass5 = new SematicValidator(at);
+        walker.walk(pass5,at.ast);
 
         //pass6：做闭包的分析
         ClosureAnalyzer closureAnalyzer = new ClosureAnalyzer(at);

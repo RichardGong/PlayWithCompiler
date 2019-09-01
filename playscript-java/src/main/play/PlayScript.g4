@@ -72,9 +72,9 @@ memberDeclaration
     | fieldDeclaration
     // | constructorDeclaration
     // | genericConstructorDeclaration
-    // | interfaceDeclaration
+//     | interfaceDeclaration
     // | annotationTypeDeclaration
-    // | classDeclaration
+     | classDeclaration
     // | enumDeclaration
     ;
 

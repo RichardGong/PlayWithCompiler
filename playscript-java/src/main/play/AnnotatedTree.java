@@ -3,6 +3,7 @@ package play;
 import java.util.*;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 
 
@@ -218,6 +219,20 @@ public class AnnotatedTree {
         return rtn;
     }
 
+    /**
+     * 包含某节点的函数
+     * @param ctx
+     * @return
+     */
+    public Function enclosingFunctionOfNode(RuleContext ctx){
+        if (ctx.parent instanceof PlayScriptParser.FunctionDeclarationContext){
+            return (Function) node2Scope.get(ctx.parent);
+        }
+        else if (ctx.parent == null){
+            return null;
+        }
+        else return enclosingFunctionOfNode(ctx.parent);
+    }
 
     /**
      * 输出本Scope中的内容，包括每个变量的名称、类型。

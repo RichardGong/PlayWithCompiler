@@ -1,77 +1,44 @@
 /**
-用闭包来模拟面向对象的多态特性。
-用Cow()函数和Sheep()函数返回的Mammal对象，其表现会不同。
-这种多态不是用类的继承实现的，但效果是一样的。
+做一些语义检查。
 */
 
-class Mammal{
-    function void() speak;
-    function int() getWeight;
-    function void(int) setWeight;
-    void foo(){
-        //在内部的方法中也可以调用这些函数型变量，与普通方法没有任何区别。
-        println("in foo");
-        setWeight(23);
-        speak();
-    }
+return 1;      //return语句只能在函数里。
+
+int foo(){     //定义了非void的返回值，就一定要有return语句
 }
 
-//返回一个Mammal对象，其特征是
-Mammal Cow(){
-    void speak(){
-        println("moo~~ moo~~");
-    }
-    int weight = 100;
-    int getWeight(){
-        return weight;
-    }
-    void setWeight(int w){
-        weight = w;
-    }
-
-    Mammal m = Mammal();
-    m.speak = speak;
-    m.getWeight = getWeight;
-    m.setWeight = setWeight;
-
-    return m;
+void foo2(){   //void类型的返回值，不需要有return语句
 }
 
-Mammal Sheep(){
-    void speak(){
-        println("mee~~ mee~~");
-    }
-    int weight = 20;
-    int getWeight(){
-        return weight;
-    }
-    void setWeight(int w){
-        weight = w;
-    }
+class C1{
+  int C1(){
+    return 0;  //构造方法里不能有返回值
+  }
+  
+  int C1(int a){
+    return;    //用一个空的return是可以的。
+  }
 
-    Mammal m = Mammal();
-    m.speak = speak;
-    m.getWeight = getWeight;
-    m.setWeight = setWeight;
-
-    return m;
+  //return 0;  如果在这里出现return语句，那么语法检查阶段就通不过。
 }
 
-Mammal m1 = Cow();
-m1.speak();
-println("weight of mammal1 : " + m1.getWeight());
-m1.setWeight(101);
-println("new weight of mammal1 : " + m1.getWeight());
 
-println();
+//////////////
 
-Mammal m2 = Sheep();
-m2.speak();
-println("weight of mammal2 : " + m2.getWeight());
-m2.setWeight(21);
-println("new weight of mammal2 : " + m2.getWeight());
-m2.foo();
-println("new weight of mammal2 : " + m2.getWeight());
+break;  //break语句只能在循环语句和case语句中。
 
-Mammal m3 = Sheep();
-m3.foo();
+void foo2(){
+  break;   //不允许
+}
+
+for (int i = 0; i < 2; i++){
+  break;   //这里可以
+}
+
+/////////////
+
+void foo3(){
+  class C2{ //不允许在函数内部声明类
+  }
+}
+
