@@ -36,10 +36,10 @@ public class AnnotatedTree {
     //语义分析过程中生成的信息，包括普通信息、警告和错误
     protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
 
+
     protected AnnotatedTree() {
 
     }
-
 
     /**
      * 记录编译错误和警告
@@ -232,6 +232,21 @@ public class AnnotatedTree {
             return null;
         }
         else return enclosingFunctionOfNode(ctx.parent);
+    }
+
+    /**
+     * 包含某节点的类
+     * @param ctx
+     * @return
+     */
+    public Class enclosingClassOfNode(RuleContext ctx){
+        if (ctx.parent instanceof PlayScriptParser.ClassDeclarationContext){
+            return (Class) node2Scope.get(ctx.parent);
+        }
+        else if (ctx.parent == null){
+            return null;
+        }
+        else return enclosingClassOfNode(ctx.parent);
     }
 
     /**

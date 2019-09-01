@@ -19,15 +19,20 @@ public class RefResolver extends PlayScriptBaseListener {
 
     private AnnotatedTree at = null;
 
+    //this()和super()构造函数留到最后去消解，因为它可能引用别的构造函数，必须等这些构造函数都消解完。
+    private List<FunctionCallContext> thisConstructorList = new LinkedList<>();
+    private List<FunctionCallContext> superConstructorList = new LinkedList<>();
+
     public RefResolver(AnnotatedTree at) {
         this.at = at;
     }
-
 
     @Override
     public void exitPrimary(PrimaryContext ctx) {
         Scope scope = at.enclosingScopeOfNode(ctx);
         Type type = null;
+
+        //标识符
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
             Variable variable = at.lookupVariable(scope, idName);
@@ -48,10 +53,28 @@ public class RefResolver extends PlayScriptBaseListener {
 
                 type = variable.type;
             }
-        } else if (ctx.literal() != null) {
+        }
+        //字面量
+        else if (ctx.literal() != null) {
             type = at.typeOfNode.get(ctx.literal());
-        } else if (ctx.expression() != null) {
+        }
+        //括号里的表达式
+        else if (ctx.expression() != null) {
             type = at.typeOfNode.get(ctx.expression());
+        }
+        //this关键字
+        else if (ctx.THIS() != null){
+            //找到Class类型的上级Scope
+            Class theClass = at.enclosingClassOfNode(ctx);
+            if (theClass != null){
+                This variable = theClass.getThis();
+                at.symbolOfNode.put(ctx, variable);
+
+                type = theClass;
+            }
+            else{
+                at.log("keyword \"this\" can only be used inside a class", ctx);
+            }
         }
 
         //类型推断、冒泡
@@ -61,7 +84,15 @@ public class RefResolver extends PlayScriptBaseListener {
 
     @Override
     public void exitFunctionCall(FunctionCallContext ctx) {
-        if(ctx.IDENTIFIER() == null){  //TODO 先不处理 this和 super的情况
+
+        // this
+        if(ctx.THIS() != null){
+            thisConstructorList.add(ctx);
+            return;
+        }
+        // super
+        else if(ctx.SUPER() != null){
+            superConstructorList.add(ctx);
             return;
         }
 
@@ -73,13 +104,7 @@ public class RefResolver extends PlayScriptBaseListener {
         String idName = ctx.IDENTIFIER().getText();
 
         // 获得参数类型，这些类型已经在表达式中推断出来
-        List<Type> paramTypes = new LinkedList<Type>();
-        if (ctx.expressionList() != null) {
-            for (ExpressionContext exp : ctx.expressionList().expression()) {
-                Type type = at.typeOfNode.get(exp);
-                paramTypes.add(type);
-            }
-        }
+        List<Type> paramTypes = getParamTypes(ctx);
 
         boolean found = false;
 
@@ -166,6 +191,95 @@ public class RefResolver extends PlayScriptBaseListener {
 
     }
 
+    /**
+     * 消解this()构造函数
+     * @param ctx
+     */
+    private void resolveThisConstructorCall(FunctionCallContext ctx){
+        Class theClass = at.enclosingClassOfNode(ctx);
+        if (theClass != null){
+            Function function = at.enclosingFunctionOfNode(ctx);
+            if (function != null && function.isConstructor()){
+                List<Type> paramTypes = getParamTypes(ctx);
+                Function refered = theClass.findConstructor(paramTypes);
+                if (refered != null){
+                    at.symbolOfNode.put(ctx,refered);
+                    at.typeOfNode.put(ctx,theClass);
+                }
+                else if (paramTypes.size() == 0){  //缺省构造函数
+                    at.symbolOfNode.put(ctx,refered);
+                    at.typeOfNode.put(ctx,theClass);
+                }
+                else{
+                    at.log("can not find a constructor matches this()", ctx);
+                }
+            }
+            else{
+                at.log("this() should only be called inside a class constructor", ctx);
+            }
+        }
+        else{
+            at.log("this() should only be called inside a class", ctx);
+        }
+    }
+
+    /**
+     * 消解Super()构造函数
+     * TODO 对于调用super()是有要求的，比如：
+     * (1)必须出现在构造函数的第一行，
+     * (2)this()和super不能同时出现，等等。
+     * @param ctx
+     */
+    private void resolveSuperConstructorCall(FunctionCallContext ctx){
+        Class theClass = at.enclosingClassOfNode(ctx);
+        if (theClass != null){
+            Function function = at.enclosingFunctionOfNode(ctx);
+            if (function != null && function.isConstructor()){
+                Class parentClass = theClass.getParentClass();
+                if (parentClass != null){
+                    List<Type> paramTypes = getParamTypes(ctx);
+                    Function refered = parentClass.findConstructor(paramTypes);
+                    if (refered != null){
+                        at.symbolOfNode.put(ctx,refered);
+                        at.typeOfNode.put(ctx,theClass);
+                    }
+                    else if(paramTypes.size() == 0) {  //缺省构造函数
+                        at.symbolOfNode.put(ctx,parentClass);
+                        at.typeOfNode.put(ctx,theClass);
+                    }
+                    else{
+                        at.log("can not find a constructor matches this()", ctx);
+                    }
+                }
+                else{  //父类是最顶层的基类。
+                    //TODO 这里暂时不处理
+                }
+            }
+            else{
+                at.log("super() should only be called inside a class constructor", ctx);
+            }
+        }
+        else{
+            at.log("super() should only be called inside a class", ctx);
+        }
+    }
+
+    /**
+     * 获得函数的参数列表
+     * @param ctx
+     * @return
+     */
+    private List<Type> getParamTypes(FunctionCallContext ctx){
+        List<Type> paramTypes = new LinkedList<Type>();
+        if (ctx.expressionList() != null) {
+            for (ExpressionContext exp : ctx.expressionList().expression()) {
+                Type type = at.typeOfNode.get(exp);
+                paramTypes.add(type);
+            }
+        }
+        return paramTypes;
+    }
+
     //消解处理点符号表达式的层层引用
     @Override
     public void exitExpression(ExpressionContext ctx) {
@@ -201,7 +315,8 @@ public class RefResolver extends PlayScriptBaseListener {
         }
 
         //变量引用冒泡： 如果下级是一个变量，往上冒泡传递，以便在点符号表达式中使用
-        else if (ctx.primary() != null && ctx.primary().IDENTIFIER() != null) {
+        //也包括This的冒泡
+        else if (ctx.primary() != null) {
             Symbol symbol = at.symbolOfNode.get(ctx.primary());
             at.symbolOfNode.put(ctx, symbol);
         }
@@ -298,6 +413,21 @@ public class RefResolver extends PlayScriptBaseListener {
             at.typeOfNode.put(ctx, PrimitiveType.Float);
         }
 
+    }
+
+    /**
+     * 在结束扫描之前，把this()和super()构造函数消解掉
+     * @param ctx
+     */
+    @Override
+    public void exitProg(ProgContext ctx) {
+        for (FunctionCallContext fcc : thisConstructorList){
+            resolveThisConstructorCall(fcc);
+        }
+
+        for (FunctionCallContext fcc : superConstructorList){
+            resolveSuperConstructorCall(fcc);
+        }
     }
 
 

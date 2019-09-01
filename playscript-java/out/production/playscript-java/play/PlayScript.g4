@@ -274,7 +274,7 @@ expression
     | expression bop='.'
       ( IDENTIFIER
       | functionCall
-    //   | THIS
+      | THIS
     //   | NEW nonWildcardTypeArguments? innerCreator
     //   | SUPER superSuffix
     //   | explicitGenericInvocation

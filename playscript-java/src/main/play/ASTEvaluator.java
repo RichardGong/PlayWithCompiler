@@ -174,6 +174,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         @Override
         public Object getValue() {
+            //对于this关键字，直接返回这个对象，应该是ClassObject
+            if (variable instanceof This){
+                return valueContainer;
+            }
+
             return valueContainer.getValue(variable);
         }
 
@@ -206,7 +211,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     ///////////////////////////////////////////////////////////
     /// 对象初始化
 
-    // 模拟在堆中申请空间，来保存对象
+    //从父类到子类层层执行缺省的初始化方法，即不带参数的初始化方法。
     protected ClassObject createAndInitClassObject(Class theClass) {
         ClassObject obj = new ClassObject();
         obj.type = theClass;
@@ -746,6 +751,12 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         else if (ctx.expression() != null){
             rtn = visitExpression(ctx.expression());
         }
+        //this
+        else if (ctx.THIS() != null){
+            This thisVar = (This)at.symbolOfNode.get(ctx);
+            rtn = getLValue(thisVar);
+        }
+
         return rtn;
     }
 
@@ -1030,7 +1041,17 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     @Override
     public Object visitFunctionCall(FunctionCallContext ctx) {
-        if (ctx.IDENTIFIER() == null) return null;  //暂时不支持this和super
+        //this
+        if (ctx.THIS() != null){
+            thisConstructor(ctx);
+            return null;  //不需要有返回值，因为本身就是在构造方法里调用的。
+        }
+        //super
+        else if (ctx.SUPER() != null){
+            return null;
+        }
+
+        //if (ctx.IDENTIFIER() == null) return null;  //暂时不支持this和super
 
         Object rtn = null;
 
@@ -1054,16 +1075,14 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         Function function = functionObject.function;
 
         //如果是对象的构造方法，则按照对象方法调用去执行，并返回所创建出的对象。
-        if (function.enclosingScope instanceof Class) {
+        if (function.isConstructor()) {
             Class theClass = (Class) function.enclosingScope;
 
-            if (theClass.name.equals(function.name)) {
-                ClassObject newObject = createAndInitClassObject(theClass);  //先做缺省的初始化
+            ClassObject newObject = createAndInitClassObject(theClass);  //先做缺省的初始化
 
-                methodCall(newObject, ctx);
+            methodCall(newObject, ctx);
 
-                return  newObject;  //返回新创建的对象。
-            }
+            return  newObject;  //返回新创建的对象。
         }
 
         //计算参数值
@@ -1139,6 +1158,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return functionObject;
     }
 
+
     /**
      * 执行一个函数的方法体。需要先设置参数值，然后再执行代码。
      * @param functionObject
@@ -1201,7 +1221,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         //对普通的类方法，需要在运行时动态绑定
         Class theClass = classObject.type;   //这是从对象获得的类型，是真实类型。可能是变量声明时的类型的子类
-        if (!theClass.name.equals(function.name)) {
+        if (!function.isConstructor()) {
             //从当前类逐级向上查找，找到正确的方法定义
             Function overrided = theClass.getFunction(function.name, function.getParamTypes());
             //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上
@@ -1227,12 +1247,25 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return rtn;
     }
 
+    private void thisConstructor(FunctionCallContext ctx){
+        Symbol symbol = at.symbolOfNode.get(ctx);
+        if (symbol instanceof Class){  //缺省构造函数
+            return; //这里不用管，因为缺省构造函数一定会被调用。
+        }
+        else if (symbol instanceof Function) {
+            Function function = (Function) symbol;
+            FunctionObject functionObject = new FunctionObject(function);
+
+            List<Object> paramValues = calcParamValues(ctx);
+
+            functionCall(functionObject, paramValues);
+        }
+    }
+
 
     @Override
     public Object visitFunctionDeclaration(FunctionDeclarationContext ctx) {
-        Object rtn = null;
-        rtn = visitFunctionBody(ctx.functionBody());
-        return rtn;
+        return visitFunctionBody(ctx.functionBody());
     }
 
     @Override

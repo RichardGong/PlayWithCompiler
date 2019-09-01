@@ -85,7 +85,7 @@ public class TypeChecker extends PlayScriptBaseListener {
                 case PlayScriptParser.URSHIFT_ASSIGN:
                     if (PrimitiveType.isNumeric(type2)) {
                         if (!checkNumericAssign(type2, type1)) {
-                            at.log("can not assign " + ctx.expression(1).getText() + " of type " + type2 + "to " + ctx.expression(0) + " of type " + type1, ctx);
+                            at.log("can not assign " + ctx.expression(1).getText() + " of type " + type2 + " to " + ctx.expression(0) + " of type " + type1, ctx);
                         }
                     }
                     else{
@@ -152,7 +152,7 @@ public class TypeChecker extends PlayScriptBaseListener {
     private void checkAssign(Type type1, Type type2,  ParserRuleContext ctx, ParserRuleContext operand1, ParserRuleContext operand2){
         if (PrimitiveType.isNumeric(type2)) {
             if (!checkNumericAssign(type2, type1)) {
-                at.log("can not assign " + operand2.getText() + " of type " + type2 + "to " + operand1.getText() + " of type " + type1, ctx);
+                at.log("can not assign " + operand2.getText() + " of type " + type2 + " to " + operand1.getText() + " of type " + type1, ctx);
             }
         }
         else if (type2 instanceof Class){
