@@ -27,20 +27,59 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     /// 栈桢的管理
     private Stack<StackFrame> stack = new Stack<StackFrame>();
 
+    /**
+     * 栈桢入栈。
+     * 其中最重要的任务，是要保证栈桢的parentFrame设置正确。否则，
+     * (1)随着栈的变深，查找变量的性能会降低；
+     * (2)甚至有可能找错栈桢，比如在递归(直接或间接)的场景下。
+     * @param frame
+     */
     private void pushStack(StackFrame frame) {
-        // 如果新加入的frame是当前frame的下一级，则入栈
         if (stack.size() > 0) {
-
+            //从栈顶到栈底依次查找
             for (int i = stack.size()-1; i>0; i--){
                 StackFrame f = stack.get(i);
+
+                /*
+                如果新加入的栈桢，跟某个已有的栈桢的enclosingScope是一样的，那么这俩的parentFrame也一样。
+                因为它们原本就是同一级的嘛。
+                比如：
+                void foo(){};
+                void bar(foo());
+
+                或者：
+                void foo();
+                if (...){
+                    foo();
+                }
+                */
                 if (f.scope.enclosingScope == frame.scope.enclosingScope){
                     frame.parentFrame = f.parentFrame;
                     break;
                 }
+
+                /*
+                如果新加入的栈桢，是某个已有的栈桢的下一级，那么就把把这个父子关系建立起来。比如：
+                void foo(){
+                    if (...){  //把这个块往栈桢里加的时候，就符合这个条件。
+                    }
+                }
+                再比如,下面的例子:
+                class MyClass{
+                    void foo();
+                }
+                MyClass c = MyClass();  //先加Class的栈桢，里面有类的属性，包括父类的
+                c.foo();                //再加foo()的栈桢
+                 */
                 else if (f.scope == frame.scope.enclosingScope){
                     frame.parentFrame = f;
                     break;
                 }
+
+                /*
+                这是针对函数可能是一等公民的情况。这个时候，函数运行时的作用域，与声明时的作用域会不一致。
+                我在这里设计了一个“receiver”的机制，意思是这个函数是被哪个变量接收了。要按照这个receiver的作用域来判断。
+                 */
                 else if (frame.object instanceof FunctionObject){
                     FunctionObject functionObject = (FunctionObject)frame.object;
                     if (functionObject.receiver != null && functionObject.receiver.enclosingScope == f.scope) {
