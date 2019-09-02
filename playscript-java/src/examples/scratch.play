@@ -5,14 +5,15 @@ class Mammal{
     int weight;
 
     Mammal(){
-        this.weight = 300;
         println("Mammal() called");
+        this.weight = 100;
     }
 
     Mammal(int weight){
         this();                   //调用另一个构造函数
+        println("Mammal(int weight) called");
         this.weight = weight;
-        this.speak();
+        this.speak();             //这里多态仍然会生效，实际调用的是Cow的speak方法
     }
 
     void speak(){
@@ -20,19 +21,28 @@ class Mammal{
     }
 }
 
-/*
-Class Cow extends Mammal{
+
+class Cow extends Mammal{
+    int weight = 300;
+
     Cow(){
         super(200);   //调用父类的构造函数
     }
+
     void speak(){
-        println("super.speak() : " + super.speak());
+        println("in Cow.speak");
+
+        println("super.weight : "  + super.weight);
+        println("this.weight : "  + this.weight);
+
+        println("call super.speak() : " );
+        super.speak();
+
         println("Cow speak is : moo~~ moo~~");
     }
 }
-*/
 
-Mammal m1 = Mammal(100);
-println("m1.weight: " + m1.weight);
 
-//Mammal com = Cow();
+Mammal cow = Cow();
+println();
+cow.speak();

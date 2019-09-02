@@ -174,8 +174,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         @Override
         public Object getValue() {
-            //对于this关键字，直接返回这个对象，应该是ClassObject
-            if (variable instanceof This){
+            //对于this或super关键字，直接返回这个对象，应该是ClassObject
+            if (variable instanceof This || variable instanceof Super){
                 return valueContainer;
             }
 
@@ -555,12 +555,17 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                 Object value = ((LValue) leftObject).getValue();
                 if (value instanceof ClassObject) {
                     ClassObject valueContainer = (ClassObject) value;
+                    Variable leftVar = (Variable)at.symbolOfNode.get(ctx.expression(0));
                     // 获得field或调用方法
                     if (ctx.IDENTIFIER() != null) {
                         Variable variable = (Variable) at.symbolOfNode.get(ctx);
-                        //类的成员可能需要重载
-                        Variable overloaded = at.lookupVariable(valueContainer.type, variable.getName());
-                        LValue lValue = new MyLValue(valueContainer, overloaded);
+
+                        //对于this和super引用的属性，不用考虑重载，因为它们的解析是准确的
+                        if (!(leftVar instanceof This || leftVar instanceof Super)) {
+                            //类的成员可能需要重载
+                            variable = at.lookupVariable(valueContainer.type, variable.getName());
+                        }
+                        LValue lValue = new MyLValue(valueContainer, variable);
                         rtn = lValue;
                     } else if (ctx.functionCall() != null) {
                         //要先计算方法的参数，才能加对象的StackFrame.
@@ -568,7 +573,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
                             System.out.println("\n>>MethodCall : " + ctx.getText());
                         }
 
-                        rtn = methodCall(valueContainer, ctx.functionCall());
+                        rtn = methodCall(valueContainer, ctx.functionCall(), (leftVar instanceof Super));
                     }
                 }
             } else {
@@ -753,8 +758,13 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         }
         //this
         else if (ctx.THIS() != null){
-            This thisVar = (This)at.symbolOfNode.get(ctx);
-            rtn = getLValue(thisVar);
+            This thisRef = (This)at.symbolOfNode.get(ctx);
+            rtn = getLValue(thisRef);
+        }
+        //super
+        else if (ctx.SUPER() != null){
+            Super superRef = (Super) at.symbolOfNode.get(ctx);
+            rtn = getLValue(superRef);
         }
 
         return rtn;
@@ -1048,6 +1058,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         }
         //super
         else if (ctx.SUPER() != null){
+            thisConstructor(ctx); //似乎跟this完全一样。因为方法的绑定是解析准确了的。
             return null;
         }
 
@@ -1080,7 +1091,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
             ClassObject newObject = createAndInitClassObject(theClass);  //先做缺省的初始化
 
-            methodCall(newObject, ctx);
+            methodCall(newObject, ctx, false);
 
             return  newObject;  //返回新创建的对象。
         }
@@ -1205,7 +1216,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
      * @param ctx
      * @return
      */
-    private Object methodCall(ClassObject classObject, FunctionCallContext ctx){
+    private Object methodCall(ClassObject classObject, FunctionCallContext ctx, boolean isSuper){
         Object rtn = null;
 
         //查找函数，并根据需要创建FunctionObject
@@ -1221,7 +1232,7 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         //对普通的类方法，需要在运行时动态绑定
         Class theClass = classObject.type;   //这是从对象获得的类型，是真实类型。可能是变量声明时的类型的子类
-        if (!function.isConstructor()) {
+        if (!function.isConstructor() && !isSuper) {
             //从当前类逐级向上查找，找到正确的方法定义
             Function overrided = theClass.getFunction(function.name, function.getParamTypes());
             //原来这个function，可能指向一个父类的实现。现在从子类中可能找到重载后的方法，这个时候要绑定到子类的方法上

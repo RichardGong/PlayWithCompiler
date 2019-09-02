@@ -18,6 +18,7 @@ public class Class extends Scope implements Type{
 
         thisRef = new This(this,ctx);
         thisRef.type = this;
+
     }
 
     protected Class getParentClass(){
@@ -26,11 +27,17 @@ public class Class extends Scope implements Type{
 
     protected void setParentClass(Class theClass){
         parentClass = theClass;
+
+        //其实superRef引用的也是自己
+        superRef = new Super(parentClass,ctx);
+        superRef.type = parentClass;
     }
 
 
     //这个类的This变量
-    private static This thisRef = null;
+    private This thisRef = null;
+
+    private Super superRef = null;
 
     //最顶层的基类
     private static Class rootClass = new Class("Object", null);
@@ -38,6 +45,8 @@ public class Class extends Scope implements Type{
     public This getThis(){
         return thisRef;
     }
+
+    public Super getSuper() {return superRef;}
 
     @Override
     public String toString(){
@@ -122,7 +131,7 @@ public class Class extends Scope implements Type{
     @Override
     protected boolean containsSymbol(Symbol symbol){
         //this关键字
-        if(symbol == thisRef){
+        if(symbol == thisRef || symbol == superRef){
             return true;
         }
 

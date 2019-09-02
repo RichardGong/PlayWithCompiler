@@ -313,7 +313,7 @@ expression
 primary
     : '(' expression ')'
     | THIS
-    // | SUPER
+    | SUPER
     | literal
     | IDENTIFIER
     // | typeTypeOrVoid '.' CLASS

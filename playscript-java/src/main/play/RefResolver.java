@@ -35,6 +35,7 @@ public class RefResolver extends PlayScriptBaseListener {
         //标识符
         if (ctx.IDENTIFIER() != null) {
             String idName = ctx.IDENTIFIER().getText();
+
             Variable variable = at.lookupVariable(scope, idName);
             if (variable == null) {
                 // 看看是不是函数，因为函数可以作为值来传递。这个时候，函数重名没法区分。
@@ -74,6 +75,20 @@ public class RefResolver extends PlayScriptBaseListener {
             }
             else{
                 at.log("keyword \"this\" can only be used inside a class", ctx);
+            }
+        }
+        //super关键字。看上去跟This关键字的用法完全一样？
+        else if (ctx.SUPER() != null){
+            //找到Class类型的上级Scope
+            Class theClass = at.enclosingClassOfNode(ctx);
+            if (theClass != null){
+                Super variable = theClass.getSuper();
+                at.symbolOfNode.put(ctx, variable);
+
+                type = theClass;
+            }
+            else{
+                at.log("keyword \"super\" can only be used inside a class", ctx);
             }
         }
 
@@ -290,12 +305,11 @@ public class RefResolver extends PlayScriptBaseListener {
             Symbol symbol = at.symbolOfNode.get(ctx.expression(0));
             if (symbol instanceof Variable && ((Variable) symbol).type instanceof Class) {
                 Class theClass = (Class) ((Variable) symbol).type;
-                Scope classScope = at.node2Scope.get(theClass.ctx); // 在类的scope里去查找，不需要改变当前的scope
 
                 //引用类的属性
                 if (ctx.IDENTIFIER() != null) {
                     String idName = ctx.IDENTIFIER().getText();
-                    Variable variable = at.lookupVariable(classScope, idName);
+                    Variable variable = at.lookupVariable(theClass, idName); // 在类的scope里去查找，不需要改变当前的scope
                     if (variable != null) {
                         at.symbolOfNode.put(ctx, variable);
                         type = variable.type;  //类型综合（冒泡)
@@ -315,7 +329,7 @@ public class RefResolver extends PlayScriptBaseListener {
         }
 
         //变量引用冒泡： 如果下级是一个变量，往上冒泡传递，以便在点符号表达式中使用
-        //也包括This的冒泡
+        //也包括This和Super的冒泡
         else if (ctx.primary() != null) {
             Symbol symbol = at.symbolOfNode.get(ctx.primary());
             at.symbolOfNode.put(ctx, symbol);
