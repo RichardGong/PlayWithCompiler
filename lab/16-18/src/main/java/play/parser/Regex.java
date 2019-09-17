@@ -52,6 +52,7 @@ public class Regex {
         //用NFA来匹配
         matchWithNFA(states2[0], "abc");
         matchWithNFA(states2[0], "abcbbbcbc");
+        matchWithNFA(states2[0], "abde");
 
         //转换成DFA
         System.out.println("\nNFA to DFA:");
@@ -61,6 +62,7 @@ public class Regex {
         //用DFA来匹配
         matchWithDFA(dfaStates2.get(0), "abc");
         matchWithDFA(dfaStates2.get(0), "abcbbbcbc");
+        matchWithDFA(dfaStates2.get(0), "abcb");
     }
 
 
@@ -182,16 +184,17 @@ public class Regex {
         char[] chars = str.toCharArray();
         int index = matchWithNFA(state, chars, 0);
 
-        System.out.println((index == chars.length) + "\n");
+        boolean match = index == chars.length;
 
-        return index == chars.length;
+        System.out.println("matched? : " + match + "\n");
+
+        return match;
     }
 
     /**
      * 用NFA来匹配字符串
-     *
-     * @param state
-     * @param chars
+     * @param state 当前所在的状态
+     * @param chars 要匹配的字符串，用数组表示
      * @param index1 当前匹配字符开始的位置。
      * @return 匹配后，新index的位置。指向匹配成功的字符的下一个字符。
      */
@@ -238,7 +241,7 @@ public class Regex {
         char[] chars = str.toCharArray();
         boolean match = matchWithDFA(state, chars, 0);
 
-        System.out.println(match + "\n");
+        System.out.println("matched? : " + match + "\n");
 
         return match;
     }
@@ -269,7 +272,7 @@ public class Regex {
             } else {
                 //字符串已经匹配完毕
                 //看看是否到达了接受状态
-                if (state.isAcceptable()) {
+                if (nextState.isAcceptable()) {
                     return true;
                 } else {
                     return false;
