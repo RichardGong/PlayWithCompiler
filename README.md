@@ -24,6 +24,12 @@
   + ASTEvaluator.java 实现了visitor模式的一个类，对AST遍历，实现表达式求值。
   + PlayScript.java 一个简单的测试程序
   + 其他文件：都是由Antlr解析规则文件后生成的  
+* lab/16-18 : 第16-18讲，算法篇的示例代码
+  + [Regex.java](lab/16-18/src/main/java/play/parser/Regex.java) : 正则表达式工具，包括从正则表达式生成NFA，从NFA生成DFA，以及基于NFA和DFA做字符串匹配。
+  + [Lexer.java](lab/16-18/src/main/java/play/parser/Lexer.java) : 基于正则表达式自动做词法分析。
+  + [GrammarNode.java](lab/16-18/src/main/java/play/parser/GrammarNode.java) : 文法。能像EBNF那样表示词法和语法。
+  + [State.java](lab/16-18/src/main/java/play/parser/State.java) : 有限自动机节点。
+  + [DFAState.java](lab/16-18/src/main/java/play/parser/DFAState.java) : DFA的节点。
   
 ### [playscript-java](playscript-java)
 这是一个java版本的脚本语言的参考实现，课程第7讲之后的示例以该项目为核心。   
