@@ -3,13 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="275d51bb-bc4a-4244-9577-ebc3ced4270d" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/../.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.name" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.name" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/CharSet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/CharSet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/Regex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/Regex.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab.code-workspace" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../oop/ClassTest.play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../oop/ThisSuperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../oop/ThisSuperTest.java" afterDir="false" />
@@ -46,16 +40,20 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/17-LL.iml">
-          <provider selected="true" editor-type-id="text-editor" />
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="120">
+              <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.idea/.name">
+        <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="1" selection-start-column="1" selection-end-column="1" />
+            <state relative-caret-position="-4443">
+              <caret line="21" selection-start-line="21" selection-end-line="21" />
             </state>
           </provider>
         </entry>
@@ -81,7 +79,7 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Regex.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="272">
@@ -189,7 +187,6 @@
         <option value="$PROJECT_DIR$/src/main/java/play/parser/RecursiveDecentParser.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/LRParser.java" />
-        <option value="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/State.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/TokenReader.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/ASTNode.java" />
@@ -203,6 +200,7 @@
         <option value="$PROJECT_DIR$/.idea/compiler.xml" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/CharSet.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/Regex.java" />
+        <option value="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" />
       </list>
     </option>
   </component>
@@ -393,18 +391,18 @@
       <option name="presentableId" value="Default" />
       <updated>1568173497866</updated>
       <workItem from="1568173501876" duration="112241000" />
-      <workItem from="1568725525272" duration="3286000" />
+      <workItem from="1568725525272" duration="4230000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="115527000" />
+    <option name="totallyTimeSpent" value="116471000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="777" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24878837" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24878837" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
@@ -413,7 +411,7 @@
       <window_info id="设计器" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.329927" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3591241" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3591241" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -596,13 +594,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" selection-start-line="21" selection-end-line="21" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNodeType.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -646,13 +637,6 @@
             <element signature="e#570#571#0" expanded="true" />
             <element signature="e#597#598#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="77">
-          <caret line="195" column="7" selection-start-line="195" selection-start-column="7" selection-end-line="195" selection-end-column="7" />
         </state>
       </provider>
     </entry>
@@ -707,6 +691,20 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="272">
           <caret line="64" column="45" selection-start-line="64" selection-start-column="45" selection-end-line="64" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-4443">
+          <caret line="21" selection-start-line="21" selection-end-line="21" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="14" selection-start-line="8" selection-start-column="14" selection-end-line="8" selection-end-column="14" />
         </state>
       </provider>
     </entry>

@@ -1,7 +1,12 @@
 package play.parser;
 
 /**
- * 构造
+ * 创建一些示例用的文法。
+ * 包括：
+ * 1.词法规则
+ * 2.消除了左递归的表达式的语法规则
+ * 3.带有左递归的表达式的语法规则
+ * 4.语句相关的语法规则
  */
 public class SampleGrammar {
 
@@ -51,21 +56,20 @@ public class SampleGrammar {
 
     /**
      * 消除了左递归的表达式语法规则：
-     * exp	: equal ;
+     * expression	: equal ;
      * equal: rel equal1 ;
+     * equal1	: (== | !=) rel equal1 | ε ;
      * rel	: add rel1 ;
+     * rel1	: (>= | > | <= | <) add rel1 | ε ;
      * add	: mul add1 ;
+     * add1	: (+ | -) mul add1 | ε ;
      * mul	: pri mul1 ;
+     * mul1	: (* | /) pri mul1 | ε ;
      * pri	: ID | INT_LITERAL | LPAREN add RPAREN ;
-     * mul1	: (* | /) pri | ε ;
-     * add1	: (+ | -) mul | ε ;
-     * rel1	: (>= | > | <= | <) add | ε ;
-     * equal1	: (== | !=) rel | ε ;
-     *
      * @return
      */
     public static GrammarNode expressionGrammar() {
-        //prog
+        //expression
         GrammarNode exp = new GrammarNode("expression", GrammarNodeType.Or);
 
         //assignment
@@ -90,7 +94,6 @@ public class SampleGrammar {
         equal1.createChild( GrammarNodeType.Epsilon);
 
         //rel
-        //GrammarNode rel = exp.createChild("rel", GrammarNodeType.And);
         GrammarNode add = rel.createChild("add", GrammarNodeType.And);
         GrammarNode rel1 = rel.createChild("rel1", GrammarNodeType.Or);
 
@@ -106,7 +109,6 @@ public class SampleGrammar {
         rel1.createChild( GrammarNodeType.Epsilon);
 
         //add
-        //GrammarNode add = prog.createChild("add", GrammarNodeType.And);
         GrammarNode mul = add.createChild("mul", GrammarNodeType.And);
         GrammarNode add1 = add.createChild("add1", GrammarNodeType.Or);
 
@@ -145,7 +147,7 @@ public class SampleGrammar {
 
     /**
      * 带有左递归的语法规则：
-     * exp	: add ;
+     * expression	: add ;
      * add	: mul | add (+ | -) mul ;
      * mul	: pri | mul (* | /) pri ;
      * pri	: ID | INT_LITERAL | LPAREN add RPAREN ;
@@ -153,8 +155,8 @@ public class SampleGrammar {
      * @return
      */
     public static GrammarNode leftRecursiveExpressionGrammar() {
-        //prog
-        GrammarNode exp = new GrammarNode("exp", GrammarNodeType.Or);
+        //expression
+        GrammarNode exp = new GrammarNode("expression", GrammarNodeType.Or);
 
         //add
         GrammarNode add = exp.createChild("add", GrammarNodeType.Or);
