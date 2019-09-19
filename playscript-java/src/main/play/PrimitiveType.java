@@ -34,7 +34,7 @@ public final class PrimitiveType implements Type {
     public static PrimitiveType Char = new PrimitiveType("Char");
     public static PrimitiveType Short = new PrimitiveType("Short");
 
-    public static PrimitiveType String = new PrimitiveType("Short"); //增加String为基础类型
+    public static PrimitiveType String = new PrimitiveType("String"); //增加String为基础类型
 
     public static PrimitiveType Null = new PrimitiveType("null");
 
