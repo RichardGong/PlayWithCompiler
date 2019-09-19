@@ -42,6 +42,20 @@ public class GrammarNode {
         this.type = type;
     }
 
+    protected GrammarNode(String name, GrammarNodeType type, GrammarNode child, Token token){
+        this.name = name;
+        this.type = type;
+        this.children.add(child);
+        this.token = token;
+    }
+
+    protected GrammarNode(String name, GrammarNodeType type, List<GrammarNode> children, Token token){
+        this.name = name;
+        this.type = type;
+        this.children.addAll(children);
+        this.token = token;
+    }
+
     protected GrammarNode(Token token){
         this.token = token;
     }
@@ -130,13 +144,71 @@ public class GrammarNode {
     }
 
     //节点类型
-    public GrammarNodeType getType(){
-        return type;
-    }
+    public GrammarNodeType getType(){ return type; }
 
 
     public String getName(){
         return name;
+    }
+
+    public String getGrammarName(){
+        if (token!= null){
+            return token.getType();
+        }
+        else if (isNamedNode()){
+            return name;
+        }
+        return null;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        GrammarNode node = (GrammarNode)obj;
+
+        //类型相同
+        if (node.type != type){
+            return false;
+        }
+
+        //名称相同
+        if (node.name == null){
+            if (name != null){
+                return false;
+            }
+        }
+        else {
+            if (!node.name.equals(name)){
+                return false;
+            }
+        }
+
+        //比较Token
+        if(type == GrammarNodeType.Token){
+            return token.equals(node.token);
+        }
+        //Epsilon
+        else if (type == GrammarNodeType.Epsilon){
+            return true;
+        }
+        //比较字符集合
+        else if (type == GrammarNodeType.Char){
+            return charSet.equals(node.charSet);
+        }
+
+        //子节点也相同
+        if(children.size() != node.children.size()){
+            return false;
+        }
+
+        for (int i = 0; i< children().size(); i++){
+            if (!children.get(i).equals(node.children.get(i))){
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -349,7 +421,7 @@ public class GrammarNode {
             }
             rtn = allNullable;
         }
-        else if (this.type ==  GrammarNodeType.And){
+        else if (this.type ==  GrammarNodeType.Or){
             boolean anyNullable = false;
             for (GrammarNode child : children){
                 if (child.isNullable()){
@@ -361,6 +433,27 @@ public class GrammarNode {
         }
 
         return rtn;
+    }
+
+    /**
+     * 获得以本节点为起始节点，能到达的所有语法节点。
+     * @return
+     */
+    protected List<GrammarNode> getAllNodes(){
+        List <GrammarNode> allNodes = new LinkedList<GrammarNode>();
+
+        getAllNodes(this,allNodes);
+
+        return allNodes;
+    }
+
+    private static void getAllNodes(GrammarNode node, List <GrammarNode> allNodes){
+        allNodes.add(node);
+        for (GrammarNode child : node.children){
+            if(!allNodes.contains(child)){
+                getAllNodes(child, allNodes);
+            }
+        }
     }
 
     /**

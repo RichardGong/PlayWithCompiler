@@ -85,9 +85,9 @@ public class Regex {
                     //递归，生成子图，返回头尾两个状态
                     State[] childState = regexToNFA(child);
                     //beginState，通过ε接到子图的开始状态
-                    beginState.addTransition(new Transition(), childState[0]);
+                    beginState.addTransition(new CharTransition(), childState[0]);
                     //子图的结束状态，通过ε接到endState
-                    childState[1].addTransition(new Transition(), endState);
+                    childState[1].addTransition(new CharTransition(), endState);
                     childState[1].setAcceptable(false);
                 }
                 break;
@@ -116,8 +116,9 @@ public class Regex {
                 beginState = new State();
                 endState = new State(true);
                 //图的边上是当前节点的charSet，也就是导致迁移的字符的集合，比如所有字母
-                beginState.addTransition(new Transition(node.getCharSet()), endState);
+                beginState.addTransition(new CharTransition(node.getCharSet()), endState);
                 break;
+
         }
 
         State[] rtn = null;
@@ -151,18 +152,18 @@ public class Regex {
 
         //允许循环
         if (node.getMaxTimes() == -1 || node.getMaxTimes() > 1) {
-            state2.addTransition(new Transition(node.getMaxTimes()), state1);
+            state2.addTransition(new CharTransition(node.getMaxTimes()), state1);
         }
 
         //允许0次，这时候要再加上两个节点
         if (node.getMinTimes() == 0) {
             beginState = new State();
             endState = new State(true);
-            beginState.addTransition(new Transition(), state1);
-            state2.addTransition(new Transition(), endState);
+            beginState.addTransition(new CharTransition(), state1);
+            state2.addTransition(new CharTransition(), endState);
             state2.setAcceptable(false);
 
-            beginState.addTransition(new Transition(), endState);
+            beginState.addTransition(new CharTransition(), endState);
         } else {
             beginState = state1;
             endState = state2;
@@ -317,7 +318,7 @@ public class Regex {
 
 
     /**
-     * 把NFA抓换成DFA
+     * 把NFA转换成DFA
      *
      * @param startState 起始的NFA状态
      * @param alphabet   该词法所采用的字符的集合
@@ -357,7 +358,7 @@ public class Regex {
                         dfaState = new DFAState(nextStateSet);
                         dfaStates.add(dfaState);
                         newStates.add(dfaState);
-                        transition = new Transition();
+                        transition = new CharTransition();
                         dfaState2.addTransition(transition, dfaState);
                     }
 
@@ -365,13 +366,13 @@ public class Regex {
                     if (transition == null) {
                         transition = dfaState2.getTransitionTo(dfaState);
                         if (transition == null) {
-                            transition = new Transition();
+                            transition = new CharTransition();
                             dfaState2.addTransition(transition, dfaState);
                         }
                     }
 
                     //往transition上添加字母
-                    transition.condition.addSubSet(new CharSet(ch));
+                    ((CharTransition)transition).condition.addSubSet(new CharSet(ch));
                 }
             }
 

@@ -92,6 +92,29 @@ public class Token {
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+
+        Token token = (Token)obj;
+        if (!type.equals(token.type)){
+            return false;
+        }
+
+        if (text== null){
+            if (token.text != null){
+                return false;
+            }
+        }
+        else{
+            if (!text.equals(token.text)){
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
     public String toString(){
         String rtn = type;
 

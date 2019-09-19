@@ -150,13 +150,13 @@ public class SampleGrammar {
      * expression	: add ;
      * add	: mul | add (+ | -) mul ;
      * mul	: pri | mul (* | /) pri ;
-     * pri	: ID | INT_LITERAL | LPAREN add RPAREN ;
+     * pri	: ID | INT_LITERAL | LPAREN expression RPAREN ;
      *
      * @return
      */
     public static GrammarNode leftRecursiveExpressionGrammar() {
         //expression
-        GrammarNode exp = new GrammarNode("expression", GrammarNodeType.Or);
+        GrammarNode exp = new GrammarNode("expression", GrammarNodeType.And);
 
         //add
         GrammarNode add = exp.createChild("add", GrammarNodeType.Or);
@@ -186,6 +186,39 @@ public class SampleGrammar {
         pri_3.createChild(new Token("RPAREN"));
 
         return exp;
+    }
+
+    /**
+     * 带有左递归的简化版的语法规则：
+     * add	: mul | add '+' mul ;
+     * mul	: pri | mul '*' pri ;
+     * pri	: INT_LITERAL | LPAREN add RPAREN ;
+     * @return
+     */
+    public static GrammarNode simpleLeftRecursiveExpressionGrammar() {
+        //add
+        GrammarNode add = new GrammarNode("add", GrammarNodeType.Or);
+        GrammarNode mul = add.createChild("mul", GrammarNodeType.Or);
+        GrammarNode add_2 = add.createChild(GrammarNodeType.And);
+        add_2.addChild(add);  //左递归
+        add_2.createChild(new Token("ADD","+"));
+        add_2.addChild(mul);
+
+        //mul
+        GrammarNode pri = mul.createChild("pri", GrammarNodeType.Or);
+        GrammarNode mul_2 = mul.createChild(GrammarNodeType.And);
+        mul_2.addChild(mul);
+        mul_2.createChild(new Token("MUL", "*"));
+        mul_2.addChild(pri);
+
+        //pri
+        pri.createChild(new Token("INT_LITERAL"));
+        GrammarNode pri_3 = pri.createChild(GrammarNodeType.And);
+        pri_3.createChild(new Token("LPAREN"));
+        pri_3.addChild(add);
+        pri_3.createChild(new Token("RPAREN"));
+
+        return add;
     }
 
 

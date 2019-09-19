@@ -55,6 +55,11 @@ public class State {
         return transition2State.get(transition);
     }
 
+    /**
+     * 获得到某个状态的Transition。  //TODO 这里假设每个两个状态之间只可能有一个Transition
+     * @param toState
+     * @return
+     */
     public Transition getTransitionTo(State toState){
         for (Transition transition: transitions){
             if (transition2State.get(transition) == toState){
