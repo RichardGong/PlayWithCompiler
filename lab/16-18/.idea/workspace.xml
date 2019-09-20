@@ -3,8 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="275d51bb-bc4a-4244-9577-ebc3ced4270d" name="默认更改列表" comment="">
       <change beforePath="$PROJECT_DIR$/../.vscode/launch.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab.code-workspace" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../oop/ClassTest.play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../oop/ThisSuperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../oop/ThisSuperTest.java" afterDir="false" />
@@ -63,22 +63,31 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="212">
-              <caret line="122" column="22" selection-start-line="122" selection-start-column="22" selection-end-line="122" selection-end-column="22" />
+            <state relative-caret-position="411">
+              <caret line="35" column="75" selection-start-line="35" selection-start-column="75" selection-end-line="35" selection-end-column="75" />
               <folding>
                 <element signature="e#10747#10760#0" expanded="true" />
                 <element signature="e#9341#9342#0" expanded="true" />
                 <element signature="e#9384#9385#0" expanded="true" />
                 <element signature="e#9465#9466#0" expanded="true" />
                 <element signature="e#9501#9502#0" expanded="true" />
-                <element signature="e#11611#11612#0" expanded="true" />
-                <element signature="e#11674#11675#0" expanded="true" />
-                <element signature="e#11737#11738#0" expanded="true" />
-                <element signature="e#11796#11797#0" expanded="true" />
-                <element signature="e#11860#11861#0" expanded="true" />
+                <element signature="e#11694#11695#0" expanded="true" />
+                <element signature="e#11757#11758#0" expanded="true" />
+                <element signature="e#11820#11821#0" expanded="true" />
+                <element signature="e#11879#11880#0" expanded="true" />
+                <element signature="e#11943#11944#0" expanded="true" />
                 <element signature="e#9861#9862#0" expanded="true" />
                 <element signature="e#9899#9900#0" expanded="true" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNodeType.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="150">
+              <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
             </state>
           </provider>
         </entry>
@@ -109,8 +118,21 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="128">
-              <caret line="18" column="8" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
+            <state relative-caret-position="301">
+              <caret line="145" column="54" selection-start-line="145" selection-start-column="54" selection-end-line="145" selection-end-column="54" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Token.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="267">
+              <caret line="22" selection-start-line="22" selection-end-line="22" />
+              <folding>
+                <element signature="e#417#418#0" expanded="true" />
+                <element signature="e#449#450#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -125,33 +147,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/CharSet.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="234" column="19" selection-start-line="234" selection-start-column="19" selection-end-line="234" selection-end-column="19" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Regex.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="171">
               <caret line="351" column="66" lean-forward="true" selection-start-line="351" selection-start-column="20" selection-end-line="351" selection-end-column="66" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/ASTNode.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="518">
-              <caret line="111" selection-start-line="111" selection-end-line="111" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#570#571#0" expanded="true" />
-                <element signature="e#597#598#0" expanded="true" />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -204,6 +203,8 @@
       <find>new Transition()</find>
       <find>new Transition(</find>
       <find>Epsilong</find>
+      <find>calcF</find>
+      <find>Epsilon</find>
     </findStrings>
     <replaceStrings>
       <replace>numChildren()</replace>
@@ -261,14 +262,14 @@
         <option value="$PROJECT_DIR$/src/main/java/play/parser/Transition.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/TokenTransition.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/CharTransition.java" />
-        <option value="$PROJECT_DIR$/src/main/java/play/parser/Token.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/ASTNode.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/Regex.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/State.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/GrammarTransition.java" />
-        <option value="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/LRParser.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" />
+        <option value="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" />
+        <option value="$PROJECT_DIR$/src/main/java/play/parser/Token.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" />
       </list>
     </option>
@@ -479,18 +480,18 @@
       <option name="presentableId" value="Default" />
       <updated>1568173497866</updated>
       <workItem from="1568173501876" duration="112241000" />
-      <workItem from="1568725525272" duration="51514000" />
+      <workItem from="1568725525272" duration="54525000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="163755000" />
+    <option name="totallyTimeSpent" value="166766000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="777" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.24878837" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24878837" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
@@ -499,7 +500,7 @@
       <window_info id="设计器" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.329927" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.31532848" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.26569343" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -550,43 +551,43 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>232</line>
+          <line>243</line>
           <properties />
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>224</line>
+          <line>235</line>
           <properties />
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>47</line>
+          <line>51</line>
           <properties />
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>390</line>
+          <line>401</line>
           <properties />
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>400</line>
+          <line>411</line>
           <properties />
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>350</line>
+          <line>361</line>
           <properties />
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>353</line>
+          <line>364</line>
           <properties />
           <option name="timeStamp" value="47" />
         </line-breakpoint>
@@ -610,7 +611,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>326</line>
+          <line>337</line>
           <properties />
           <option name="timeStamp" value="62" />
         </line-breakpoint>
@@ -640,13 +641,6 @@
             <element signature="e#605#606#0" expanded="true" />
             <element signature="e#631#632#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNodeType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" selection-start-line="6" selection-end-line="6" />
         </state>
       </provider>
     </entry>
@@ -721,17 +715,6 @@
           <folding>
             <element signature="e#5748#5749#0" expanded="true" />
             <element signature="e#5784#5785#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Token.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="148">
-          <caret line="95" column="37" selection-start-line="95" selection-start-column="37" selection-end-line="95" selection-end-column="37" />
-          <folding>
-            <element signature="e#417#418#0" expanded="true" />
-            <element signature="e#449#450#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -811,27 +794,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="212">
-          <caret line="122" column="22" selection-start-line="122" selection-start-column="22" selection-end-line="122" selection-end-column="22" />
-          <folding>
-            <element signature="e#10747#10760#0" expanded="true" />
-            <element signature="e#9341#9342#0" expanded="true" />
-            <element signature="e#9384#9385#0" expanded="true" />
-            <element signature="e#9465#9466#0" expanded="true" />
-            <element signature="e#9501#9502#0" expanded="true" />
-            <element signature="e#11611#11612#0" expanded="true" />
-            <element signature="e#11674#11675#0" expanded="true" />
-            <element signature="e#11737#11738#0" expanded="true" />
-            <element signature="e#11796#11797#0" expanded="true" />
-            <element signature="e#11860#11861#0" expanded="true" />
-            <element signature="e#9861#9862#0" expanded="true" />
-            <element signature="e#9899#9900#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Regex.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -867,10 +829,49 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="411">
+          <caret line="35" column="75" selection-start-line="35" selection-start-column="75" selection-end-line="35" selection-end-column="75" />
+          <folding>
+            <element signature="e#10747#10760#0" expanded="true" />
+            <element signature="e#9341#9342#0" expanded="true" />
+            <element signature="e#9384#9385#0" expanded="true" />
+            <element signature="e#9465#9466#0" expanded="true" />
+            <element signature="e#9501#9502#0" expanded="true" />
+            <element signature="e#11694#11695#0" expanded="true" />
+            <element signature="e#11757#11758#0" expanded="true" />
+            <element signature="e#11820#11821#0" expanded="true" />
+            <element signature="e#11879#11880#0" expanded="true" />
+            <element signature="e#11943#11944#0" expanded="true" />
+            <element signature="e#9861#9862#0" expanded="true" />
+            <element signature="e#9899#9900#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/GrammarNodeType.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="4" selection-start-line="10" selection-start-column="4" selection-end-line="10" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Token.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="267">
+          <caret line="22" selection-start-line="22" selection-end-line="22" />
+          <folding>
+            <element signature="e#417#418#0" expanded="true" />
+            <element signature="e#449#450#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="18" column="8" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
+        <state relative-caret-position="301">
+          <caret line="145" column="54" selection-start-line="145" selection-start-column="54" selection-end-line="145" selection-end-column="54" />
         </state>
       </provider>
     </entry>

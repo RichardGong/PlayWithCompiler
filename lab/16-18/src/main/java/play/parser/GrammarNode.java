@@ -33,6 +33,8 @@ public class GrammarNode {
     //是否被词法处理器忽略，比如空白字符
     private boolean neglect = false;
 
+    public static GrammarNode EPSILON = new GrammarNode(GrammarNodeType.Epsilon);
+
     protected GrammarNode(GrammarNodeType type){
         this.type = type;
     }

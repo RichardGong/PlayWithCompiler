@@ -8,15 +8,19 @@ import java.util.*;
  * 1.计算First集合；
  * 2.计算Follow集合
  * 3.通过递归下降算法，使用First和Follow集合实现带有预测能力的语法分析。
+ *
+ * 另外，里面计算First和Follow集合，都是基于GrammarNode来做的。有可能代码有点长，看起来费力。
+ * 特别是计算Follow集合的时候，要考虑到如何计算产生式中最后一个元素的后面跟着的是谁。
+ *
+ * 如果不基于GrammarNode的结构，先转化成简单的产生式再计算，应该会更简单一些。抽空可能会再实现一个版本。
+ *
  */
 public class LLParser {
 
     public static void main(String args[]) {
         String script1 = "2+3*(4+5)";
 
-
         parse(script1, SampleGrammar.expressionGrammar());
-        
     }
 
     /**
@@ -110,6 +114,7 @@ public class LLParser {
             if (grammar.getType() == GrammarNodeType.And) {
                 childToAdd.add(grammar.getChild(0));
 
+                //要一直找到一个不产生Epsilong的符号
                 for (GrammarNode child : grammar.children()) {
                     childToAdd.add(child);
                     if (!child.isNullable()) {
@@ -134,6 +139,12 @@ public class LLParser {
                     if (!firstSet.contains(child.getToken().getType())) {
                         stable = false;
                         firstSet.add(child.getToken().getType());
+                    }
+                }
+
+                if (child.isNullable()) {
+                    if (!firstSet.contains("EPSILON")) {
+                        firstSet.add("EPSILON");
                     }
                 }
             }
