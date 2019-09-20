@@ -632,7 +632,7 @@ public class LRParser {
         for (State state : states) {
             Set<State> closure = calculatedClosures.get(state);
             if (closure == null){
-                System.out.println();
+                System.out.println("error : closure is null");
             }
             newStates.addAll(closure);
         }
@@ -755,11 +755,6 @@ public class LRParser {
             this.item = item;
         }
 
-        GrammarNFAState(Item item, boolean acceptable) {
-            super(acceptable);
-            this.item = item;
-        }
-
         @Override
         public String toString() {
             StringBuffer sb = new StringBuffer();
@@ -768,21 +763,5 @@ public class LRParser {
             return sb.toString();
         }
     }
-
-    /**
-     * 解析过程的动作。移进还是规约？规约的话，用哪个句柄？
-     */
-    private interface Action {
-
-    }
-
-    private class Shift implements Action {
-
-    }
-
-    private class Reduce implements Action {
-
-    }
-
 
 }
