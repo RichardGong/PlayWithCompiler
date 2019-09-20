@@ -72,15 +72,19 @@ public class SampleGrammar {
         //expression
         GrammarNode exp = new GrammarNode("expression", GrammarNodeType.Or);
 
-        //assignment
-        GrammarNode assign = exp.createChild("assign", GrammarNodeType.Or);
-        GrammarNode assign1 = assign.createChild(GrammarNodeType.And);
-        assign1.createChild(new Token("ID"));
-        assign1.createChild(new Token("ASSIGN", "="));
-        assign1.addChild(exp);
+        //assign
+        GrammarNode assign = exp.createChild("assign", GrammarNodeType.And);
+        GrammarNode equal = assign.createChild("equal", GrammarNodeType.And);
+        GrammarNode assign1 = assign.createChild("assgn1", GrammarNodeType.Or);
+
+        //assign1
+        GrammarNode assign1_1 = assign1.createChild( GrammarNodeType.And);
+        assign1_1.createChild(new Token("ASSIGN", "="));
+        assign1_1.addChild(equal);
+        assign1_1.addChild(assign1);
+        assign1.createChild( GrammarNodeType.Epsilon);
 
         //equal
-        GrammarNode equal = assign.createChild("equal", GrammarNodeType.And);
         GrammarNode rel = equal.createChild("rel", GrammarNodeType.And);
         GrammarNode equal1 = equal.createChild("equal1", GrammarNodeType.Or);
 

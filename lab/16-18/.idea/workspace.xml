@@ -2,17 +2,9 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="275d51bb-bc4a-4244-9577-ebc3ced4270d" name="默认更改列表" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/play/parser/CharTransition.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/play/parser/GrammarTransition.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../.vscode/launch.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/ASTNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/ASTNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/Regex.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/Regex.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/State.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/State.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/Token.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/Token.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/play/parser/Transition.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/play/parser/Transition.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab.code-workspace" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../oop/ClassTest.play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../oop/ThisSuperTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../oop/ThisSuperTest.java" afterDir="false" />
@@ -62,8 +54,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="137">
-              <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
+            <state relative-caret-position="1078">
+              <caret line="81" column="8" selection-start-line="81" selection-start-column="8" selection-end-line="81" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -118,7 +110,7 @@
         <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="128">
-              <caret line="441" column="25" selection-start-line="441" selection-start-column="25" selection-end-line="441" selection-end-column="25" />
+              <caret line="18" column="8" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
             </state>
           </provider>
         </entry>
@@ -211,6 +203,7 @@
       <find>exl</find>
       <find>new Transition()</find>
       <find>new Transition(</find>
+      <find>Epsilong</find>
     </findStrings>
     <replaceStrings>
       <replace>numChildren()</replace>
@@ -274,8 +267,8 @@
         <option value="$PROJECT_DIR$/src/main/java/play/parser/State.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/GrammarTransition.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/GrammarNode.java" />
-        <option value="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/LRParser.java" />
+        <option value="$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java" />
         <option value="$PROJECT_DIR$/src/main/java/play/parser/LLParser.java" />
       </list>
     </option>
@@ -379,7 +372,20 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Application.LRParser">
+  <component name="RunManager" selected="Application.LLParser">
+    <configuration name="LLParser" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="play.parser.LLParser" />
+      <module name="parser" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="play.parser.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="LRParser" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="play.parser.LRParser" />
       <module name="parser" />
@@ -455,6 +461,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.LLParser" />
         <item itemvalue="Application.LRParser" />
         <item itemvalue="Application.Regex" />
         <item itemvalue="Application.RecursiveDecentParser" />
@@ -472,12 +479,12 @@
       <option name="presentableId" value="Default" />
       <updated>1568173497866</updated>
       <workItem from="1568173501876" duration="112241000" />
-      <workItem from="1568725525272" duration="47456000" />
+      <workItem from="1568725525272" duration="51514000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="159697000" />
+    <option name="totallyTimeSpent" value="163755000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="23" width="1280" height="777" extended-state="0" />
@@ -492,7 +499,7 @@
       <window_info id="设计器" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.329927" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.329927" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.31532848" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -543,51 +550,45 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>233</line>
+          <line>232</line>
           <properties />
           <option name="timeStamp" value="32" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>225</line>
+          <line>224</line>
           <properties />
           <option name="timeStamp" value="36" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>48</line>
+          <line>47</line>
           <properties />
           <option name="timeStamp" value="43" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>400</line>
+          <line>390</line>
           <properties />
           <option name="timeStamp" value="44" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>410</line>
+          <line>400</line>
           <properties />
           <option name="timeStamp" value="45" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>354</line>
+          <line>350</line>
           <properties />
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>357</line>
+          <line>353</line>
           <properties />
           <option name="timeStamp" value="47" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="java-line">
-          <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
-          <line>374</line>
-          <properties />
-          <option name="timeStamp" value="48" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/java/play/parser/Regex.java</url>
@@ -606,6 +607,12 @@
           <line>467</line>
           <properties />
           <option name="timeStamp" value="61" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java</url>
+          <line>326</line>
+          <properties />
+          <option name="timeStamp" value="62" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -825,13 +832,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/Regex.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="171">
@@ -860,10 +860,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/SampleGrammar.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1078">
+          <caret line="81" column="8" selection-start-line="81" selection-start-column="8" selection-end-line="81" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/play/parser/LLParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="128">
-          <caret line="441" column="25" selection-start-line="441" selection-start-column="25" selection-end-line="441" selection-end-column="25" />
+          <caret line="18" column="8" selection-start-line="18" selection-start-column="8" selection-end-line="18" selection-end-column="8" />
         </state>
       </provider>
     </entry>

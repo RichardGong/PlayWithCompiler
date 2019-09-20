@@ -13,11 +13,10 @@ public class LLParser {
 
     public static void main(String args[]) {
         String script1 = "2+3*(4+5)";
-        String script2 = "if(a > 5){ a = 5;}";
-        String script3 = "int a = 10; if(a > 5){ a = 5;}";
+
 
         parse(script1, SampleGrammar.expressionGrammar());
-
+        
     }
 
     /**
@@ -327,8 +326,6 @@ public class LLParser {
                                  Map<GrammarNode, Set<String>> followSets) {
         ASTNode node = new ASTNode(grammar.getName());
 
-//        int pos = tokenReader.getPosition();
-//        boolean success = true;
 
         if (grammar.getChildCount() > 0) {
             assert (grammar.getType() == GrammarNodeType.And || grammar.getType() == GrammarNodeType.Or);
@@ -344,7 +341,6 @@ public class LLParser {
                     }
                     //子节点匹配失败，回溯，报错
                     else {
-//                        success = false;
                         System.out.println("failed to match: " + child);
                         break;
                     }
@@ -372,11 +368,6 @@ public class LLParser {
                         if (childNode != null) {
                             if (childNode != ASTNode.EpsilonNode) {
                                 node.addChild(childNode);
-//                                if (grammar.isNamedNode()) {
-//                                    node.addChild(childNode);
-//                                } else {
-//                                    node = childNode;
-//                                }
                             }
                         } else {
                             System.out.println("failed to match: " + child);
@@ -391,12 +382,11 @@ public class LLParser {
                         Set<String> followSet = followSets.get(grammar);
                         assert followSet!=null;
                         if (followSet.contains(token.getType())){
-                            System.out.println("epsilong generated");
+                            //System.out.println("epsilong generated");
                             node = ASTNode.EpsilonNode;
                             epsilon = true;
                         }
                     }
-//                    success = false;
                     if (!epsilon) {
                         System.out.println("unable to find a selection for: " + grammar);
                     }
