@@ -27,6 +27,12 @@ public class ASTNode {
         this.type = type;
     }
 
+    protected ASTNode (String type, String text){
+        this.type = type;
+        this.text = text;
+    }
+
+
     public String getType() {
         return type;
     }

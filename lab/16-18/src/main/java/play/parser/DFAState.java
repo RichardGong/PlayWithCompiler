@@ -23,13 +23,13 @@ public class DFAState extends State {
     }
 
     /**
-     * 提供一个字符，看能否迁移到下一个状态
-     * @param ch
+     * 提供一个对象作为迁移条件，看能否迁移到下一个状态
+     * @param obj，做词法分析
      * @return
      */
-    protected DFAState getNextState(char ch) {
+    protected DFAState getNextState(Object obj) {
         for (Transition transition : transitions()) {
-            if (transition.match(ch)) {
+            if (transition.match(obj)) {
                 return (DFAState) getState(transition);
             }
         }
@@ -39,7 +39,7 @@ public class DFAState extends State {
     @Override
     public String toString() {
         String rtn = super.toString();
-        rtn += "\t(";
+        rtn += "\tNFA states: ";
         int i = 0;
         for (State state : states) {
             if (i++ > 0) {
@@ -50,7 +50,7 @@ public class DFAState extends State {
                 rtn += "(" + state.getGrammarNode().getName() + ")";
             }
         }
-        rtn += ")\n";
+        rtn += "\n";
         return rtn;
     }
 

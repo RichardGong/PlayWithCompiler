@@ -45,7 +45,7 @@ public class Lexer extends Regex{
         List<DFAState> dfaStates = NFA2DFA(nfaStates[0],CharSet.ascii);
         List<Token> tokens = tokenize(str,dfaStates.get(0),lexerGrammar);
         //加上结束符号
-        tokens.add(new Token("$", "$"));
+        tokens.add(Token.EOF);
         return tokens;
     }
 

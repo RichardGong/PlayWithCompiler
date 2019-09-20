@@ -197,6 +197,7 @@ public class SampleGrammar {
         return exp;
     }
 
+
     /**
      * 带有左递归的简化版的语法规则：
      * add	: mul | add '+' mul ;
@@ -230,6 +231,78 @@ public class SampleGrammar {
         return add;
     }
 
+    /**
+     * 带有左递归的语法规则：
+     * expression	: assign ;
+     * assign	: equal | assign '=' equal ;
+     * equal	: rel | equal ('==' | '!=') rel ;
+     * rel		: add | rel ('>=' | '>' | '<=' | '<') add ;
+     * add		: mul | add ('+' | '-') mul ;
+     * mul		: pri | mul ('*' | '/') pri ;
+     * pri		: ID | INT_LITERAL | LPAREN expression RPAREN ;
+     *
+     * @return
+     */
+    public static GrammarNode fullLeftRecursiveExpressionGrammar() {
+        //expression
+        GrammarNode exp = new GrammarNode("expression", GrammarNodeType.And);
+
+        //assign
+        GrammarNode assign = exp.createChild("assign", GrammarNodeType.Or);
+        GrammarNode equal = assign.createChild("equal", GrammarNodeType.Or);
+        GrammarNode assign_2 = assign.createChild(GrammarNodeType.And);
+        assign_2.addChild(assign);  //左递归
+        GrammarNode assignOp = assign_2.createChild( new Token("ASSIGN","="));
+        assign_2.addChild(equal);   //TODO 这里是否可以改为expresssion
+
+        //equal
+        GrammarNode rel = equal.createChild("rel", GrammarNodeType.Or);
+        GrammarNode equal_2 = equal.createChild(GrammarNodeType.And);
+        equal_2.addChild(equal);  //左递归
+        GrammarNode equalOp = equal_2.createChild( GrammarNodeType.Or);
+        equalOp.createChild(new Token("EQUAL","=="));
+        equalOp.createChild(new Token("NOTEQUAL", "!="));
+        equal_2.addChild(rel);
+
+        //rel
+        GrammarNode add = rel.createChild("add", GrammarNodeType.Or);
+        GrammarNode rel_2 = rel.createChild(GrammarNodeType.And);
+        rel_2.addChild(rel);  //左递归
+        GrammarNode relOp = rel_2.createChild( GrammarNodeType.Or);
+        relOp.createChild(new Token("GE",">="));
+        relOp.createChild(new Token("GT", ">"));
+        relOp.createChild(new Token("LE", "<="));
+        relOp.createChild(new Token("LT", "<"));
+        rel_2.addChild(add);
+
+        //add
+        GrammarNode mul = add.createChild("mul", GrammarNodeType.Or);
+        GrammarNode add_2 = add.createChild(GrammarNodeType.And);
+        add_2.addChild(add);  //左递归
+        GrammarNode addOp = add_2.createChild( GrammarNodeType.Or);
+        addOp.createChild(new Token("ADD","+"));
+        addOp.createChild(new Token("SUB", "-"));
+        add_2.addChild(mul);
+
+        //mul
+        GrammarNode pri = mul.createChild("pri", GrammarNodeType.Or);
+        GrammarNode mul_2 = mul.createChild(GrammarNodeType.And);
+        mul_2.addChild(mul);
+        GrammarNode mulOp = mul_2.createChild(GrammarNodeType.Or);
+        mulOp.createChild(new Token("MUL", "*"));
+        mulOp.createChild(new Token("DIV", "/"));
+        mul_2.addChild(pri);
+
+        //pri
+        pri.createChild(new Token("ID"));
+        pri.createChild(new Token("INT_LITERAL"));
+        GrammarNode pri_3 = pri.createChild(GrammarNodeType.And);
+        pri_3.createChild(new Token("LPAREN"));
+        pri_3.addChild(exp);
+        pri_3.createChild(new Token("RPAREN"));
+
+        return exp;
+    }
 
     /**
      * 创建一个示例用词法规则，支持：

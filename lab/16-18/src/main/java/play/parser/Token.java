@@ -21,6 +21,9 @@ public class Token {
     private int startColumn = 0;
     private int endColumn = 0;
 
+    //程序结束符号
+    protected static Token EOF = new Token("$");
+
     public Token(String type){
         this.type = type;
     }
