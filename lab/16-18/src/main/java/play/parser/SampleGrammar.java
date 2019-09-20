@@ -11,13 +11,18 @@ package play.parser;
 public class SampleGrammar {
 
 
+    /**
+     *
+     * @return
+     */
     public static GrammarNode statementGrammar(){
         GrammarNode exp = expressionGrammar();
 
         GrammarNode blockStatements = new GrammarNode("blockStatements", GrammarNodeType.Or);
-        GrammarNode blockStatement = blockStatements.createChild("blockStatement", GrammarNodeType.Or);
-        blockStatements.addChild(blockStatements);
         blockStatements.createChild( GrammarNodeType.Epsilon);
+        GrammarNode blockStatements1 = blockStatements.createChild( GrammarNodeType.And);
+        GrammarNode blockStatement = blockStatements1.createChild("blockStatement", GrammarNodeType.Or);
+        blockStatements1.addChild(blockStatements);
 
         GrammarNode variableDeclarator = blockStatement.createChild("variableDeclarator",GrammarNodeType.And);
         variableDeclarator.createChild(new Token("INT","int"));

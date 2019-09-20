@@ -19,8 +19,14 @@ public class LLParser {
 
     public static void main(String args[]) {
         String script1 = "2+3*(4+5)";
-
         parse(script1, SampleGrammar.expressionGrammar());
+
+        String script2 = "int a = 0; a>3;";
+        parse(script2, SampleGrammar.statementGrammar());
+
+        String script3 = "int a = 0; if(a<3) a=3;";
+        parse(script3, SampleGrammar.statementGrammar());
+
     }
 
     /**
