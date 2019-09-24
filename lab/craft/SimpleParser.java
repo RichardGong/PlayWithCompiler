@@ -242,7 +242,7 @@ public class SimpleParser {
             Token token = tokens.peek();
             if (token != null && (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)) {
                 token = tokens.read();
-                SimpleASTNode child2 = primary(tokens);
+                SimpleASTNode child2 = multiplicative(tokens);
                 if (child2 != null) {
                     node = new SimpleASTNode(ASTNodeType.Multiplicative, token.getText());
                     node.addChild(child1);
