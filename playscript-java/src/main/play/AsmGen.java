@@ -104,6 +104,11 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
         return sb.toString();
     }
 
+    /**
+     * 生成过程体
+     * @param name
+     * @param sb
+     */
     private void generateProcedure(String name, StringBuffer sb) {
         // 1.函数标签
         sb.append("\n## 过程:").append(name).append("\n");

@@ -1,0 +1,14 @@
+/*
+asm.play
+生成汇编代码的测试。
+功能点：
+1.6个以上的参数；
+2.加法运算，能够充分利用寄存器做计算；
+3.函数调用。
+*/
+int fun1(int x1, int x2, int x3, int x4, int x5, int x6, int x7, int x8){
+    int c = 10; 
+    return x1 + x2 + x3 + x4 + x5 + x6 + x7 + x8 + c;
+}
+
+println("fun1:" + fun1(1,2,3,4,5,6,7,8));
