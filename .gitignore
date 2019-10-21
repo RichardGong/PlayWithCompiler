@@ -27,10 +27,13 @@ hs_err_pid*
 .DS_Store
 
 #idea files
-#*.iml
-#.idea/
+*.iml
+.idea/
 # lab/craft/out/
 lab/antlrtest/bin
+
+#cmake
+cmake-build-debug/
 
 #antlr temp files
 .antlr/
