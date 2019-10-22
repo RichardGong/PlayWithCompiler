@@ -29,18 +29,19 @@ MESSAGE(STATUS "SRC_LIST: " ${SRC_LIST})
 
 add_executable(llvmdemo ${SRC_LIST})
 
-llvm_map_components_to_libnames(llvm_libs
-        support
-        core
-        irreader
-        analysis
-        ExecutionEngine
-        InstCombine
-        Object
-        OrcJIT
-        RuntimeDyld
-        ScalarOpts
-        native)
+#llvm_map_components_to_libnames(llvm_libs
+#        support
+#        core
+#        irreader
+#        analysis
+#        ExecutionEngine
+#        InstCombine
+#        Object
+#        OrcJIT
+#        RuntimeDyld
+#        ScalarOpts
+#        native)
+llvm_map_components_to_libnames(llvm_libs all)
 message(STATUS "llvm_libs: " ${llvm_libs})
 
 # Link against LLVM libraries

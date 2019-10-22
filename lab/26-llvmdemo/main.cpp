@@ -2,10 +2,7 @@
  * 使用llvm的示例程序。
  * 能使用IRBuilder，生成一个简单程序的IR，并执行。
  * 示例代码相当于下面的C语言代码：
- * int fun1(int a, int b){
- *      int c = 10;
- *      return a + b + c;
- * }
+ *
  */
 
 #include <iostream>
@@ -23,7 +20,12 @@
 #include "llvm/Transforms/Scalar/GVN.h"
 #include "llvm/Transforms/Utils.h"
 #include "llvm/Support/TargetSelect.h"
+#include "llvm/Support/FileSystem.h"
+#include "llvm/Support/Host.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/Support/TargetRegistry.h"
 #include "llvm/Target/TargetMachine.h"
+#include "llvm/Target/TargetOptions.h"
 
 #include <cctype>
 #include <cstdio>
@@ -44,7 +46,12 @@ static std::map<std::string, Value *> NamedValues;
 static std::unique_ptr<legacy::FunctionPassManager> TheFPM;
 static std::unique_ptr<DemoJIT> TheJIT;
 
-
+/**
+相当于为下面的程序生成IR：
+int fun1(int a, int b){
+    return a + b;
+}
+**/
 Function * codegen_fun1(){
     //函数类型
     vector<Type *> argTypes(2, Type::getInt32Ty(TheContext));
@@ -85,84 +92,9 @@ Function * codegen_fun1(){
 }
 
 
-Function * codegen_fun2(){
-    string argNames[2] = {"a", "b"};
-
-    //函数类型
-    vector<Type *> argTypes(2, Type::getInt32Ty(TheContext));
-    FunctionType *fun1Type = FunctionType::get(Type::getInt32Ty(TheContext), argTypes, false);
-
-    //函数对象
-    Function *fun = Function::Create(fun1Type, Function::ExternalLinkage, "fun2", TheModule.get());
-
-    //设置参数名称
-    unsigned i = 0;
-    for (auto &arg : fun->args()){
-        arg.setName(argNames[i++]);
-    }
-
-    //创建一个基本块
-    BasicBlock *BB = BasicBlock::Create(TheContext, "", fun);
-    Builder.SetInsertPoint(BB);
-
-    //在基本快里创建语句
-    //把参数变量寸到NamedValues里面备用
-    NamedValues.clear();
-    for (auto &Arg : fun->args())
-        NamedValues[Arg.getName()] = &Arg;
-
-    //做加法
-    Value *a = NamedValues["a"];
-    Value *b = NamedValues["b"];
-
-    Value * const1 = ConstantInt::get(TheContext, APInt(32, 2, true));
-    Value * const2 = ConstantInt::get(TheContext, APInt(32, 3, true));
-    Value * const3 = ConstantInt::get(TheContext, APInt(32, 2, true));
-    Value * const4 = ConstantInt::get(TheContext, APInt(32, 3, true));
-
-    Value *exp1 = Builder.CreateAdd(a, const1);
-    Value *exp2 = Builder.CreateAdd(exp1, const2);
-    Value *exp3 = Builder.CreateAdd(exp2, b);
-
-    //返回值
-    Builder.CreateRet(exp3);
-
-    //验证函数的正确性
-    verifyFunction(*fun);
-
-    return fun;
-}
-
-Function * codegen_fun3(){
-
-    //函数类型
-    FunctionType *funType = FunctionType::get(Type::getInt32Ty(TheContext), false);
-
-    //函数对象
-    Function *fun = Function::Create(funType, Function::ExternalLinkage, "fun3", TheModule.get());
-
-    //创建一个基本块
-    BasicBlock *BB = BasicBlock::Create(TheContext, "", fun);
-    Builder.SetInsertPoint(BB);
-
-    Value * const1 = ConstantInt::get(TheContext, APInt(32, 2, true));
-    Value * const2 = ConstantInt::get(TheContext, APInt(32, 3, true));
-    Value * const3 = ConstantInt::get(TheContext, APInt(32, 2, true));
-    Value * const4 = ConstantInt::get(TheContext, APInt(32, 3, true));
-
-    Value *exp1 = Builder.CreateAdd(const1, const2);
-    Value *exp2 = Builder.CreateAdd(exp1, const3);
-    Value *exp3 = Builder.CreateAdd(exp2, const4);
-
-    //返回值
-    Builder.CreateRet(exp3);
-
-    //验证函数的正确性
-    verifyFunction(*fun);
-
-    return fun;
-}
-
+/**
+ * 一个外部函数，由__main来调用。
+ */
 #ifdef _WIN32
 #define DLLEXPORT __declspec(dllexport)
 #else
@@ -174,12 +106,14 @@ extern "C" DLLEXPORT void foo(int a){
 
 
 /**
- * if (a > 2){
- *    return 2;
- * }
- * else{
- *    return 3;
- * }
+ * 相当于为下面的函数生成代码：
+ 相当于为下面的函数生成IR：
+  int fun_ifstmt(int a){
+     if (a > 2)
+         return 2;
+     else
+         return 3;
+  }
  * @return
  */
 Function * codegen_ifstmt(){
@@ -239,14 +173,15 @@ Function * codegen_ifstmt(){
 }
 
 /**
- * int b = 0
- * if (a > 2){
- *    b = 2;
- * }
- * else{
- *    b = 3;
- * }
- * return b;
+ * 相当于为下面的函数生成IR：
+  int fun_localvar(int a){
+     int b = 0;
+     if (a > 2)
+         b = 2;
+     else
+         b = 3;
+     return b;
+  }
  * @return
  */
 Function * codegen_localvar(){
@@ -310,89 +245,9 @@ Function * codegen_localvar(){
 }
 
 /**
- * int a;
- * for (int i = 0; i< 10; i++){
- *  a = a+i;
- * }
- * return a;
+ * 不带参数的一个入口函数
  * @return
  */
-//Function * codegen_for() {
-//    vector < Type * > argTypes(1, Type::getInt32Ty(TheContext));
-//    FunctionType *funType = FunctionType::get(Type::getInt32Ty(TheContext), argTypes, false);
-//    Function *fun = Function::Create(funType, Function::ExternalLinkage, "fun_for", TheModule.get());
-//
-//    BasicBlock *PreheaderBB = Builder.GetInsertBlock();
-//    BasicBlock *LoopBB = BasicBlock::Create(TheContext, "loop", fun);
-//
-//    // Insert an explicit fall through from the current block to the LoopBB.
-//    Builder.CreateBr(LoopBB);
-//
-//    // Start insertion in LoopBB.
-//    Builder.SetInsertPoint(LoopBB);
-//
-//    // Start the PHI node with an entry for Start.
-//    PHINode *Variable =
-//            Builder.CreatePHI(Type::getDoubleTy(TheContext), 2, VarName);
-//    Variable->addIncoming(StartVal, PreheaderBB);
-//
-//    // Within the loop, the variable is defined equal to the PHI node.  If it
-//    // shadows an existing variable, we have to restore it, so save it now.
-//    Value *OldVal = NamedValues[VarName];
-//    NamedValues[VarName] = Variable;
-//
-//    // Emit the body of the loop.  This, like any other expr, can change the
-//    // current BB.  Note that we ignore the value computed by the body, but don't
-//    // allow an error.
-//    if (!Body->codegen())
-//        return nullptr;
-//
-//    // Emit the step value.
-//    Value *StepVal = nullptr;
-//    if (Step) {
-//        StepVal = Step->codegen();
-//        if (!StepVal)
-//            return nullptr;
-//    } else {
-//        // If not specified, use 1.0.
-//        StepVal = ConstantFP::get(TheContext, APFloat(1.0));
-//    }
-//
-//    Value *NextVar = Builder.CreateFAdd(Variable, StepVal, "nextvar");
-//
-//    // Compute the end condition.
-//    Value *EndCond = End->codegen();
-//    if (!EndCond)
-//        return nullptr;
-//
-//    // Convert condition to a bool by comparing non-equal to 0.0.
-//    EndCond = Builder.CreateFCmpONE(
-//            EndCond, ConstantFP::get(TheContext, APFloat(0.0)), "loopcond");
-//
-//    // Create the "after loop" block and insert it.
-//    BasicBlock *LoopEndBB = Builder.GetInsertBlock();
-//    BasicBlock *AfterBB =
-//            BasicBlock::Create(TheContext, "afterloop", TheFunction);
-//
-//    // Insert the conditional branch into the end of LoopEndBB.
-//    Builder.CreateCondBr(EndCond, LoopBB, AfterBB);
-//
-//    // Any new code will be inserted in AfterBB.
-//    Builder.SetInsertPoint(AfterBB);
-//
-//    // Add a new entry to the PHI node for the backedge.
-//    Variable->addIncoming(NextVar, LoopEndBB);
-//
-//    // Restore the unshadowed variable.
-//    if (OldVal)
-//        NamedValues[VarName] = OldVal;
-//    else
-//        NamedValues.erase(VarName);
-//
-//    return fun;
-//}
-
-
 Function * codegen_main(){
     //创建main函数
     FunctionType *mainType = FunctionType::get(Type::getInt32Ty(TheContext), false);
@@ -440,71 +295,131 @@ Function * codegen_main(){
 }
 
 
-void InitializeModuleAndPassManager() {
-    // Open a new module.
+/**
+ * 生成二进制目标文件output.o。
+ */
+int emit_object() {
+
     TheModule = std::make_unique<Module>("llvmdemo", TheContext);
-    TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
-    // Create a new pass manager attached to it.
-    TheFPM = std::make_unique<legacy::FunctionPassManager>(TheModule.get());
+    //初始化编译目标平台
+    InitializeAllTargetInfos();
+    InitializeAllTargets();
+    InitializeAllTargetMCs();
+    InitializeAllAsmParsers();
+    InitializeAllAsmPrinters();
 
-    // Do simple "peephole" optimizations and bit-twiddling optzns.
-    TheFPM->add(createInstructionCombiningPass());
-    // Reassociate expressions.
-    TheFPM->add(createReassociatePass());
-    // Eliminate Common SubExpressions.
-    TheFPM->add(createGVNPass());
-    // Simplify the control flow graph (deleting unreachable blocks, etc).
-    TheFPM->add(createCFGSimplificationPass());
+    auto TargetTriple = sys::getDefaultTargetTriple();
+    TheModule->setTargetTriple(TargetTriple);
 
-    TheFPM->doInitialization();
+    std::string Error;
+    auto Target = TargetRegistry::lookupTarget(TargetTriple, Error);
+
+    // Print an error and exit if we couldn't find the requested target.
+    // This generally occurs if we've forgotten to initialise the
+    // TargetRegistry or we have a bogus target triple.
+    if (!Target) {
+        errs() << Error;
+        return 1;
+    }
+
+    auto CPU = "generic";
+    auto Features = "";
+
+    TargetOptions opt;
+    auto RM = Optional<Reloc::Model>();
+    auto TheTargetMachine =
+            Target->createTargetMachine(TargetTriple, CPU, Features, opt, RM);
+
+    TheModule->setDataLayout(TheTargetMachine->createDataLayout());
+
+    ////生成IR
+    Function *fun1 = codegen_fun1();
+    Function *fun_ifstmt = codegen_ifstmt();
+    Function *fun_localvar = codegen_localvar();
+    codegen_main();
+
+    auto Filename = "output.o";
+    std::error_code EC;
+    raw_fd_ostream dest(Filename, EC, sys::fs::OF_None);
+
+    if (EC) {
+        errs() << "Could not open file: " << EC.message();
+        return 1;
+    }
+
+    legacy::PassManager pass;
+    auto FileType = TargetMachine::CGFT_ObjectFile;
+
+    if (TheTargetMachine->addPassesToEmitFile(pass, dest, nullptr, FileType)) {
+        errs() << "TheTargetMachine can't emit a file of this type";
+        return 1;
+    }
+
+    pass.run(*TheModule);
+    dest.flush();
+
+    outs() << "Wrote " << Filename << "\n";
+
+    return 0;
 }
 
-
-int main() {
+/**
+ * 即时编译并执行。
+ * @return
+ */
+int JIT() {
+    //为JIT做一些初始化
     InitializeNativeTarget();
     InitializeNativeTargetAsmPrinter();
     InitializeNativeTargetAsmParser();
 
     TheJIT = std::make_unique<DemoJIT>();
-//    auto H = TheJIT->addModule(std::move(TheModule));
 
-    InitializeModuleAndPassManager();
+    // 创建模块
+    TheModule = std::make_unique<Module>("llvmdemo", TheContext);
+    TheModule->setDataLayout(TheJIT->getTargetMachine().createDataLayout());
 
-
+    ////生成IR
     Function *fun1 = codegen_fun1();
-    Function *fun2 = codegen_fun2();
-    Function *fun3 = codegen_fun3();
     Function *fun_ifstmt = codegen_ifstmt();
     Function *fun_localvar = codegen_localvar();
     codegen_main();
 
-    //TheFPM->run(*fun1);
-    TheFPM->run(*fun2);
-    TheFPM->run(*fun3);
-    //TheFPM->run(*fun_ifstmt);
-
+    //打印输出
     TheModule->print(errs(), nullptr);
 
+    ////即时编译并执行
+    //把模块加入到即时编译的引擎中
     auto H = TheJIT->addModule(std::move(TheModule));
 
-
-    //即时执行
-    // Search the JIT for the __anon_expr symbol.
+    // 查找函数
     auto main = TheJIT->findSymbol("__main");
     assert(main && "Function not found");
 
-    // Get the symbol's address and cast it to the right type (takes no
-    // arguments, returns a double) so we can call it as a native function.
+    //获得函数地址（指针）
     int32_t (*FP)() = (int32_t (*)())(intptr_t)cantFail(main.getAddress());
 
+    //执行该函数
     int rtn = FP();
 
+    //打印运行结果
     fprintf(stderr, "__main: %d\n", rtn);
 
-    // Delete the anonymous expression module from the JIT.
+    //从JIT引擎中删除模块
     TheJIT->removeModule(H);
 
 
+    ////生成目标文件
+    emit_object();
+
     return 0;
+}
+
+int main(){
+    //即时编译和运行
+    //return JIT();
+
+    //编译成静态文件
+    return emit_object();
 }

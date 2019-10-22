@@ -1,5 +1,5 @@
 //
-// Created by Richard Gong on 2019-10-18.
+// copy and modified from llvm tutorial on 2019-10-18.
 //
 
 #ifndef LLVMDEMO_DEMOJIT_H
