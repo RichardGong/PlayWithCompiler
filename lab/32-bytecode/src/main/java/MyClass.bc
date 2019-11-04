@@ -1,0 +1,15 @@
+Compiled from "MyClass.java"
+public class MyClass {
+  public MyClass();
+    Code:
+       0: aload_0
+       1: invokespecial #1                  // Method java/lang/Object."<init>":()V
+       4: return
+
+  public int foo(int);
+    Code:
+       0: iload_1
+       1: iconst_3
+       2: iadd
+       3: ireturn
+}
