@@ -467,7 +467,7 @@ public class AsmGen extends PlayScriptBaseVisitor<String> {
     public String visitFunctionDeclaration(FunctionDeclarationContext ctx) {
         // 给所有参数确定地址
 
-        Function function = (Function) at.typeOfNode.get(ctx);
+        Function function = (Function) at.node2Scope.get(ctx);
         for (int i = 0; i < function.parameters.size(); i++) {
             if (i < 6) {
                 // 少于6个参数，使用寄存器

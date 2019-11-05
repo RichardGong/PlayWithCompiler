@@ -1,11 +1,9 @@
 package play;
 
-import org.antlr.v4.runtime.ParserRuleContext;
+import org.objectweb.asm.Label;
 import play.PlayScriptParser.*;
 
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 
 import org.objectweb.asm.ClassWriter;
@@ -33,20 +31,40 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
     //当前的MethodVisitor
     MethodVisitor mv = null;
 
-    //当前本地变量的下标，要把方法的参数也算进去
+    //下一个本地变量的下标，要把方法的参数也算进去
     int localVarIndex = 0;
 
     //变量名与下标的映射表
     Map<String, Integer> varName2Index = new HashMap<>();
 
+    //是否产生了renturn语句。这是没有经过数据流检查的，所以是不严密的。
+    boolean returnGenerated = false;
+
+    //this在参数中的位置。main方法中，我们存在1号位置。普通方法中，是在0好位置
+    int instanceIndex = 0;
+
+    ///////main函数所使用的中间变量，用于切换上下文时临时保存
+    MethodVisitor mv_main = null;
+    int localVarIndex_main = 0;
+    Map<String, Integer> varName2Index_main = null;
 
     ///////////////////////////////////////
     // 主控程序
     public byte[] generate(){
         cw = new ClassWriter(ClassWriter.COMPUTE_FRAMES);
 
-        //从根节点开始翻译成字节码
+        //创建main函数
         visitProg((ProgContext)at.ast);
+
+        //创建其他函数
+        for (Type type : at.types){
+            if (type instanceof Function){
+                Function function = (Function) type;
+                FunctionDeclarationContext ctx = (FunctionDeclarationContext)function.ctx;
+
+                genMethod(ctx);
+            }
+        }
 
         return cw.toByteArray();
     }
@@ -67,13 +85,24 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         constructor.visitEnd();
     }
 
+    //产生对System.out.println方法的调用。
+    private void genPrintln(ExpressionContext ctx){
+        //getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+
+        //计算参数
+        visitExpression(ctx);
+
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
+    }
+
     ///////////////////////////////////////
     // 继承的visitor方法，用于产生asm代码片段
 
     @Override
     public Object visitProg(ProgContext ctx) {
         //把全局的变量和函数封装到一个缺省的类中。
-        cw.visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC,
+        cw.visit(Opcodes.V1_8, ACC_PUBLIC + ACC_SUPER,
                 "DefaultPlayClass", null, "java/lang/Object",null);
 
         //缺省的构造函数
@@ -85,8 +114,24 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
                 "([Ljava/lang/String;)V", //参数类型：String []
                 null, null);
 
+        //mv.visitCode();
+        Label l0 = new Label();
+        mv.visitLabel(l0);
+
         //添加参数args
         mv.visitParameter("args", ACC_PUBLIC);
+
+
+        ////创建一个DefaultPlayClass的实例，并存到下标为1的位置
+        //new
+        mv.visitTypeInsn(NEW,"DefaultPlayClass");
+        //dup
+        mv.visitInsn(DUP);
+        mv.visitMethodInsn(INVOKESPECIAL,"DefaultPlayClass","<init>","()V", false);
+        mv.visitVarInsn(ASTORE, 1);
+
+        localVarIndex = 1;
+        instanceIndex = 1;
 
 
         ////生成中间的代码
@@ -95,6 +140,15 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
 
         ////Main函数--尾声
         mv.visitInsn(RETURN);
+
+        Label l1 = new Label();
+        mv.visitLabel(l1);
+
+        //设置本地变量，这一定要放在最后
+        for (String varName : varName2Index.keySet()){
+            int varIndex = varName2Index.get(varName).intValue();
+            mv.visitLocalVariable(varName,"I",null, l0, l1, varIndex);
+        }
 
         //设置操作数栈最大的帧数，以及最大的本地变量数
         mv.visitMaxs(3, 1);
@@ -106,26 +160,6 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
     }
 
 
-/*
-    @Override
-    public Object visitBlockStatements(BlockStatementsContext ctx) {
-
-        return null;
-    }
-
-    @Override
-    public Object visitBlockStatement(BlockStatementContext ctx) {
-
-        return null;
-    }
-
-    @Override
-    public Object visitVariableDeclarators(VariableDeclaratorsContext ctx) {
-
-        return null;
-    }
-*/
-
     @Override
     public Object visitVariableDeclarator(VariableDeclaratorContext ctx) {
         String varName = ctx.variableDeclaratorId().getText();
@@ -133,9 +167,6 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         localVarIndex++;
 
         varName2Index.put(varName, Integer.valueOf(localVarIndex));
-
-        //mv.visitLocalVariable(varName,"I",null,null,null,localVarIndex++);
-
 
         if (ctx.variableInitializer() != null){
             visitVariableInitializer(ctx.variableInitializer());
@@ -165,12 +196,46 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return null;
     }
 
+    @Override
+    public Object visitStatement(StatementContext ctx) {
+        if (ctx.statementExpression != null) {
+            visitExpression(ctx.statementExpression);
+        } else if (ctx.RETURN() != null) {
+            if (ctx.expression() != null) {
+                visitExpression(ctx.expression());
+
+                mv.visitInsn(IRETURN);  //返回整数
+            }
+            else {
+                mv.visitInsn(RETURN);
+            }
+
+            returnGenerated = true;
+        }
+        return null;
+    }
 
     @Override
     public Object visitExpression(ExpressionContext ctx) {
         String address = "";
+
+        //赋值
+        if (ctx.bop != null && ctx.bop.getType() == PlayScriptParser.ASSIGN){
+            //左侧必须是一个左值，现在只考虑变量名
+            if (ctx.expression(0).primary() != null && ctx.expression(0).primary().IDENTIFIER() != null) {
+                String varName = ctx.expression(0).getText();
+                int varIndex = varName2Index.get(varName).intValue();
+
+                //右边必须是一个右值
+                visitExpression(ctx.expression(1));
+
+                //设置变量的值
+                mv.visitVarInsn(ISTORE, varIndex);
+            }
+        }
+
         // 二元运算
-        if (ctx.bop != null && ctx.expression().size() >= 2) {
+        else if (ctx.bop != null && ctx.expression().size() >= 2) {
             visitExpression(ctx.expression(0));
             visitExpression(ctx.expression(1));
             switch (ctx.bop.getType()) {
@@ -186,14 +251,11 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
             case PlayScriptParser.DIV:
                 mv.visitInsn(IDIV);
                 break;
-//            case PlayScriptParser.ASSIGN:
-//                bodyAsm.append("\tmovl\t").append(right).append(", ").append(left).append("\n");
-//                break;
             }
         } else if (ctx.primary() != null) {
             visitPrimary(ctx.primary());
         } else if (ctx.functionCall() != null) {// functionCall
-            //address = visitFunctionCall(ctx.functionCall());
+            visitFunctionCall(ctx.functionCall());
         }
         return address;
     }
@@ -278,27 +340,45 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return null;
     }
 
-    /*
     @Override
-    public Object visitStatement(StatementContext ctx) {
-        String value = "";
-        if (ctx.statementExpression != null) {
-            value = visitExpression(ctx.statementExpression);
-        } else if (ctx.RETURN() != null) {
-            if (ctx.expression() != null) {
-                value = visitExpression(ctx.expression());
-                // 在%eax中设置返回值
-                bodyAsm.append("\n\t# 返回值\n");
-                if (value.equals("%eax")){
-                    bodyAsm.append("\t# 返回值在之前的计算中,已经存入%eax\n");
-                }
-                else{
-                    bodyAsm.append("\tmovl\t" + value + ", %eax\n");
-                }
+    public Object visitFunctionCall(FunctionCallContext ctx) {
+        Function function = null;
+
+        Symbol symbol = at.symbolOfNode.get(ctx);
+
+        if (symbol instanceof Function) {
+            function = (Function) symbol;
+        } else {
+            // TODO 临时代码，用于打印输出
+            if (ctx.IDENTIFIER().getText().equals("println")) {
+
+                //调用System.out.println()方法
+                genPrintln(ctx.expressionList().expression(0));
+
+                return null;
+
+            } else {
+                at.log("unable to find function " + ctx.IDENTIFIER().getText(), ctx);
             }
         }
-        return value;
+
+        //把对象示例放入栈，作为第一个参数
+        mv.visitVarInsn(ALOAD, instanceIndex);
+
+        //设置参数
+        if (ctx.expressionList() != null) {
+            visitExpressionList(ctx.expressionList());
+        }
+
+        //调用方法
+        mv.visitMethodInsn(INVOKEVIRTUAL,"DefaultPlayClass", function.getName(),
+                genFunctionDescriptor(function),false);
+
+        return null;
     }
+
+    /*
+
 
     @Override
     public Object visitFunctionCall(FunctionCallContext ctx) {
@@ -386,69 +466,103 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return address;
     }
 
-    @Override
-    public Object visitFunctionDeclaration(FunctionDeclarationContext ctx) {
-        // 给所有参数确定地址
+*/
 
-        Function function = (Function) at.typeOfNode.get(ctx);
-        for (int i = 0; i < function.parameters.size(); i++) {
-            if (i < 6) {
-                // 少于6个参数，使用寄存器
-                localVars.put(function.parameters.get(i), paramRegisterl[i]);
-            } else {
-                int paramOffset = (i - 6) * 8 + 16; // 参数在栈中相对于%rbp的偏移量
-                String paramAddress = "" + paramOffset + "(%rbp)";
-                localVars.put(function.parameters.get(i), paramAddress);
+    //形成函数的描述符。参数只支持int型的，返回值只支持void和int。
+    private String genFunctionDescriptor(Function function){
+        StringBuffer sb = new StringBuffer();
+        sb.append('(');
+
+        for (int i = 0; i < function.parameters.size(); i++){
+            sb.append('I');
+        }
+
+        sb.append(')');
+
+        if (function.getReturnType() instanceof  VoidType){
+            sb.append('V');
+        }
+        else{
+            sb.append('I');
+        }
+
+        return sb.toString();
+    }
+
+    @Override
+    public Object visitFunctionDeclaration(FunctionDeclarationContext ctx){
+        //在这里不做任何事情，阻断缺省的遍历逻辑
+        return null;
+    }
+
+
+    //根据函数生成方法。是在main函数生成完毕以后调用。
+    private void genMethod(FunctionDeclarationContext ctx) {
+        //保存main方法的上下文
+        MethodVisitor mv_main = mv;
+        int localVarIndex_main = localVarIndex;
+        Map<String, Integer> varName2Index_main = varName2Index;
+
+        localVarIndex = 0; //第0个参数是this
+        varName2Index = new HashMap<>();
+        instanceIndex = 0;
+
+        Function function = (Function) at.node2Scope.get(ctx);
+
+        mv = cw.visitMethod(ACC_PUBLIC,
+                function.getName(),
+                genFunctionDescriptor(function),
+                null, null);
+
+        //mv.visitCode();
+        Label l0 = new Label();
+        mv.visitLabel(l0);
+
+        //添加参数
+        for (Variable param : function.parameters){
+            mv.visitParameter(param.getName(), ACC_PUBLIC);
+            localVarIndex++;   //参数也存在栈桢中的本地变量列表中。
+            varName2Index.put(param.getName(), Integer.valueOf(localVarIndex));
+        }
+
+        int lastParamIndex = localVarIndex;
+
+
+        ////生成中间的代码
+        visitFunctionBody(ctx.functionBody());
+
+
+        ////Main函数--尾声
+
+        if(!returnGenerated) {
+            mv.visitInsn(RETURN);
+        }
+
+        Label l1 = new Label();
+        mv.visitLabel(l1);
+
+        //设置本地变量，这一定要放在最后
+        for (String varName : varName2Index.keySet()){
+            int varIndex = varName2Index.get(varName).intValue();
+            if (varIndex > lastParamIndex) {
+                mv.visitLocalVariable(varName, "I", null, l0, l1, varIndex);
             }
         }
 
-        return visitFunctionBody(ctx.functionBody());
+        //设置操作数栈最大的帧数，以及最大的本地变量数
+        mv.visitMaxs(3, 1);
+
+        //结束方法
+        mv.visitEnd();
+
+
+        ////////////////
+        ////还原main函数的上下文
+        mv = mv_main;
+        localVarIndex = localVarIndex_main;
+        varName2Index = varName2Index_main;
+
     }
 
-    @Override
-    public Object visitFunctionBody(FunctionBodyContext ctx) {
-        String value = null;
-        if (ctx.block() != null) {
-            value = visitBlock(ctx.block());
-        }
-        return value;
-    }
-
-    */
-
-    @Override
-    public Object visitBlock(BlockContext ctx) {
-        return visitBlockStatements(ctx.blockStatements());
-    }
-
-    @Override
-    public Object visitExpressionList(ExpressionListContext ctx) {
-        return super.visitExpressionList(ctx);
-    }
-
-    @Override
-    public Object visitFormalParameter(FormalParameterContext ctx) {
-        return super.visitFormalParameter(ctx);
-    }
-
-    @Override
-    public Object visitFormalParameterList(FormalParameterListContext ctx) {
-        return super.visitFormalParameterList(ctx);
-    }
-
-    @Override
-    public Object visitFormalParameters(FormalParametersContext ctx) {
-        return super.visitFormalParameters(ctx);
-    }
-
-    @Override
-    public Object visitPrimitiveType(PrimitiveTypeContext ctx) {
-        return super.visitPrimitiveType(ctx);
-    }
-
-    @Override
-    public Object visitTypeType(TypeTypeContext ctx) {
-        return super.visitTypeType(ctx);
-    }
 
 }

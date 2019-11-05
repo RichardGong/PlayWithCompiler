@@ -42,13 +42,8 @@
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" beforeDir="false" afterPath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/examples/scratch.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/scratch.play" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/Class.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/Class.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/ClassObject.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ClassObject.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/PlayScript.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/RefResolver.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/RefResolver.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/SematicValidator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/SematicValidator.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/play/AsmGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/AsmGen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/playscript-java.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/playscript-java.iml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -80,29 +75,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="563">
-              <caret line="211" column="49" selection-start-line="211" selection-start-column="49" selection-end-line="211" selection-end-column="49" />
+            <state relative-caret-position="-2649">
+              <caret line="343" column="18" selection-start-line="343" selection-start-column="18" selection-end-line="343" selection-end-column="18" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#12113#12114#0" expanded="true" />
-                <element signature="e#12248#12249#0" expanded="true" />
-                <element signature="e#12386#12387#0" expanded="true" />
-                <element signature="e#12677#12678#0" expanded="true" />
-                <element signature="e#12809#12810#0" expanded="true" />
-                <element signature="e#12926#12927#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+            <state relative-caret-position="375">
+              <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
               <folding>
                 <element signature="e#0#230#0" expanded="true" />
               </folding>
@@ -113,8 +102,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.bc">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="14" lean-forward="true" selection-start-line="13" selection-start-column="14" selection-end-line="13" selection-end-column="14" />
+            <state relative-caret-position="574">
+              <caret line="102" lean-forward="true" selection-start-line="102" selection-end-line="102" />
             </state>
           </provider>
         </entry>
@@ -122,17 +111,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/play/AsmGen.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2045">
-              <caret line="89" column="18" selection-start-line="89" selection-start-column="18" selection-end-line="89" selection-end-column="31" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.g4">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="148" column="19" lean-forward="true" selection-start-line="148" selection-start-column="19" selection-end-line="148" selection-end-column="19" />
+            <state relative-caret-position="1444">
+              <caret line="474" column="20" lean-forward="true" selection-start-line="474" selection-start-column="20" selection-end-line="474" selection-end-column="20" />
             </state>
           </provider>
         </entry>
@@ -140,35 +120,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="870">
-              <caret line="60" column="75" selection-start-line="60" selection-start-column="75" selection-end-line="60" selection-end-column="75" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/play/This.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="17" selection-start-line="17" selection-end-line="17" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/play/CommonLexer.g4">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2310">
-              <caret line="154" column="5" selection-start-line="154" selection-end-line="154" selection-end-column="5" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/examples/FirstClassFunction.play">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="17" column="40" selection-start-line="17" selection-end-line="17" selection-end-column="40" />
+            <state relative-caret-position="668">
+              <caret line="210" column="37" lean-forward="true" selection-start-line="210" selection-start-column="37" selection-end-line="210" selection-end-column="37" />
             </state>
           </provider>
         </entry>
@@ -178,6 +131,15 @@
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="240">
               <caret line="16" selection-start-line="16" selection-end-line="16" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.g4">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="211">
+              <caret line="220" column="10" selection-start-line="220" selection-start-column="6" selection-end-line="220" selection-end-column="10" />
             </state>
           </provider>
         </entry>
@@ -194,7 +156,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>初始化</find>
       <find>not</find>
       <find>new Va</find>
       <find>exitprima</find>
@@ -224,6 +185,7 @@
       <find>blok</find>
       <find>THIS</find>
       <find>variableIn</find>
+      <find>RETU</find>
     </findStrings>
     <replaceStrings>
       <replace>at</replace>
@@ -286,14 +248,14 @@
         <option value="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" />
         <option value="$PROJECT_DIR$/src/main/play/RefResolver.java" />
         <option value="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" />
-        <option value="$PROJECT_DIR$/src/main/play/AsmGen.java" />
         <option value="$PROJECT_DIR$/src/main/play/PlayScript.java" />
+        <option value="$PROJECT_DIR$/src/main/play/AsmGen.java" />
         <option value="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="536" />
+    <option name="x" value="313" />
     <option name="y" value="23" />
     <option name="width" value="1338" />
     <option name="height" value="1337" />
@@ -445,12 +407,12 @@
       <workItem from="1572910589485" duration="1907000" />
       <workItem from="1572918197896" duration="600000" />
       <workItem from="1572926700838" duration="501000" />
-      <workItem from="1572936829066" duration="7860000" />
+      <workItem from="1572936829066" duration="19540000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="244120000" />
+    <option name="totallyTimeSpent" value="255800000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -462,7 +424,7 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="536" y="23" width="1338" height="1337" extended-state="0" />
+    <frame x="313" y="23" width="1338" height="1337" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.51762116" visible="true" weight="0.27083334" />
@@ -474,18 +436,18 @@
       <window_info id="设计器" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.1981132" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.37751004" />
+      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3188755" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" sideWeight="0.49952245" weight="0.329927" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.32846716" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32771084" />
       <window_info anchor="bottom" id="Terminal" order="8" weight="0.32876712" />
       <window_info anchor="bottom" id="Docker" order="9" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.50047755" side_tool="true" weight="0.329927" />
       <window_info anchor="bottom" id="Database Changes" order="11" />
       <window_info anchor="bottom" id="Version Control" order="12" weight="0.329927" />
-      <window_info anchor="bottom" id="调试" order="13" weight="0.35502008" />
+      <window_info anchor="bottom" id="调试" order="13" weight="0.3253012" />
       <window_info anchor="bottom" id="Tool Output" order="14" weight="0.32876712" />
       <window_info anchor="bottom" id="ANTLR Preview" order="15" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -585,15 +547,21 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java</url>
-          <line>48</line>
+          <line>56</line>
           <properties />
           <option name="timeStamp" value="152" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java</url>
-          <line>268</line>
+          <line>64</line>
           <properties />
-          <option name="timeStamp" value="153" />
+          <option name="timeStamp" value="156" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java</url>
+          <line>511</line>
+          <properties />
+          <option name="timeStamp" value="157" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
@@ -665,20 +633,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/main/play/CompilationLog.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="13" selection-end-line="29" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/play/PrimitiveType.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="41" column="21" selection-end-line="91" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/PlayScriptParser.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
@@ -922,16 +876,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/play/Function.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="300">
-          <caret line="24" column="5" selection-start-line="20" selection-start-column="4" selection-end-line="24" selection-end-column="5" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/ASTEvaluator.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="4035">
@@ -989,54 +933,74 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="870">
-          <caret line="60" column="75" selection-start-line="60" selection-start-column="75" selection-end-line="60" selection-end-column="75" />
+        <state relative-caret-position="668">
+          <caret line="210" column="37" lean-forward="true" selection-start-line="210" selection-start-column="37" selection-end-line="210" selection-end-column="37" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/AsmGen.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2045">
-          <caret line="89" column="18" selection-start-line="89" selection-start-column="18" selection-end-line="89" selection-end-column="31" />
+        <state relative-caret-position="1444">
+          <caret line="474" column="20" lean-forward="true" selection-start-line="474" selection-start-column="20" selection-end-line="474" selection-end-column="20" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.g4">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="148" column="19" lean-forward="true" selection-start-line="148" selection-start-column="19" selection-end-line="148" selection-end-column="19" />
+        <state relative-caret-position="211">
+          <caret line="220" column="10" selection-start-line="220" selection-start-column="6" selection-end-line="220" selection-end-column="10" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
+    <entry file="file://$PROJECT_DIR$/src/main/play/VoidType.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" lean-forward="true" selection-start-line="14" selection-end-line="14" />
+        <state relative-caret-position="30">
+          <caret line="2" column="19" selection-start-line="2" selection-start-column="19" selection-end-line="2" selection-end-column="19" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/play/Function.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="274">
+          <caret line="27" column="16" selection-start-line="27" selection-start-column="16" selection-end-line="27" selection-end-column="16" />
           <folding>
-            <element signature="e#0#230#0" expanded="true" />
+            <element signature="imports" expanded="true" />
+            <element signature="e#683#684#0" expanded="true" />
+            <element signature="e#716#717#0" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$PROJECT_DIR$/lib/asm-7.2.jar!/org/objectweb/asm/ClassWriter.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="271">
+          <caret line="160" selection-start-line="160" selection-end-line="160" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.bc">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="14" lean-forward="true" selection-start-line="13" selection-start-column="14" selection-end-line="13" selection-end-column="14" />
+        <state relative-caret-position="574">
+          <caret line="102" lean-forward="true" selection-start-line="102" selection-end-line="102" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="563">
-          <caret line="211" column="49" selection-start-line="211" selection-start-column="49" selection-end-line="211" selection-end-column="49" />
+        <state relative-caret-position="-2649">
+          <caret line="343" column="18" selection-start-line="343" selection-start-column="18" selection-end-line="343" selection-end-column="18" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#12113#12114#0" expanded="true" />
-            <element signature="e#12248#12249#0" expanded="true" />
-            <element signature="e#12386#12387#0" expanded="true" />
-            <element signature="e#12677#12678#0" expanded="true" />
-            <element signature="e#12809#12810#0" expanded="true" />
-            <element signature="e#12926#12927#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="375">
+          <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
+          <folding>
+            <element signature="e#0#230#0" expanded="true" />
           </folding>
         </state>
       </provider>
