@@ -8,6 +8,7 @@
       <change beforePath="$PROJECT_DIR$/../lab/16-18/src/main/java/play/parser/LLParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab/16-18/src/main/java/play/parser/LLParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab/16-18/src/main/java/play/parser/LRParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab/16-18/src/main/java/play/parser/LRParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab/16-18/src/main/java/play/parser/SampleGrammar.java" beforeDir="false" afterPath="$PROJECT_DIR$/../lab/16-18/src/main/java/play/parser/SampleGrammar.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../lab/32-bytecode/MyClass2.bc" beforeDir="false" afterPath="$PROJECT_DIR$/../lab/32-bytecode/MyClass2.bc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab/32-bytecode/src/main/java/MyClass.bc" beforeDir="false" afterPath="$PROJECT_DIR$/../lab/32-bytecode/src/main/java/MyClass.bc" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab/lab.code-workspace" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../lab/oop/ClassTest.play" beforeDir="false" />
@@ -40,10 +41,6 @@
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/build/bin/play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/build/cmake_install.cmake" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" beforeDir="false" afterPath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/examples/bytecode.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/bytecode.play" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/examples/scratch.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/scratch.play" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/PlayScript.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -116,7 +113,7 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="401">
+            <state relative-caret-position="5460">
               <caret line="364" column="17" selection-start-line="364" selection-start-column="17" selection-end-line="364" selection-end-column="17" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -406,12 +403,12 @@
       <workItem from="1572910589485" duration="1907000" />
       <workItem from="1572918197896" duration="600000" />
       <workItem from="1572926700838" duration="501000" />
-      <workItem from="1572936829066" duration="22621000" />
+      <workItem from="1572936829066" duration="23138000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="258881000" />
+    <option name="totallyTimeSpent" value="259398000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -996,7 +993,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="401">
+        <state relative-caret-position="5460">
           <caret line="364" column="17" selection-start-line="364" selection-start-column="17" selection-end-line="364" selection-end-column="17" />
           <folding>
             <element signature="imports" expanded="true" />
