@@ -1,0 +1,3 @@
+int b = 200;
+int c = b + 30;
+println(c);
