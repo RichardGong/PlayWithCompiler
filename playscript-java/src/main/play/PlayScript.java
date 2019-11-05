@@ -1,13 +1,6 @@
 package play;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.StringReader;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,9 +30,6 @@ public class PlayScript {
         //脚本
         String script = null;
 
-        // 是否生成汇编代码
-        boolean genAsm = false;
-
         Map params = null;
 
         //解析参数
@@ -67,6 +57,12 @@ public class PlayScript {
             }
         }
 
+        //是否生成汇编代码
+        boolean genAsm = params.containsKey("genAsm") ? (Boolean) params.get("genAsm") : false;
+
+        //是否生成字节码
+        boolean genByteCode = params.containsKey("genByteCode") ? (Boolean) params.get("genByteCode") : false;
+
         //打印编译过程中的信息
         boolean verbose = params.containsKey("verbose") ? (Boolean) params.get("verbose") : false;
 
@@ -83,6 +79,13 @@ public class PlayScript {
             //输出文件
             String outputFile = params.containsKey("outputFile") ? (String)params.get("outputFile") : null;
             generateAsm(script, outputFile);
+        }
+
+        //生成Java字节码
+        else if (genByteCode) {
+            //输出文件
+            String outputFile = params.containsKey("outputFile") ? (String)params.get("outputFile") : null;
+            generateByteCode(script, outputFile);
         }
 
         //执行脚本
@@ -111,6 +114,11 @@ public class PlayScript {
             //输出汇编代码
             if (args[i].equals("-S")) {
                 params.put("genAsm",true);
+            }
+
+            //生成字节码
+            else if (args[i].equals("-bc")){
+                params.put("genByteCode",true);
             }
 
             //显示作用域和符号
@@ -158,13 +166,14 @@ public class PlayScript {
      * 打印帮助信息
      */
     private static void showHelp(){
-        System.out.println("usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]");
+        System.out.println("usage: java play.PlayScript [-h | --help | -o outputfile | -S | -bc | -v | -ast-dump] [scriptfile]");
 
         System.out.println("\t-h or --help : print this help information");
         System.out.println("\t-v verbose mode : dump AST and symbols");
         System.out.println("\t-ast-dump : dump AST in lisp style");
         System.out.println("\t-o outputfile : file pathname used to save generated code, eg. assembly code");
         System.out.println("\t-S : compile to assembly code");
+        System.out.println("\t-bc : compile to java byte code");
         System.out.println("\tscriptfile : file contains playscript code");
 
         System.out.println("\nexamples:");
@@ -205,6 +214,33 @@ public class PlayScript {
             }
         } else {
             System.out.println(asm);
+        }
+    }
+
+    /**
+     * 生成字节码
+     *
+     * @param script     脚本
+     * @param outputFile 输出的文件名
+     */
+    private static void generateByteCode(String script, String outputFile) {
+        PlayScriptCompiler compiler = new PlayScriptCompiler();
+        AnnotatedTree at = compiler.compile(script);
+        ByteCodeGen bcGen = new ByteCodeGen(at);
+        byte[] bc = bcGen.generate();
+
+        if (outputFile == null){
+            outputFile = "DefaultPlayClass.class";
+        }
+
+        try {
+            File file = new File(outputFile);
+            FileOutputStream fos = new FileOutputStream(file);
+            fos.write(bc);
+            fos.close();
+        } catch (IOException e) {
+            System.out.println("unable to write to : " + outputFile);
+            return;
         }
     }
 

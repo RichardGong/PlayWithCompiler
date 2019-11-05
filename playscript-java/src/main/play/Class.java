@@ -5,12 +5,15 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import java.util.List;
 
 public class Class extends Scope implements Type{
-    // class的属性
-    //protected List<Variable> fields = new LinkedList<Variable>();
-    //protected List<Function> functions = new LinkedList<Function>();
-
     //父类
     private Class parentClass = null; //= rootClass;
+
+    //这个类的This变量
+    private This thisRef = null;
+
+    private Super superRef = null;
+
+    private DefaultConstructor defaultConstructor = null;
 
     protected Class(String name, ParserRuleContext ctx) {
         this.name = name;
@@ -32,12 +35,6 @@ public class Class extends Scope implements Type{
         superRef = new Super(parentClass,ctx);
         superRef.type = parentClass;
     }
-
-
-    //这个类的This变量
-    private This thisRef = null;
-
-    private Super superRef = null;
 
     //最顶层的基类
     private static Class rootClass = new Class("Object", null);
@@ -104,8 +101,10 @@ public class Class extends Scope implements Type{
      * @return
      */
     protected Function getFunction(String name, List<Type> paramTypes){
+        //在本级查找这个这个方法
         Function rtn = super.getFunction(name, paramTypes);  //TODO 是否要检查visibility?
 
+        //如果在本级找不到，那么递归的从父类中查找
         if (rtn == null && parentClass != null){
             rtn = parentClass.getFunction(name,paramTypes);
         }
@@ -173,6 +172,13 @@ public class Class extends Scope implements Type{
             }
         }
         return false;
+    }
+
+    protected DefaultConstructor defaultConstructor(){
+        if (defaultConstructor == null){
+            defaultConstructor = new DefaultConstructor(this.name,this);
+        }
+        return defaultConstructor;
     }
 
 }

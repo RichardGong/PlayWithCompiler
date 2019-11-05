@@ -1,13 +1,8 @@
 package play;
 
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import play.PlayScriptParser.*;
-
-import java.sql.Statement;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  * 进行一些语义检查，包括：
@@ -19,11 +14,15 @@ import java.util.List;
  * 02-03 return语句只能出现在函数里。
  * 02-04 返回值类型检查 -> (在TypeChecker里做）
  *
- * 03.标注左值（不标注就是右值)；
+ * 03.左值
+ * 03-01 标注左值（不标注就是右值)；
+ * 03-02 检查表达式能否生成合格的左值。
  *
  * 04.类的声明不能在函数里（TODO 未来应该也可以，只不过对生存期有要求）
  *
- * 05.
+ * 05.super()和this()，只能是构造函数中的第一句。  这个在RefResolver中实现了。
+ *
+ * 06.
  */
 public class SematicValidator extends PlayScriptBaseListener {
 

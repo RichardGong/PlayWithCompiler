@@ -144,22 +144,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     }
 
 
-    /**
-     * 从栈顶开始，找到第一个ClassObject
-     * 在调用类的方法时，需要找到实际的类。
-     * @return
-     */
-    private ClassObject firstClassObjectInStack(){
-
-        for (int i= stack.size()-1; i>0; i--){
-            StackFrame stackFrame = stack.get(i);
-            if (stackFrame.object instanceof ClassObject){
-                return (ClassObject) stackFrame.object;
-            }
-        }
-        return null;
-    }
-
     ///////////////////////////////////////////////
     //为闭包获取环境变量的值
 
@@ -288,6 +272,9 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         // 执行缺省初始化
         ClassBodyContext ctx = ((ClassDeclarationContext) theClass.ctx).classBody();
         visitClassBody(ctx);
+
+        //TODO 其实这里还没干完活。还需要调用显式声明的构造方法
+
     }
 
 
@@ -505,11 +492,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
             rtn = visitStatement(ctx.statement());
         }
         return rtn;
-    }
-
-    @Override
-    public Object visitEnhancedForControl(EnhancedForControlContext ctx) {
-        return super.visitEnhancedForControl(ctx);
     }
 
     @Override
@@ -981,21 +963,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitSuperSuffix(SuperSuffixContext ctx) {
-        return super.visitSuperSuffix(ctx);
-    }
-
-    @Override
-    public Object visitSwitchBlockStatementGroup(SwitchBlockStatementGroupContext ctx) {
-        return super.visitSwitchBlockStatementGroup(ctx);
-    }
-
-    @Override
-    public Object visitSwitchLabel(SwitchLabelContext ctx) {
-        return super.visitSwitchLabel(ctx);
-    }
-
-    @Override
     public Object visitTypeType(TypeTypeContext ctx) {
         return visitPrimitiveType(ctx.primitiveType());
     }
@@ -1074,21 +1041,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
     }
 
     @Override
-    public Object visitFormalParameter(FormalParameterContext ctx) {
-        return super.visitFormalParameter(ctx);
-    }
-
-    @Override
-    public Object visitFormalParameterList(FormalParameterListContext ctx) {
-        return super.visitFormalParameterList(ctx);
-    }
-
-    @Override
-    public Object visitFormalParameters(FormalParametersContext ctx) {
-        return super.visitFormalParameters(ctx);
-    }
-
-    @Override
     public Object visitFunctionCall(FunctionCallContext ctx) {
         //this
         if (ctx.THIS() != null){
@@ -1109,9 +1061,11 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
         //如果调用的是类的缺省构造函数，则直接创建对象并返回
         Symbol symbol = at.symbolOfNode.get(ctx);
-        if (symbol instanceof Class) {
+        //if (symbol instanceof Class) {
+        if (symbol instanceof DefaultConstructor) {
             //类的缺省构造函数。没有一个具体函数跟它关联，只是指向了一个类。
-            return createAndInitClassObject((Class) symbol);  //返回新创建的对象
+            //return createAndInitClassObject((Class) symbol);  //返回新创建的对象
+            return createAndInitClassObject(((DefaultConstructor)symbol).Class());  //返回新创建的对象
         }
         //硬编码的一些函数
         else if(functionName.equals("println")){
@@ -1299,7 +1253,8 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
 
     private void thisConstructor(FunctionCallContext ctx){
         Symbol symbol = at.symbolOfNode.get(ctx);
-        if (symbol instanceof Class){  //缺省构造函数
+        //if (symbol instanceof Class){  //缺省构造函数
+        if (symbol instanceof DefaultConstructor){  //缺省构造函数
             return; //这里不用管，因为缺省构造函数一定会被调用。
         }
         else if (symbol instanceof Function) {
@@ -1327,20 +1282,6 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return rtn;
     }
 
-    @Override
-    public Object visitQualifiedName(QualifiedNameContext ctx) {
-        return super.visitQualifiedName(ctx);
-    }
-
-    @Override
-    public Object visitQualifiedNameList(QualifiedNameListContext ctx) {
-        return super.visitQualifiedNameList(ctx);
-    }
-
-    @Override
-    public Object visitTypeTypeOrVoid(TypeTypeOrVoidContext ctx) {
-        return super.visitTypeTypeOrVoid(ctx);
-    }
 
     @Override
     public Object visitClassBody(ClassBodyContext ctx) {
@@ -1378,34 +1319,5 @@ public class ASTEvaluator extends PlayScriptBaseVisitor<Object> {
         return rtn;
     }
 
-    @Override
-    public Object visitClassDeclaration(ClassDeclarationContext ctx) {
-        return super.visitClassDeclaration(ctx);
-    }
-
-    @Override
-    public Object visitConstructorDeclaration(ConstructorDeclarationContext ctx) {
-        return super.visitConstructorDeclaration(ctx);
-    }
-
-    @Override
-    public Object visitCreator(CreatorContext ctx) {
-        return super.visitCreator(ctx);
-    }
-
-    @Override
-    public Object visitTypeArgument(TypeArgumentContext ctx) {
-        return super.visitTypeArgument(ctx);
-    }
-
-    @Override
-    public Object visitTypeList(TypeListContext ctx) {
-        return super.visitTypeList(ctx);
-    }
-
-    @Override
-    public Object visitVariableModifier(VariableModifierContext ctx) {
-        return super.visitVariableModifier(ctx);
-    }
 
 }

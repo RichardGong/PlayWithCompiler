@@ -180,7 +180,8 @@ public class RefResolver extends PlayScriptBaseListener {
                 //如果是与类名相同的方法，并且没有参数，那么就是缺省构造方法
                 else if (ctx.expressionList() == null){
                     found = true;
-                    at.symbolOfNode.put(ctx, theClass); // TODO 直接赋予class
+                    //at.symbolOfNode.put(ctx, theClass); // TODO 直接赋予class
+                    at.symbolOfNode.put(ctx, theClass.defaultConstructor());
                 }
                 else{
                     at.log("unknown class constructor: " + ctx.getText(), ctx);
@@ -215,15 +216,24 @@ public class RefResolver extends PlayScriptBaseListener {
         if (theClass != null){
             Function function = at.enclosingFunctionOfNode(ctx);
             if (function != null && function.isConstructor()){
+                //检查是不是构造函数中的第一句
+                FunctionDeclarationContext fdx = (FunctionDeclarationContext) function.ctx;
+                if (!firstStatmentInFunction(fdx, ctx)){
+                    at.log("this() must be first statement in a constructor", ctx);
+                    return;
+                }
+
                 List<Type> paramTypes = getParamTypes(ctx);
                 Function refered = theClass.findConstructor(paramTypes);
                 if (refered != null){
                     at.symbolOfNode.put(ctx,refered);
                     at.typeOfNode.put(ctx,theClass);
+                    at.thisConstructorRef.put(function, refered);
                 }
                 else if (paramTypes.size() == 0){  //缺省构造函数
-                    at.symbolOfNode.put(ctx,refered);
+                    at.symbolOfNode.put(ctx,theClass.defaultConstructor());
                     at.typeOfNode.put(ctx,theClass);
+                    at.thisConstructorRef.put(function, theClass.defaultConstructor());
                 }
                 else{
                     at.log("can not find a constructor matches this()", ctx);
@@ -236,6 +246,16 @@ public class RefResolver extends PlayScriptBaseListener {
         else{
             at.log("this() should only be called inside a class", ctx);
         }
+    }
+
+    private boolean firstStatmentInFunction(FunctionDeclarationContext fdx, FunctionCallContext ctx){
+        if (fdx.functionBody().block().blockStatements().blockStatement(0).statement()!= null
+            && fdx.functionBody().block().blockStatements().blockStatement(0).statement().expression()!= null
+            && fdx.functionBody().block().blockStatements().blockStatement(0).statement().expression().functionCall()==ctx){
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -252,15 +272,25 @@ public class RefResolver extends PlayScriptBaseListener {
             if (function != null && function.isConstructor()){
                 Class parentClass = theClass.getParentClass();
                 if (parentClass != null){
+                    //检查是不是构造函数中的第一句
+                    FunctionDeclarationContext fdx = (FunctionDeclarationContext) function.ctx;
+                    if (!firstStatmentInFunction(fdx, ctx)){
+                        at.log("super() must be first statement in a constructor", ctx);
+                        return;
+                    }
+
                     List<Type> paramTypes = getParamTypes(ctx);
                     Function refered = parentClass.findConstructor(paramTypes);
                     if (refered != null){
                         at.symbolOfNode.put(ctx,refered);
                         at.typeOfNode.put(ctx,theClass);
+                        at.superConstructorRef.put(function, refered);
+
                     }
                     else if(paramTypes.size() == 0) {  //缺省构造函数
-                        at.symbolOfNode.put(ctx,parentClass);
+                        at.symbolOfNode.put(ctx, parentClass.defaultConstructor());
                         at.typeOfNode.put(ctx,theClass);
+                        at.superConstructorRef.put(function, theClass.defaultConstructor());
                     }
                     else{
                         at.log("can not find a constructor matches this()", ctx);

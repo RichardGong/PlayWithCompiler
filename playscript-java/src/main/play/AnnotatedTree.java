@@ -36,6 +36,12 @@ public class AnnotatedTree {
     //语义分析过程中生成的信息，包括普通信息、警告和错误
     protected List<CompilationLog> logs = new LinkedList<CompilationLog>();
 
+    //在构造函数里,引用的this()。第二个函数是被调用的构造函数
+    protected Map<Function, Function> thisConstructorRef = new HashMap<>();
+
+    //在构造函数里,引用的super()。第二个函数是被调用的构造函数
+    protected Map<Function, Function> superConstructorRef = new HashMap<>();
+
 
     protected AnnotatedTree() {
 
