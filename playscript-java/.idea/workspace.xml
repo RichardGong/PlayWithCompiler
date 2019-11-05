@@ -40,11 +40,6 @@
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/build/bin/play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/build/cmake_install.cmake" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" beforeDir="false" afterPath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/examples/scratch.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/scratch.play" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/AsmGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/AsmGen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/playscript-java.iml" beforeDir="false" afterPath="$PROJECT_DIR$/src/playscript-java.iml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -90,8 +85,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
+            <state relative-caret-position="60">
+              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
               <folding>
                 <element signature="e#0#230#0" expanded="true" />
               </folding>
@@ -407,12 +402,12 @@
       <workItem from="1572910589485" duration="1907000" />
       <workItem from="1572918197896" duration="600000" />
       <workItem from="1572926700838" duration="501000" />
-      <workItem from="1572936829066" duration="19540000" />
+      <workItem from="1572936829066" duration="19943000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="255800000" />
+    <option name="totallyTimeSpent" value="256203000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -997,8 +992,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="28" lean-forward="true" selection-start-line="25" selection-start-column="28" selection-end-line="25" selection-end-column="28" />
+        <state relative-caret-position="60">
+          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
           <folding>
             <element signature="e#0#230#0" expanded="true" />
           </folding>
