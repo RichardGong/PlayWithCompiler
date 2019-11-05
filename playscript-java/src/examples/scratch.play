@@ -1,15 +1,21 @@
 /**
 测试把playscript生成字节码的示例程序。
+
 机制：
 1.生成一个DefaultPlayClass.class
+
 2.全局的代码，封装到main()方法中。
+
 3.函数变成了DefaultPlayClass的方法。
+
 4.目前特性：
 (1)数据类型只支持int
 (2)加减乘除运算
 (3)变量声明和初始化
 (4)函数声明和调用
 (5)println()系统函数，参数目前也只支持一个整数。
+
+5.运行示例程序： java play.PlayScript -bc bytecode.play
 
 本示例代码生成的.class文件反编译后是下面的样子：
 public class DefaultPlayClass {
@@ -37,6 +43,7 @@ public class DefaultPlayClass {
     }
 }
 */
+
 
 int b = 200;    //变量声明
 int c = 2 + b;  //表达式，支持加减乘除

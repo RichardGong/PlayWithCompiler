@@ -12,7 +12,23 @@ import org.objectweb.asm.Opcodes;
 
 
 /**
- * 基于AST，产生汇编代码。 限制： 1.目前仅针对macos，64位； 2.仅支持整型，字符串仅支持字面量； 3.运算仅支持加减法。
+ * 测试把playscript生成字节码的示例程序。
+ *
+ * 机制：
+ * 1.生成一个DefaultPlayClass.class
+ *
+ * 2.全局的代码，封装到main()方法中。
+ *
+ * 3.函数变成了DefaultPlayClass的方法。
+ *
+ * 4.目前特性：
+ * (1)数据类型只支持int
+ * (2)加减乘除运算
+ * (3)变量声明和初始化
+ * (4)函数声明和调用
+ * (5)println()系统函数，参数目前也只支持一个整数。
+ *
+ * 5.运行示例程序： java play.PlayScript -bc bytecode.play
  */
 public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcodes{
 
@@ -43,10 +59,6 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
     //this在参数中的位置。main方法中，我们存在1号位置。普通方法中，是在0好位置
     int instanceIndex = 0;
 
-    ///////main函数所使用的中间变量，用于切换上下文时临时保存
-    MethodVisitor mv_main = null;
-    int localVarIndex_main = 0;
-    Map<String, Integer> varName2Index_main = null;
 
     ///////////////////////////////////////
     // 主控程序
@@ -69,32 +81,6 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return cw.toByteArray();
     }
 
-
-    ///////////////////////////////////////
-    ///一些工具方法
-    //创建缺省构造方法
-    private static void genDefaultConstructor(ClassWriter cw){
-        MethodVisitor constructor = cw.visitMethod(ACC_PUBLIC, "<init>",
-                "()V", null, null);
-
-        constructor.visitCode();
-        constructor.visitVarInsn(ALOAD, 0);
-        constructor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
-        constructor.visitInsn(RETURN);
-        constructor.visitMaxs(1,1);
-        constructor.visitEnd();
-    }
-
-    //产生对System.out.println方法的调用。
-    private void genPrintln(ExpressionContext ctx){
-        //getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;
-        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
-
-        //计算参数
-        visitExpression(ctx);
-
-        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
-    }
 
     ///////////////////////////////////////
     // 继承的visitor方法，用于产生asm代码片段
@@ -175,13 +161,6 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return null;
     }
 
-
-
-    @Override
-    public Object visitVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
-
-        return null;
-    }
 
     @Override
     public Object visitVariableInitializer(VariableInitializerContext ctx) {
@@ -277,6 +256,7 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return rtn;
     }
 
+    //只支持整数常量
     @Override
     public Object visitLiteral(LiteralContext ctx) {
         String rtn = "";
@@ -284,9 +264,8 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
             visitIntegerLiteral(ctx.integerLiteral());
         }
         else if (ctx.STRING_LITERAL() != null) {
-            String withQuotationMark = ctx.STRING_LITERAL().getText();
-            String withoutQuotationMark = withQuotationMark.substring(1, withQuotationMark.length() - 1);
-            //rtn = getStringLiteralAddress(withoutQuotationMark);
+//            String withQuotationMark = ctx.STRING_LITERAL().getText();
+//            String withoutQuotationMark = withQuotationMark.substring(1, withQuotationMark.length() - 1);
         }
         return rtn;
     }
@@ -377,117 +356,7 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
         return null;
     }
 
-    /*
 
-
-    @Override
-    public Object visitFunctionCall(FunctionCallContext ctx) {
-        String address = "%eax"; // 缺省获得返回值的地方
-
-        String functionName = null;
-
-        Symbol symbol = at.symbolOfNode.get(ctx);
-
-        if (symbol instanceof Function) {
-            Function function = (Function) symbol;
-            functionName = function.name;
-        } else {
-            // TODO 临时代码，用于打印输出
-            if (ctx.IDENTIFIER().getText().equals("println")) {
-                functionName = "printf";
-            } else {
-                at.log("unable to find function " + ctx.IDENTIFIER().getText(), ctx);
-            }
-        }
-
-        // 设置参数
-        if (ctx.expressionList() != null) {
-            int paramOffset = 0;
-            int numParams = ctx.expressionList().expression().size();
-
-            // 1. 先计算所有参数的值，这个时候可能会引起栈的变化，用来存放临时变量
-            int oldOffset = rspOffset;
-            List<String> values = new LinkedList<String>();
-            for (int i = 0; i < numParams; i++) {
-                values.add(visitExpression(ctx.expressionList().expression(i)));
-            }
-            int offset1 = rspOffset - oldOffset;
-
-            // 2.扩展栈
-            if (numParams > 6) {
-                paramOffset = 8 * (numParams - 6) + offset1;
-                bodyAsm.append("\n\t# 为参数而扩展栈\n");
-                bodyAsm.append("\tsubq\t$").append(paramOffset).append(", %rsp\n");
-            }
-
-            // 3.设置参数
-            if (numParams > 0) {
-                bodyAsm.append("\n\t# 设置参数\n");
-            }
-
-            for (int i = 0; i < numParams; i++) {
-                String value = values.get(i);
-                String paramAddress = "";
-                if (i < 6) {
-                    if (value.startsWith("ref:")){
-                        paramAddress = paramRegisterq[i];
-                    }else{
-                        paramAddress = paramRegisterl[i];
-                    }
-                } else {
-                    if (i == 6) {
-                        paramAddress = "(%rsp)";
-                    } else {
-                        paramAddress = "" + ((i - 6) * 8) + "(%rsp)";
-                    }
-                }
-
-                if (value.startsWith("ref:")){
-                    //传地址
-                    bodyAsm.append("\tleaq\t").append(value.substring(4)).append(", ").append(paramAddress).append("\n");
-                }else{
-                    bodyAsm.append("\tmovl\t").append(value).append(", ").append(paramAddress).append("\n");
-                }
-            }
-
-            // 4.调用函数
-            bodyAsm.append("\n\t# 调用函数\n");
-            bodyAsm.append("\tcallq\t_").append(functionName).append("\n");
-
-            // 5.恢复栈
-            if (numParams > 6) {
-                paramOffset = 8 * (numParams - 6);
-                bodyAsm.append("\n\t# 收回参数的栈空间\n");
-                bodyAsm.append("\taddq\t$").append(paramOffset).append(", %rsp\n");
-            }
-
-        }
-
-        return address;
-    }
-
-*/
-
-    //形成函数的描述符。参数只支持int型的，返回值只支持void和int。
-    private String genFunctionDescriptor(Function function){
-        StringBuffer sb = new StringBuffer();
-        sb.append('(');
-
-        for (int i = 0; i < function.parameters.size(); i++){
-            sb.append('I');
-        }
-
-        sb.append(')');
-
-        if (function.getReturnType() instanceof  VoidType){
-            sb.append('V');
-        }
-        else{
-            sb.append('I');
-        }
-
-        return sb.toString();
-    }
 
     @Override
     public Object visitFunctionDeclaration(FunctionDeclarationContext ctx){
@@ -498,11 +367,7 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
 
     //根据函数生成方法。是在main函数生成完毕以后调用。
     private void genMethod(FunctionDeclarationContext ctx) {
-        //保存main方法的上下文
-        MethodVisitor mv_main = mv;
-        int localVarIndex_main = localVarIndex;
-        Map<String, Integer> varName2Index_main = varName2Index;
-
+        //重置中间变量
         localVarIndex = 0; //第0个参数是this
         varName2Index = new HashMap<>();
         instanceIndex = 0;
@@ -554,14 +419,56 @@ public class ByteCodeGen extends PlayScriptBaseVisitor<Object> implements Opcode
 
         //结束方法
         mv.visitEnd();
+    }
 
 
-        ////////////////
-        ////还原main函数的上下文
-        mv = mv_main;
-        localVarIndex = localVarIndex_main;
-        varName2Index = varName2Index_main;
+    ///////////////////////////////////////
+    ///一些工具方法
+    //创建缺省构造方法
+    private static void genDefaultConstructor(ClassWriter cw){
+        MethodVisitor constructor = cw.visitMethod(ACC_PUBLIC, "<init>",
+                "()V", null, null);
 
+        constructor.visitCode();
+        constructor.visitVarInsn(ALOAD, 0);
+        constructor.visitMethodInsn(INVOKESPECIAL, "java/lang/Object", "<init>", "()V", false);
+        constructor.visitInsn(RETURN);
+        constructor.visitMaxs(1,1);
+        constructor.visitEnd();
+    }
+
+    //产生对System.out.println方法的调用。
+    private void genPrintln(ExpressionContext ctx){
+        //getstatic     #5                  // Field java/lang/System.out:Ljava/io/PrintStream;
+        mv.visitFieldInsn(GETSTATIC, "java/lang/System", "out", "Ljava/io/PrintStream;");
+
+        //计算参数
+        visitExpression(ctx);
+
+        mv.visitMethodInsn(INVOKEVIRTUAL, "java/io/PrintStream", "println", "(I)V", false);
+    }
+
+
+
+    //形成函数的描述符。参数只支持int型的，返回值只支持void和int。
+    private String genFunctionDescriptor(Function function){
+        StringBuffer sb = new StringBuffer();
+        sb.append('(');
+
+        for (int i = 0; i < function.parameters.size(); i++){
+            sb.append('I');
+        }
+
+        sb.append(')');
+
+        if (function.getReturnType() instanceof  VoidType){
+            sb.append('V');
+        }
+        else{
+            sb.append('I');
+        }
+
+        return sb.toString();
     }
 
 

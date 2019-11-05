@@ -40,6 +40,10 @@
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/build/bin/play" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/build/cmake_install.cmake" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" beforeDir="false" afterPath="$PROJECT_DIR$/../playscript-cpp/src/grammar/IRGen.h" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/examples/bytecode.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/bytecode.play" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/examples/scratch.play" beforeDir="false" afterPath="$PROJECT_DIR$/src/examples/scratch.play" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/play/PlayScript.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/play/PlayScript.java" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -73,8 +77,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2649">
-              <caret line="343" column="18" selection-start-line="343" selection-start-column="18" selection-end-line="343" selection-end-column="18" />
+            <state relative-caret-position="2400">
+              <caret line="162" selection-start-line="162" selection-end-line="162" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -82,14 +86,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="60">
-              <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
-              <folding>
-                <element signature="e#0#230#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="15">
+              <caret line="1" column="60" lean-forward="true" selection-start-line="1" selection-start-column="60" selection-end-line="1" selection-end-column="60" />
             </state>
           </provider>
         </entry>
@@ -112,11 +113,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="668">
-              <caret line="210" column="37" lean-forward="true" selection-start-line="210" selection-start-column="37" selection-end-line="210" selection-end-column="37" />
+            <state relative-caret-position="401">
+              <caret line="364" column="17" selection-start-line="364" selection-start-column="17" selection-end-line="364" selection-end-column="17" />
+              <folding>
+                <element signature="imports" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -243,16 +247,16 @@
         <option value="$PROJECT_DIR$/src/main/play/AnnotatedTree.java" />
         <option value="$PROJECT_DIR$/src/main/play/RefResolver.java" />
         <option value="$PROJECT_DIR$/src/main/play/ASTEvaluator.java" />
-        <option value="$PROJECT_DIR$/src/main/play/PlayScript.java" />
         <option value="$PROJECT_DIR$/src/main/play/AsmGen.java" />
         <option value="$PROJECT_DIR$/src/main/play/ByteCodeGen.java" />
+        <option value="$PROJECT_DIR$/src/main/play/PlayScript.java" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
     <option name="x" value="313" />
     <option name="y" value="23" />
-    <option name="width" value="1338" />
+    <option name="width" value="1719" />
     <option name="height" value="1337" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -402,12 +406,12 @@
       <workItem from="1572910589485" duration="1907000" />
       <workItem from="1572918197896" duration="600000" />
       <workItem from="1572926700838" duration="501000" />
-      <workItem from="1572936829066" duration="19943000" />
+      <workItem from="1572936829066" duration="22621000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="256203000" />
+    <option name="totallyTimeSpent" value="258881000" />
   </component>
   <component name="TodoView" selected-index="1">
     <todo-panel id="selected-file">
@@ -419,10 +423,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="313" y="23" width="1338" height="1337" extended-state="0" />
+    <frame x="313" y="23" width="1719" height="1337" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.51762116" visible="true" weight="0.27083334" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.51762116" visible="true" weight="0.20930232" />
       <window_info id="Structure" order="1" sideWeight="0.48237884" side_tool="true" weight="0.2358643" />
       <window_info id="Image Layers" order="2" />
       <window_info id="Capture Tool" order="3" />
@@ -431,7 +435,7 @@
       <window_info id="设计器" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.1981132" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.3188755" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.3188755" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -542,19 +546,19 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java</url>
-          <line>56</line>
+          <line>68</line>
           <properties />
           <option name="timeStamp" value="152" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java</url>
-          <line>64</line>
+          <line>76</line>
           <properties />
           <option name="timeStamp" value="156" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java</url>
-          <line>511</line>
+          <line>376</line>
           <properties />
           <option name="timeStamp" value="157" />
         </line-breakpoint>
@@ -926,13 +930,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="668">
-          <caret line="210" column="37" lean-forward="true" selection-start-line="210" selection-start-column="37" selection-end-line="210" selection-end-column="37" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/AsmGen.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1444">
@@ -980,22 +977,29 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="60" lean-forward="true" selection-start-line="1" selection-start-column="60" selection-end-line="1" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/play/ByteCodeGen.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2649">
-          <caret line="343" column="18" selection-start-line="343" selection-start-column="18" selection-end-line="343" selection-end-column="18" />
+        <state relative-caret-position="2400">
+          <caret line="162" selection-start-line="162" selection-end-line="162" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/examples/DefaultPlayClass.class">
+    <entry file="file://$PROJECT_DIR$/src/main/play/PlayScript.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="4" lean-forward="true" selection-start-line="4" selection-end-line="4" />
+        <state relative-caret-position="401">
+          <caret line="364" column="17" selection-start-line="364" selection-start-column="17" selection-end-line="364" selection-end-column="17" />
           <folding>
-            <element signature="e#0#230#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>

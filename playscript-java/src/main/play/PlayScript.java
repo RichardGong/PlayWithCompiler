@@ -1,6 +1,7 @@
 package play;
 
 import java.io.*;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -84,8 +85,9 @@ public class PlayScript {
         //生成Java字节码
         else if (genByteCode) {
             //输出文件
-            String outputFile = params.containsKey("outputFile") ? (String)params.get("outputFile") : null;
-            generateByteCode(script, outputFile);
+            //String outputFile = params.containsKey("outputFile") ? (String)params.get("outputFile") : null;
+            byte[] bc = generateByteCode(script);
+            runJavaClass("DefaultPlayClass", bc);
         }
 
         //执行脚本
@@ -192,6 +194,10 @@ public class PlayScript {
         System.out.println("\tjava play.PlayScript -v scratch.play");
         System.out.println("\t>>compile and execute scratch.play in verbose mode, dump ast and symbols");
         System.out.println();
+
+        System.out.println("\tjava play.PlayScript -bc scratch.play");
+        System.out.println("\t>>compile to bytecode, save as DefaultPlayClass.class and run it");
+        System.out.println();
     }
 
     /**
@@ -218,20 +224,18 @@ public class PlayScript {
     }
 
     /**
-     * 生成字节码
+     * 生成字节码，保存到DefaultPlayClass.class
      *
      * @param script     脚本
-     * @param outputFile 输出的文件名
      */
-    private static void generateByteCode(String script, String outputFile) {
+    private static byte[] generateByteCode(String script) {
         PlayScriptCompiler compiler = new PlayScriptCompiler();
         AnnotatedTree at = compiler.compile(script);
         ByteCodeGen bcGen = new ByteCodeGen(at);
         byte[] bc = bcGen.generate();
 
-        if (outputFile == null){
-            outputFile = "DefaultPlayClass.class";
-        }
+
+        String outputFile = "DefaultPlayClass.class";
 
         try {
             File file = new File(outputFile);
@@ -240,8 +244,9 @@ public class PlayScript {
             fos.close();
         } catch (IOException e) {
             System.out.println("unable to write to : " + outputFile);
-            return;
         }
+
+        return bc;
     }
 
     /**
@@ -339,5 +344,54 @@ public class PlayScript {
 
     }
 
+    /**
+     * 运行指定名称的Java类
+     * @param className
+     */
+    private static void runJavaClass(String className, byte[] b){
+        try {
+            //java.lang.Class clazz = java.lang.Class.forName(className);
+            java.lang.Class clazz = loadClass(className,b);
+            Method method = clazz.getMethod("main", String[].class);
+            method.invoke(null, (Object)new String[]{});
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+
+    /**
+     * 从byte数组加载类
+     * @param className
+     * @param b
+     * @return
+     */
+    private static java.lang.Class loadClass(String className, byte[] b) {
+        // Override defineClass (as it is protected) and define the class.
+        java.lang.Class clazz = null;
+        try {
+            ClassLoader loader = ClassLoader.getSystemClassLoader();
+            java.lang.Class cls = java.lang.Class.forName("java.lang.ClassLoader");
+            java.lang.reflect.Method method =
+                    cls.getDeclaredMethod(
+                            "defineClass",
+                            new java.lang.Class[] { String.class, byte[].class, int.class, int.class });
+
+            // Protected method invocation.
+            method.setAccessible(true);
+            try {
+                Object[] args =
+                        new Object[] { className, b, new Integer(0), new Integer(b.length)};
+                clazz = (java.lang.Class) method.invoke(loader, args);
+            } finally {
+                method.setAccessible(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return clazz;
+    }
 
 }
