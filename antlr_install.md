@@ -34,15 +34,17 @@ $ antlr PlayScript.g4
 
 2.测试语法规则   
 使用grun命令，可以用生成的编译器来解析你写的程序，比如：   
-grun antlrtest.PlayScript expression -gui   
-其中，-gui参数告诉grun，用图形化的方式来显示生成的AST。否则，它会在终端用lisp的括号嵌套括号的方式显示。  
+$ grun antlrtest.PlayScript expression -gui   
+其中:    
+-gui参数告诉grun，用图形化的方式来显示生成的AST。否则，它会在终端用lisp的括号嵌套括号的方式显示。  
+expression参数是.g4文件中的一条语法规则，所生成的AST的根节点就是代表这个规则的节点。   
 
 特别注意：  
 使用grun是同学们遇到问题最多的地方。最重要的问题，就是目录不对，找不到生成的编译器。
 假设你生成的java类在/Users/richard/antlr/play目录下，其中play是package的名称，你应该在/Users/richard/antlr目录下运行grun命令，并且让CLASSPATH包含这个目录。否则，就会报找不到lexer或parser的错误。
 
 ### 在IDE里使用Antlr  
-很多IDE现在都支持Antlr，包括自动下载依赖项、g4文件语法加亮、错误检测、代码跳转等。
+很多IDE现在都支持Antlr，包括自动下载依赖项、g4文件语法加亮、错误检测、代码跳转等。   
 可以参见[这个链接](https://www.antlr.org/tools.html)。
 
 
