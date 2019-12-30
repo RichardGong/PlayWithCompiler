@@ -1,6 +1,6 @@
 # Antlr的安装、配置和使用
 
-在《编译原理之美》课程中，很多同学在使用antlr的时候遇到了障碍。这里把安装、配置和使用整理一下，供大家参考。
+在学习[《编译原理之美》](https://time.geekbang.org/column/intro/100034101)的过程中，很多同学在使用antlr的时候遇到了一些障碍。这些障碍基本都是环境配置的问题，所以这里把Antlr的安装、配置和使用的要点整理一下，供大家参考。
 
 ### 安装Antlr
 Antlr是用java写的。所以，使用antlr，只需要下载它的jar文件(当前版本是[antlr-4.7.2-complete.jar](https://www.antlr.org/download/antlr-4.7.2-complete.jar))就可以了。    
