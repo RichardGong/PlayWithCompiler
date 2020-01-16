@@ -27,7 +27,7 @@ public class TypeChecker extends PlayScriptBaseListener {
         if (ctx.variableInitializer() != null){
             Variable variable = (Variable) at.symbolOfNode.get(ctx.variableDeclaratorId());
             Type type1 = variable.type;
-            Type type2 = at.typeOfNode.get(ctx.variableDeclaratorId());
+            Type type2 = at.typeOfNode.get(ctx.variableInitializer());
             checkAssign(type1,type2,ctx,ctx.variableDeclaratorId(),ctx.variableInitializer());
         }
     }
