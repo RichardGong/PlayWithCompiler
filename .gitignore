@@ -40,5 +40,8 @@ cmake-build-debug/
 
 #cpp files
 *.o
+CommonLexer.tokens
 
 playscript-java/src/main/play/ir/
+playscript-java/.idea/
+playscript-java/target/

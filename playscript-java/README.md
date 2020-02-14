@@ -8,17 +8,22 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 * Coming soon: 很快将添加更多的脚本用例，展示playscript的功能。
 
 ### 构建和开发
-从代码库中克隆下代码以后，可以基于源代码构建一个项目。或者使用里面原来带的idea项目文件。后面我将提供Maven的项目文件。  
-本项目依赖Antlr的运行库。相应的jar包已经包含在了[lib目录](lib)下。  
-在idea项目中，我设置了一个PlayScript scratch任务，可以解析执行examples目录中的scratch.play文件。你可以在这个文件里随意写一些脚本，并编译执行，或者跟踪调试。
+#### 环境准备
+- JDK 8
+- Maven 3.2+
 
-### 运行playscript
+#### 构建
+从代码库中克隆下代码以后, 使用 maven 构建
+
+#### 开发
+使用 idea 打开项目即可. 或者使用其他支持 maven 的 IDE.
+
+### 运行 playscript
 在运行之前：
-* 要设置好本机的java环境；
-* 设置好CLASSPATH,让java能够找到play包中的类。    
-     
-命令行工具 java play.PlayScript     
->usage: java play.PlayScript [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]  
+* mvn package
+
+命令行工具 java -jar target/play.jar
+>usage: java -jar target/play.jar [-h | --help | -o outputfile | -S | -v | -ast-dump] [scriptfile]
 >	-h or --help : print this help information  
 >	-v verbose mode : dump AST and symbols   
 >	-ast-dump : dump AST in lisp style   
@@ -27,20 +32,20 @@ playscript是在准备《编译原理之美》课程期间开发的一门脚本�
 >	scriptfile : file contains playscript code   
 
 举例:   
->java play.PlayScript    
+>java -jar target/play.jar
 >这将启动一个REPL界面，在里面输入脚本，并解释执行。   
 
->java play.PlayScript -v   
+>java -jar target/play.jar -v
 >REPL模式，并打印AST和符号表   
 
->java play.PlayScript scratch.play   
+>java -jar target/play.jar scratch.play
 >编译和执行scratch.play脚本   
 
->java play.PlayScript -v scratch.play   
+>java -jar target/play.jar -v scratch.play
 >编译和执行scratch.play脚本，并输出AST和符号表   
 
 设置你的bash命令，可以使用起来更方便，比如，我在.bash_profile文件中添加了：    
->alias play='java play.PlayScript'   
+>alias play='java -jar target/play.jar'
 这样，运行一个.play脚本的时候，可以很简单：  
 >play scratch.play
 
