@@ -283,6 +283,7 @@ public class PlayScript {
             String line;
             while ((line = br.readLine()) != null) {
                 out.write(line);
+                out.newLine();
             }
             out.flush(); // 把缓存区内容压入文件
         }
