@@ -5,41 +5,65 @@ import play.PlayScriptParser.*;
 /**
  * 第二遍扫描。把变量、类继承、函数声明的类型都解析出来。
  * 也就是所有用到typeTpe的地方。
+ *
+ * 实际运行时，把变量添加到符号表，是分两步来做的。
+ * 第一步，是把类成员变量和函数的参数加进去
+ *
+ * 第二步，是在变量引用消解的时候再添加。这个时候是边Enter符号表，边消解，会避免变量引用到错误的定义。
+ *
  */
 public class TypeResolver extends PlayScriptBaseListener {
 
     private AnnotatedTree at = null;
 
+    //是否把本地变量加入符号表
+    private boolean enterLocalVariable = false;
+
     public TypeResolver(AnnotatedTree at) {
         this.at = at;
+    }
+
+    public TypeResolver(AnnotatedTree at, boolean enterLocalVariable) {
+        this.at = at;
+        this.enterLocalVariable = enterLocalVariable;
     }
 
     //设置所声明的变量的类型
     @Override
     public void exitVariableDeclarators(VariableDeclaratorsContext ctx) {
-        // 设置变量类型
-        Type type = (Type) at.typeOfNode.get(ctx.typeType());
+        Scope scope = at.enclosingScopeOfNode(ctx);
 
-        for (VariableDeclaratorContext child : ctx.variableDeclarator()) {
-            Variable variable = (Variable) at.symbolOfNode.get(child.variableDeclaratorId());
-            variable.type = type;
+        //Aaaaaaaaaaayou同学请看这里。
+        if (scope instanceof Class  || enterLocalVariable){
+            // 设置变量类型
+            Type type = (Type) at.typeOfNode.get(ctx.typeType());
+
+            for (VariableDeclaratorContext child : ctx.variableDeclarator()) {
+                Variable variable = (Variable) at.symbolOfNode.get(child.variableDeclaratorId());
+                variable.type = type;
+            }
         }
     }
 
-    //把所有的变量声明加入符号表
+    //把类成员变量的声明加入符号表
     @Override
     public void enterVariableDeclaratorId(VariableDeclaratorIdContext ctx) {
         String idName = ctx.IDENTIFIER().getText();
         Scope scope = at.enclosingScopeOfNode(ctx);
-        Variable variable = new Variable(idName, scope, ctx);
 
-        //变量查重
-        if (Scope.getVariable(scope,idName) != null){
-            at.log("Variable or parameter already Declared: " + idName, ctx);
+        //第一步只把类的成员变量入符号表。在变量消解时，再把本地变量加入符号表，一边Enter，一边消解。
+        //Aaaaaaaaaaayou同学请看这里。
+        if (scope instanceof Class || enterLocalVariable) {
+            Variable variable = new Variable(idName, scope, ctx);
+
+            //变量查重
+            if (Scope.getVariable(scope, idName) != null) {
+                at.log("Variable or parameter already Declared: " + idName, ctx);
+            }
+
+            scope.addSymbol(variable);
+            at.symbolOfNode.put(ctx, variable);
         }
-
-        scope.addSymbol(variable);
-        at.symbolOfNode.put(ctx, variable);
     }
 
     //设置函数的返回值类型

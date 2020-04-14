@@ -1,5 +1,6 @@
 package play;
 
+import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import play.PlayScriptParser.*;
 
 import java.util.LinkedList;
@@ -19,12 +20,27 @@ public class RefResolver extends PlayScriptBaseListener {
 
     private AnnotatedTree at = null;
 
+    //用于把本地变量添加到符号表，并计算类型
+    ParseTreeWalker typeResolverWalker = new ParseTreeWalker();
+    TypeResolver localVariableEnter = null;
+
     //this()和super()构造函数留到最后去消解，因为它可能引用别的构造函数，必须等这些构造函数都消解完。
     private List<FunctionCallContext> thisConstructorList = new LinkedList<>();
     private List<FunctionCallContext> superConstructorList = new LinkedList<>();
 
     public RefResolver(AnnotatedTree at) {
         this.at = at;
+        localVariableEnter = new TypeResolver(at, true);
+    }
+
+    //把本地变量加到符号表。本地变量必须是边添加，边解析，不能先添加后解析，否则会引起引用消解的错误。
+    //Aaaaaaaaaaayou同学请看这里。
+    @Override
+    public void enterVariableDeclarators(VariableDeclaratorsContext ctx) {
+        Scope scope = at.enclosingScopeOfNode(ctx);
+        if (scope instanceof BlockScope){
+            typeResolverWalker.walk(localVariableEnter, ctx);
+        }
     }
 
     @Override
