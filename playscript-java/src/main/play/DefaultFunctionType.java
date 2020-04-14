@@ -66,7 +66,7 @@ public class DefaultFunctionType implements FunctionType {
         }
 
         List<Type> paramTypes1 = type1.getParamTypes();
-        List<Type> paramTypes2 = type1.getParamTypes();
+        List<Type> paramTypes2 = type2.getParamTypes();
 
         if (paramTypes1.size() != paramTypes2.size()){
             return false;
