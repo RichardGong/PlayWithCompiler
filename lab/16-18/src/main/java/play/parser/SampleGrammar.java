@@ -61,7 +61,9 @@ public class SampleGrammar {
 
     /**
      * 消除了左递归的表达式语法规则：
-     * expression	: equal ;
+     * expression    : assign ;
+     * assign	: equal assgn1 ;
+     * assgn1	: '=' equal assgn1 | ε ;
      * equal: rel equal1 ;
      * equal1	: (== | !=) rel equal1 | ε ;
      * rel	: add rel1 ;
@@ -359,6 +361,12 @@ public class SampleGrammar {
         // ;
         GrammarNode semi = rootNode.createChild("SEMI", new CharSet(';'));
 
+        // ;
+        GrammarNode question = rootNode.createChild("QUESTION", new CharSet('?'));
+
+        // :
+        GrammarNode colon = rootNode.createChild("COLON", new CharSet(':'));
+
         // =
         GrammarNode assign = rootNode.createChild("ASSIGN", new CharSet('='));
 
@@ -405,6 +413,89 @@ public class SampleGrammar {
         whiteSpace.setNeglect(true);
 
         return rootNode;
+    }
+
+    /**
+     * Ebnf -> statements
+     * statements -> statement | epsilon | statements
+     * statement -> id ‘:’ exp ‘;’
+     * Exp -> exp ‘|' and
+     * and -> and pri (‘*’ | ‘?’ | ‘+’ | epsilon)
+     * Pri ->  id | StringLiteral | brackLiteral | (exp)
+     * brackLiteral-> ‘[’(^|epsion)brackElements’]’
+     * brackElements -> char | charRange| escapedChar | brackElements | epsilon
+     * charRange -> char ‘-‘ char
+     * escapedChar -> ‘\n’ | ‘\\’
+     * @return
+     */
+    public static GrammarNode EBNFGrammar() {
+        GrammarNode grammar = new GrammarNode("grammar",GrammarNodeType.And);
+        GrammarNode id = new GrammarNode(new Token("ID"));
+        GrammarNode semi = new GrammarNode(new Token("SEMI"));
+        GrammarNode colon = new GrammarNode(new Token("COLON"));
+        GrammarNode star = new GrammarNode(new Token("MUL"));
+        GrammarNode question = new GrammarNode(new Token("QUESTION"));
+        GrammarNode plus = new GrammarNode(new Token("ADD"));
+        GrammarNode bar = new GrammarNode(new Token("BITOR"));
+        GrammarNode stringLiteral = new GrammarNode(new Token("STRING_LITERAL"));
+        GrammarNode lbrace = new GrammarNode(new Token("LBRACE"));
+        GrammarNode rbrace = new GrammarNode(new Token("RBRACE"));
+
+        GrammarNode statements = new GrammarNode("statements",GrammarNodeType.Or);
+        GrammarNode statement = new GrammarNode("statement",GrammarNodeType.And);
+        GrammarNode exp = new GrammarNode("exp",GrammarNodeType.And);
+        GrammarNode and = new GrammarNode("and",GrammarNodeType.And);
+        GrammarNode pri = new GrammarNode("pri",GrammarNodeType.Or);
+        GrammarNode multiple = new GrammarNode(GrammarNodeType.Or);
+        GrammarNode bracedExp = new GrammarNode(GrammarNodeType.And);
+
+        //grammar
+        grammar.addChild(statement);
+
+        //statements
+        statements.addChild(statement);
+        //statements.addChild(GrammarNode.EPSILON);
+        statements.addChild(statements);
+
+        //statement
+        statement.addChild(id);
+        statement.addChild(colon);
+        statement.addChild(exp);
+        statement.addChild(semi);
+
+        //exp
+        exp.addChild(exp);
+        exp.addChild(bar);
+        exp.addChild(and);
+
+        //and
+        and.addChild(and);
+        and.addChild(pri);
+        //and.addChild(multiple);
+        multiple.addChild(star);
+        multiple.addChild(question);
+        multiple.addChild(plus);
+        multiple.addChild(GrammarNode.EPSILON);
+
+        //pri
+        pri.addChild(id);
+        pri.addChild(stringLiteral);
+        pri.addChild(bracedExp);
+        bracedExp.addChild(lbrace);
+        bracedExp.addChild(exp);
+        bracedExp.addChild(rbrace);
+
+        return grammar;
+    }
+
+    public static GrammarNode simpleRepeat() {
+        GrammarNode stmts = new GrammarNode("stmts", GrammarNodeType.Or);
+        stmts.createChild( GrammarNodeType.Epsilon);
+        GrammarNode stmts1 = stmts.createChild( GrammarNodeType.And);
+        GrammarNode stmt = stmts1.createChild("stmt", GrammarNodeType.Or);
+        stmts1.addChild(stmts);
+        stmt.createChild(new Token("ID"));
+        return stmts;
     }
 
 }

@@ -59,6 +59,7 @@ public class GrammarNode {
     }
 
     protected GrammarNode(Token token){
+        this.type = GrammarNodeType.Token;
         this.token = token;
     }
 
@@ -108,7 +109,13 @@ public class GrammarNode {
     protected void addChild(GrammarNode child){
         children.add(child);
         if (child.name == null){
-            child.name = "_"+child.type+children.size();
+            if (child.getGrammarName() != null) {
+                child.name = "_" + child.getGrammarName() + children.size();
+            }
+            else{
+                child.name = "_" + child.type + children.size();
+            }
+
             if (this.name!=null){
                 child.name = this.name + child.name;
             }

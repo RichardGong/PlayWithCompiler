@@ -58,11 +58,13 @@ public class LRParser {
      * @return
      */
     public static ASTNode parse(String script, GrammarNode grammar) {
+        System.out.println("Grammar:");
         grammar.dump();
 
         //转化成NFA
         List<GrammarNode> allNodes = new LinkedList<GrammarNode>();
         GrammarNFAState startNFAState = grammarToNFA(grammar, allNodes);
+        System.out.println("\nNFA:");
         startNFAState.dump();
 
         //取下所有的命名元素的名称，包括非终结符名称和终结符的名称，待用
@@ -80,17 +82,18 @@ public class LRParser {
 
         //计算所有NFA状态的闭包
         Map<State, Set<State>> closures = calcClosure(startNFAState);
-        for (State state : closures.keySet()){
-            Set<State> closure = closures.get(state);
-            System.out.print("Closure " + state.getName() + " -> ");
-            for (State state1 : closure){
-                System.out.print(" " + state1.getName());
-            }
-            System.out.println();
-        }
+//        for (State state : closures.keySet()){
+//            Set<State> closure = closures.get(state);
+//            System.out.print("Closure " + state.getName() + " -> ");
+//            for (State state1 : closure){
+//                System.out.print(" " + state1.getName());
+//            }
+//            System.out.println();
+//        }
 
         //把NFA转换成DFA
         List<DFAState> dfaStates = NFA2DFA(startNFAState, grammarNames, closures);
+        System.out.println("\nDFA:");
         dfaStates.get(0).dump();
 
         //TODO：在这里可以检查语法是否合法，比如是否存在reduce/reduce或shift/reduce冲突
@@ -101,6 +104,7 @@ public class LRParser {
 
         //语法分析
         ASTNode rootNode = shiftReduce(new Stack<ASTNode>(), tokenReader, dfaStates.get(0));
+        System.out.println("\nAST:");
         rootNode.dump();
 
         return rootNode;
@@ -257,15 +261,13 @@ public class LRParser {
         //2.2从名称查找GrammarNode的一个表
         Map<String, GrammarNode> nodes = new HashMap<String, GrammarNode>();
         for (GrammarNode node : allNodes) {
-            System.out.print(node.getName() + " ");
-            System.out.println(node.getText());
             nodes.put(node.getName(), node);
         }
 
         //2.3为每个GrammarNode中的命名节点生成一个或多个产生式。
         //比如，add -> add + mul | mul 会被拆成两个产生式：add->add + mul，以及 add->mul
         //但右边存在未被充分拆解，比如： add -> add (+ | -) mul。其中的（+|-）还需要进一步拆解。
-        List<Production> productions = new LinkedList<Production>();
+        Set<Production> productions = new HashSet<Production>();
         generateProduction(nodes, productions);
 
         //2.4把产生式右边的Or节点都展开，变成最简单的产生式。
@@ -274,6 +276,7 @@ public class LRParser {
         simplifyProductions(nodes, productions);
 
         //打印所有产生式看看
+        System.out.println("\nProductions:");
         for (Production production : productions) {
             System.out.println(production);
         }
@@ -309,24 +312,24 @@ public class LRParser {
      * @param nodes
      * @param productions
      */
-    private static void generateProduction(Map<String, GrammarNode> nodes, List<Production> productions) {
+    private static void generateProduction(Map<String, GrammarNode> nodes, Set<Production> productions) {
         for (String name : nodes.keySet()) {
             GrammarNode node = nodes.get(name);
             if (node.isNamedNode()) {
                 if (node.getType() == GrammarNodeType.Or) {
                     for (GrammarNode child : node.children()) {
                         Production production = new Production();
-                        productions.add(production);
                         production.lhs = node.getName();
                         production.rhs.add(child.getName());
+                        productions.add(production);
                     }
                 } else if (node.getType() == GrammarNodeType.And) {
                     Production production = new Production();
-                    productions.add(production);
                     production.lhs = node.getName();
                     for (GrammarNode child : node.children()) {
                         production.rhs.add(child.getName());
                     }
+                    productions.add(production);
                 }
             }
         }
@@ -339,14 +342,14 @@ public class LRParser {
      * @param nodes
      * @param productions
      */
-    private static void simplifyProductions(Map<String, GrammarNode> nodes, List<Production> productions) {
+    private static void simplifyProductions(Map<String, GrammarNode> nodes, Set<Production> productions) {
         boolean modified = true;
 
         int round = 1;
         while (modified) {
             System.out.println("round:" + round++);
-            List<Production> toRemove = new LinkedList<Production>();
-            List<Production> newProductions = new LinkedList<Production>();
+            Set<Production> toRemove = new HashSet<Production>();
+            Set<Production> newProductions = new HashSet<Production>();
             for (Production production : productions) {
                 for (int i = 0; i < production.rhs.size(); i++) {
                     String name = production.rhs.get(i);
@@ -357,7 +360,6 @@ public class LRParser {
                             for (int j = 0; j < node.getChildCount(); j++) {
                                 //创建一个新的产生式
                                 Production newProduction = new Production();
-                                newProductions.add(newProduction);
                                 newProduction.lhs = production.lhs;
                                 //拷贝or左边的部分
                                 for (int k = 0; k < i; k++)
@@ -371,13 +373,14 @@ public class LRParser {
                                 //拷贝or右边的部分
                                 for (int k = i + 1; k < production.rhs.size(); k++)
                                     newProduction.rhs.add(production.rhs.get(k));
+
+                                newProductions.add(newProduction);
                             }
 
                             break; //每次只替换右边的一个节点就行
                         } else if (node.getType() == GrammarNodeType.And) {
                             toRemove.add(production);
                             Production newProduction = new Production();
-                            newProductions.add(newProduction);
                             newProduction.lhs = production.lhs;
 
                             //拷贝add左边的部分
@@ -395,11 +398,12 @@ public class LRParser {
                             for (int k = i + 1; k < production.rhs.size(); k++)
                                 newProduction.rhs.add(production.rhs.get(k));
 
+                            newProductions.add(newProduction);
+
                             break; //每次只替换右边的一个节点就行
                         } else if (node.getType() == GrammarNodeType.Token) {
                             toRemove.add(production);
                             Production newProduction = new Production();
-                            newProductions.add(newProduction);
                             newProduction.lhs = production.lhs;
 
                             //拷贝Token左边的部分
@@ -411,6 +415,26 @@ public class LRParser {
                             //拷贝add右边的部分
                             for (int k = i + 1; k < production.rhs.size(); k++)
                                 newProduction.rhs.add(production.rhs.get(k));
+
+                            newProductions.add(newProduction);
+                        }
+
+                        else if (node.getType() == GrammarNodeType.Epsilon) {
+                            toRemove.add(production);
+                            Production newProduction = new Production();
+                            newProduction.lhs = production.lhs;
+
+                            //拷贝Token左边的部分
+                            for (int k = 0; k < i; k++)
+                                newProduction.rhs.add(production.rhs.get(k));
+                            //把Token的子节点替换上来
+                            newProduction.rhs.add(node.getType().toString());
+
+                            //拷贝add右边的部分
+                            for (int k = i + 1; k < production.rhs.size(); k++)
+                                newProduction.rhs.add(production.rhs.get(k));
+
+                            newProductions.add(newProduction);
                         }
                     }
                 }
@@ -434,7 +458,7 @@ public class LRParser {
      * @param productions
      * @return
      */
-    private static void calcSubGraphs(List<Production> productions, Map<Production,
+    private static void calcSubGraphs(Set<Production> productions, Map<Production,
             GrammarNFAState> subGraphs, List<GrammarNFAState> states) {
         for (Production production : productions) {
             Item item = new Item(production, 0);
@@ -448,7 +472,12 @@ public class LRParser {
                 item = new Item(production, i + 1);
                 state = new GrammarNFAState(item);
                 states.add(state);
-                lastState.addTransition(new GrammarTransition(production.rhs.get(i)), state);
+                if (production.rhs.get(i).equals("Epsilon")) {
+                    lastState.addTransition(new GrammarTransition(), state);
+                }
+                else{
+                    lastState.addTransition(new GrammarTransition(production.rhs.get(i)), state);
+                }
                 lastState = state;
             }
         }
@@ -666,7 +695,7 @@ public class LRParser {
      */
     private static class Production {
         //产生式左侧，非终结符名称
-        String lhs = null;
+        String lhs = "";
         //产生式右侧
         List<String> rhs = new LinkedList<String>();
         //GrammarNode grammar;
@@ -674,11 +703,24 @@ public class LRParser {
         Production() {
         }
 
-        Production(GrammarNode grammar) {
-            lhs = grammar.getName();
-            for (int i = 0; i < grammar.getChildCount(); i++) {
-                rhs.add(grammar.getChild(i).getName());
-            }
+        @Override
+        public int hashCode() {
+            return toString().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+
+            Production production = (Production)obj;
+
+            if (!production.lhs.equals(lhs)) return false;
+
+            if (production.rhs.size() != rhs.size()) return false;
+
+            if (!production.rhs.containsAll(rhs)) return false;
+
+            return true;
         }
 
         @Override
@@ -692,6 +734,7 @@ public class LRParser {
 
             return sb.toString();
         }
+
     }
 
     /**
