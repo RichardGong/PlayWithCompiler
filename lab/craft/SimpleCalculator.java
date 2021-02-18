@@ -160,7 +160,7 @@ public class SimpleCalculator {
                     tokens.read();      //消耗掉等号
                     SimpleASTNode child = additive(tokens);  //匹配一个表达式
                     if (child == null) {
-                        throw new Exception("invalide variable initialization, expecting an expression");
+                        throw new Exception("invalid variable initialization, expecting an expression");
                     }
                     else{
                         node.addChild(child);
