@@ -34,7 +34,7 @@ public class TypeResolver extends PlayScriptBaseListener {
         Scope scope = at.enclosingScopeOfNode(ctx);
 
         //Aaaaaaaaaaayou同学请看这里。
-        if (scope instanceof Class  || enterLocalVariable){
+        if (scope instanceof Class  || enterLocalVariable ){
             // 设置变量类型
             Type type = (Type) at.typeOfNode.get(ctx.typeType());
 
@@ -53,7 +53,8 @@ public class TypeResolver extends PlayScriptBaseListener {
 
         //第一步只把类的成员变量入符号表。在变量消解时，再把本地变量加入符号表，一边Enter，一边消解。
         //Aaaaaaaaaaayou同学请看这里。
-        if (scope instanceof Class || enterLocalVariable) {
+        //2021-3-4 添加了函数参数，上次修改不小心丢掉了这个场景:-(
+        if (scope instanceof Class || enterLocalVariable || ctx.parent instanceof FormalParameterContext) {
             Variable variable = new Variable(idName, scope, ctx);
 
             //变量查重

@@ -35,10 +35,11 @@ public class RefResolver extends PlayScriptBaseListener {
 
     //把本地变量加到符号表。本地变量必须是边添加，边解析，不能先添加后解析，否则会引起引用消解的错误。
     //Aaaaaaaaaaayou同学请看这里。
+    //2021-3-4 添加了scope是Function的情况，上次修改不小心漏掉了:-(
     @Override
     public void enterVariableDeclarators(VariableDeclaratorsContext ctx) {
         Scope scope = at.enclosingScopeOfNode(ctx);
-        if (scope instanceof BlockScope){
+        if (scope instanceof BlockScope || scope instanceof Function){
             typeResolverWalker.walk(localVariableEnter, ctx);
         }
     }
