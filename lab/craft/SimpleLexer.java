@@ -273,6 +273,8 @@ public class SimpleLexer {
         while ((token= tokenReader.read())!=null){
             System.out.println(token.getText()+"\t\t"+token.getType());
         }
+        //此处应该重置pos，否则打印完以后，指针已到token流的末尾，后续如果继续调用TokenReader会导致错误。
+        tokenReader.setPosition(0);
     }
 
     /**
