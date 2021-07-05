@@ -187,13 +187,11 @@ public class SimpleParser {
                 throw new Exception("variable name expected");
             }
 
-            if (node != null) {
-                token = tokens.peek();
-                if (token != null && token.getType() == TokenType.SemiColon) {
-                    tokens.read();
-                } else {
-                    throw new Exception("invalid statement, expecting semicolon");
-                }
+            token = tokens.peek();
+            if (token != null && token.getType() == TokenType.SemiColon) {
+                tokens.read();
+            } else {
+                throw new Exception("invalid statement, expecting semicolon");
             }
         }
         return node;
@@ -237,7 +235,9 @@ public class SimpleParser {
     private SimpleASTNode multiplicative(TokenReader tokens) throws Exception {
         SimpleASTNode child1 = primary(tokens);
         SimpleASTNode node = child1;
-
+        if node == null {
+            return node
+        }
         while (true) {
             Token token = tokens.peek();
             if (token != null && (token.getType() == TokenType.Star || token.getType() == TokenType.Slash)) {
@@ -248,7 +248,7 @@ public class SimpleParser {
                     node.addChild(child1);
                     node.addChild(child2);
                     child1 = node;
-                }else{
+                } else {
                     throw new Exception("invalid multiplicative expression, expecting the right part.");
                 }
             } else {
